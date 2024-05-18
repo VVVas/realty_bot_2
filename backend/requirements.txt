@@ -1,0 +1,8 @@
+# Django==3.2.21
+# django-filter==23.2
+# djangorestframework==3.12.4
+# djoser==2.1.0
+# Pillow==9.3.0
+# psycopg2-binary==2.9.3
+
+# gunicorn==20.1.0
