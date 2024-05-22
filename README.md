@@ -14,5 +14,10 @@
 Python, Django, Docker  
 
 ## Авторы
+Кавтырев Максим, https://github.com/h-inek  
 Мишустин Василий, v@vvvas.ru, https://github.com/VVVas  
-Сделано в Мастерской программирования Яндекс.Практикума  
+Песчанов Никита, https://github.com/ItWasCain  
+Сулайманова Сайкал, https://github.com/saikal12  
+Турубанов Евгений, https://github.com/eturubanov  
+
+Сделано в Мастерской программирования Яндекс.Практикума под руководством Александрова Романа, https://github.com/teamofroman  
