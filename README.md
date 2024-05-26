@@ -11,7 +11,7 @@
 Запустите docker compose -f docker-compose.production.yml up -d  
 
 ## Стек технологий
-Python, Django, Docker  
+Python 3.11, Django 4.2.13, Docker  
 
 ## Авторы
 Кавтырев Максим, https://github.com/h-inek  
