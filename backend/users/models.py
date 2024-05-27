@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
 
+from realties.models import Ad
+
 
 class User(AbstractUser):
 
@@ -41,3 +43,32 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.external_id} - {self.first_name} {self.last_name}'
+
+
+class Favorite(models.Model):
+    """
+    Модель избранного.
+    favorite_ad - можно получить объявления, добавленные юзером в избранное.
+    favorite_users - можно получить юзеров, добавивших объявление в избранное.
+    """
+    user = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='favorite_ad',
+        verbose_name='Пользователь',
+    )
+    ad = models.ForeignKey(
+        Ad,
+        on_delete=models.CASCADE,
+        related_name='favorite_users',
+        verbose_name='Объявление',
+    )
+
+    class Meta:
+        verbose_name = 'избранное'
+        verbose_name_plural = 'избранное'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'ad'],
+                name='unique_user_ad')
+        ]
