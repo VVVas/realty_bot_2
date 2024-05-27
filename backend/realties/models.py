@@ -19,7 +19,8 @@ class City(models.Model):
         'Название', max_length=16, null=False
     )
     timezone = models.CharField(
-        'Часовой пояс (от Москвы)', max_length=3, null=True
+        'Часовой пояс (по UTC)', max_length=3, null=True,
+        help_text='Пример записи для Москвы: +3. Для Новосибирска: +7'
     )
 
     class Meta:
@@ -80,18 +81,18 @@ class Ad(models.Model):
         'Название объявления', max_length=128, null=True
     )
     realty = models.ForeignKey(
-        'Место, в котором выставлено объвление', Realty,
+        'Место, в котором выставлено объявление', Realty,
         on_delete=models.DO_NOTHING
     )
     address = models.CharField(
         'Точный адрес объявления',
         max_length=256, null=False
     )
-    date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True
-    )
     additional_information = models.TextField(
         'Дополнительная информация',
+    )
+    date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True
     )
 
 
