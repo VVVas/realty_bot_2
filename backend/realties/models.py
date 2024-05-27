@@ -32,9 +32,6 @@ class Realty(models.Model):
     title = models.CharField(
         'Название недвижимости', max_length=128, null=True
     )
-    management_company = models.CharField(
-        'Название управляющей компании', max_length=128, null=True
-    )
     phone_number = models.TextField(
         'Номер стационарного телефона', null=True
     )
@@ -94,6 +91,7 @@ class Ad(models.Model):
     date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
+    is_published = models.BooleanField('Актуальность объявления', default=True)
 
 
 class Photo(models.Model):
