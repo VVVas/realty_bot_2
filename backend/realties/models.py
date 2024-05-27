@@ -1,5 +1,7 @@
 from django.db import models
 
+from users.models import Profile
+
 
 class Category(models.Model):
     """Модель категории объявления."""
@@ -96,7 +98,10 @@ class Photo(models.Model):
         'Фотография для объявления',
         Ad, on_delete=models.CASCADE, related_name='photos', null=True
     )
-    # user = Здесь будет связь с моделью юзера
+    user = models.ForeignKey(
+        'Связь с моделью юзера',
+        Profile, on_delete=models.DO_NOTHING, related_name='photos'
+    )
 
 
 class Comment(models.Model):
@@ -109,6 +114,9 @@ class Comment(models.Model):
     )
     ad = models.ForeignKey(
         'Связь с моделью объявления',
-        Ad, on_delete=models.CASCADE, related_name='photos', null=True
+        Ad, on_delete=models.CASCADE, related_name='comment', null=True
     )
-    # user = Здесь будет связь с моделью юзера
+    user = models.ForeignKey(
+        'Связь с моделью юзера',
+        Profile, on_delete=models.DO_NOTHING, related_name='comment'
+    )
