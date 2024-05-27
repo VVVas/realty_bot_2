@@ -51,12 +51,12 @@ class Favorite(models.Model):
     favorite_ad - можно получить объявления, добавленные юзером в избранное.
     favorite_users - можно получить юзеров, добавивших объявление в избранное.
     """
-    # user = models.ForeignKey(
-    #     User,
-    #     on_delete=models.CASCADE,
-    #     related_name='favorite_ad',
-    #     verbose_name='Пользователь',
-    # ) Здесь будет связь с юзером
+    user = models.ForeignKey(
+        Profile,
+        on_delete=models.CASCADE,
+        related_name='favorite_ad',
+        verbose_name='Пользователь',
+    )
     ad = models.ForeignKey(
         Ad,
         on_delete=models.CASCADE,
