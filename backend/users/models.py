@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -19,7 +20,7 @@ class Profile(models.Model):
         unique=True,
     )
     username = models.CharField(
-        'Имя пользователя', max_length=255,
+        'Имя пользователя', max_length=255, blank=True
     )
     first_name = models.CharField(
         'Имя', max_length=255,
@@ -29,6 +30,9 @@ class Profile(models.Model):
     )
     is_active = models.BooleanField(
         'Активный', default=True,
+    )
+    date_joined = models.DateTimeField(
+        'Дата регистрации', default=timezone.now
     )
 
     class Meta:
