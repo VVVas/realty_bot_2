@@ -4,7 +4,7 @@ from users.models import Profile
 
 
 class Category(models.Model):
-    """Модель категории объявления."""
+    """Модель категории недвижимости."""
     title = models.CharField(
         'Название', max_length=32, null=False
     )
@@ -26,31 +26,34 @@ class City(models.Model):
         ordering = ('title',)
 
 
-class RealtyAd(models.Model):
-    """Модель торгового центра/склада."""
+class Realty(models.Model):
+    """Модель недвижимости."""
     title = models.CharField(
-        'Название торогового центра/склада', max_length=128, null=True
+        'Название недвижимости', max_length=128, null=True
     )
     management_company = models.CharField(
         'Название управляющей компании', max_length=128, null=True
     )
-    phone_number = models.CharField(
-        'Номер стационарного телефона', max_length=16, null=True
+    phone_number = models.TextField(
+        'Номер стационарного телефона', null=True
     )
-    mobile_number = models.CharField(
-        'Номер мобильного телефона', max_length=16, null=True
+    mobile_number = models.TextField(
+        'Номер мобильного телефона', null=True
+    )
+    number = models.TextField(
+        'Номер бесплатной линии 8800', null=True
     )
     address = models.CharField(
         'Адрес', max_length=256, null=False
     )
-    email = models.EmailField(
-        'Электронная почта', max_length=32, null=True
+    email = models.TextField(
+        'Электронная почта', null=True
     )
-    website = models.CharField(
-        'Сайт', max_length=32, null=True
+    site = models.TextField(
+        'Сайт', null=True
     )
-    contact_name = models.CharField(
-        'Контактное лицо', max_length=32, null=True
+    contact_name = models.TextField(
+        'Контактное лицо', null=True
     )
     city = models.OneToOneField(
         'Город', City, on_delete=models.DO_NOTHING
@@ -61,10 +64,13 @@ class RealtyAd(models.Model):
     img = models.FileField(
         'Фото', null=True
     )
+    additional_information = models.TextField(
+        'Дополнительная информация',
+    )
 
     class Meta:
-        verbose_name = 'Торговый центры'
-        verbose_name_plural = 'торговые центры'
+        verbose_name = 'Недвижимость'
+        verbose_name_plural = 'недвижимости'
         ordering = ('title',)
 
 
@@ -73,13 +79,16 @@ class Ad(models.Model):
     title = models.CharField(
         'Название объявления', max_length=128, null=True
     )
-    realty_place = models.ForeignKey(
-        'Место, в котором выставлено объвление', RealtyAd,
+    realty = models.ForeignKey(
+        'Место, в котором выставлено объвление', Realty,
         on_delete=models.DO_NOTHING
     )
     address = models.CharField(
         'Точный адрес объявления',
         max_length=256, null=False
+    )
+    date = models.DateTimeField(
+        'Дата добавления', auto_now_add=True, db_index=True
     )
     additional_information = models.TextField(
         'Дополнительная информация',
@@ -88,7 +97,7 @@ class Ad(models.Model):
 
 class Photo(models.Model):
     """Модель фотографии к объявлению."""
-    date_create = models.DateTimeField(
+    date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
     img = models.FileField(
@@ -102,6 +111,7 @@ class Photo(models.Model):
         'Связь с моделью юзера',
         Profile, on_delete=models.DO_NOTHING, related_name='photos'
     )
+    is_validate = models.BooleanField('Премодерация админом')
 
 
 class Comment(models.Model):
@@ -120,3 +130,4 @@ class Comment(models.Model):
         'Связь с моделью юзера',
         Profile, on_delete=models.DO_NOTHING, related_name='comment'
     )
+    is_validate = models.BooleanField('Премодерация админом')
