@@ -91,7 +91,7 @@ class Ad(models.Model):
     date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
-    published = models.BooleanField('Актуальность объявления')
+    is_published = models.BooleanField('Актуальность объявления', default=True)
 
 
 class Photo(models.Model):
