@@ -11,6 +11,11 @@ class Category(models.Model):
 
     class Meta:
         ordering = ('title',)
+        verbose_name = 'Категория'
+        verbose_name_plural = 'категории'
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class City(models.Model):
@@ -25,6 +30,11 @@ class City(models.Model):
 
     class Meta:
         ordering = ('title',)
+        verbose_name = 'Город'
+        verbose_name_plural = 'города'
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class Realty(models.Model):
@@ -60,7 +70,7 @@ class Realty(models.Model):
         Category, on_delete=models.DO_NOTHING
     )
     img = models.FileField(
-        'Фото', null=True
+        'Фото', null=True, upload_to='images/'
     )
     additional_information = models.TextField(
         'Дополнительная информация',
@@ -70,6 +80,9 @@ class Realty(models.Model):
         verbose_name = 'Недвижимость'
         verbose_name_plural = 'недвижимости'
         ordering = ('title',)
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class Ad(models.Model):
@@ -91,7 +104,11 @@ class Ad(models.Model):
     date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
-    is_published = models.BooleanField('Актуальность объявления', default=True)
+    is_published = models.BooleanField('Опубликовано', default=True)
+
+    class Meta:
+        verbose_name = 'Объявление'
+        verbose_name_plural = 'объявления'
 
 
 class Photo(models.Model):
@@ -110,6 +127,10 @@ class Photo(models.Model):
     )
     is_validate = models.BooleanField('Премодерация админом')
 
+    class Meta:
+        verbose_name = 'Фото'
+        verbose_name_plural = 'фото'
+
 
 class Comment(models.Model):
     """Модель комментария к объявлению."""
@@ -126,6 +147,10 @@ class Comment(models.Model):
         Profile, on_delete=models.DO_NOTHING, related_name='comment'
     )
     is_validate = models.BooleanField('Премодерация админом')
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'комментарии'
 
 
 class Favorite(models.Model):
