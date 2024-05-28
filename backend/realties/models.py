@@ -54,10 +54,10 @@ class Realty(models.Model):
         'Контактное лицо', null=True
     )
     city = models.OneToOneField(
-        'Город', City, on_delete=models.DO_NOTHING
+        City, on_delete=models.DO_NOTHING
     )
     category = models.ForeignKey(
-        'Категория', Category, on_delete=models.DO_NOTHING
+        Category, on_delete=models.DO_NOTHING
     )
     img = models.FileField(
         'Фото', null=True
@@ -78,7 +78,7 @@ class Ad(models.Model):
         'Название объявления', max_length=128, null=True
     )
     realty = models.ForeignKey(
-        'Место, в котором выставлено объявление', Realty,
+        Realty,
         on_delete=models.DO_NOTHING
     )
     address = models.CharField(
@@ -103,11 +103,9 @@ class Photo(models.Model):
         'Фото', null=True
     )
     ad = models.ForeignKey(
-        'Фотография для объявления',
         Ad, on_delete=models.CASCADE, related_name='photos', null=True
     )
     user = models.ForeignKey(
-        'Связь с моделью юзера',
         Profile, on_delete=models.DO_NOTHING, related_name='photos'
     )
     is_validate = models.BooleanField('Премодерация админом')
@@ -122,11 +120,9 @@ class Comment(models.Model):
         'Текст объявления', null=False
     )
     ad = models.ForeignKey(
-        'Связь с моделью объявления',
         Ad, on_delete=models.CASCADE, related_name='comment', null=True
     )
     user = models.ForeignKey(
-        'Связь с моделью юзера',
         Profile, on_delete=models.DO_NOTHING, related_name='comment'
     )
     is_validate = models.BooleanField('Премодерация админом')
