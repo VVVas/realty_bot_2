@@ -1,9 +1,16 @@
+import os
 from pathlib import Path
+
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env_file_path = '../../infra/.env'
+load_dotenv(dotenv_path=env_file_path)
 
+TOKEN_BOT = os.getenv('TOKEN_BOT', default='XXXXXXXXXXXXX')
+GENERAL_URL = os.getenv('GENERAL_URL', default='https://mysite.com/')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 

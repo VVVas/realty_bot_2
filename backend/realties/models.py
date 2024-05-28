@@ -63,7 +63,7 @@ class Realty(models.Model):
     contact_name = models.TextField(
         'Контактное лицо', null=True
     )
-    city = models.OneToOneField(
+    city = models.ForeignKey(
         City, on_delete=models.DO_NOTHING
     )
     category = models.ForeignKey(
