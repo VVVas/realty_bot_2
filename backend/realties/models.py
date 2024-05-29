@@ -82,7 +82,7 @@ class Realty(models.Model):
 
     class Meta:
         verbose_name = 'Недвижимость'
-        verbose_name_plural = 'недвижимости'
+        verbose_name_plural = 'недвижимость'
         ordering = ('title',)
 
     def __str__(self) -> str:

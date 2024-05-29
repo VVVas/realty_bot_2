@@ -1,4 +1,7 @@
 from django.contrib import admin
+from django.db import models
+from django.apps import apps
+from django.forms import TextInput, Textarea
 from import_export.admin import ImportExportModelAdmin
 from django.contrib.admin import display
 from django.utils.safestring import mark_safe
@@ -26,10 +29,14 @@ class RealtyAdmin(ImportExportModelAdmin):
     list_display = (
         'title', 'city', 'address', 'category', 'image_preview',
     )
-    list_filter = ('city', 'category',)
     search_fields = ('title', 'city', 'address')
     list_filter = ()
     resource_class = RealtyResource
+
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size': '40'})},
+        models.TextField: {'widget': Textarea(attrs={'rows': 2, 'cols': 40})},
+    }
 
     @mark_safe
     @display(description='Фото')

@@ -5,4 +5,4 @@ from .models import Realty
 class RealtyResource(resources.ModelResource):
     class Meta:
         model = Realty
-        exclude = ['city', 'img']
+        exclude = ['img']
