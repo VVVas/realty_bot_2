@@ -8,7 +8,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env_file_path = '../../infra/.env'
 load_dotenv(dotenv_path=env_file_path)
-
 TOKEN_BOT = os.getenv('TOKEN_BOT', default='XXXXXXXXXXXXX')
 GENERAL_URL = os.getenv('GENERAL_URL', default='https://mysite.com/')
 # Quick-start development settings - unsuitable for production
@@ -32,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'import_export',
     'bot.apps.BotConfig',
     'users.apps.UsersConfig',
     'realties.apps.RealtiesConfig',
@@ -121,3 +121,5 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.User'
+
+IMPORT_EXPORT_USE_TRANSACTIONS = True

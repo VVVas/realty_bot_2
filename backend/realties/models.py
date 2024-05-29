@@ -64,10 +64,14 @@ class Realty(models.Model):
         'Контактное лицо', null=True
     )
     city = models.ForeignKey(
-        City, on_delete=models.DO_NOTHING
+        City,
+        on_delete=models.DO_NOTHING,
+        verbose_name='Город',
     )
     category = models.ForeignKey(
-        Category, on_delete=models.DO_NOTHING
+        Category,
+        on_delete=models.DO_NOTHING,
+        verbose_name='Категория',
     )
     img = models.FileField(
         'Фото', null=True, upload_to='images/'
@@ -78,7 +82,7 @@ class Realty(models.Model):
 
     class Meta:
         verbose_name = 'Недвижимость'
-        verbose_name_plural = 'недвижимости'
+        verbose_name_plural = 'недвижимость'
         ordering = ('title',)
 
     def __str__(self) -> str:
@@ -92,7 +96,8 @@ class Ad(models.Model):
     )
     realty = models.ForeignKey(
         Realty,
-        on_delete=models.DO_NOTHING
+        on_delete=models.DO_NOTHING,
+        verbose_name='Объект',
     )
     address = models.CharField(
         'Точный адрес объявления',
