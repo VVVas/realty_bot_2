@@ -27,7 +27,7 @@ class UserAdmin(UserAdmin):
 class ProfileAdmin(admin.ModelAdmin):
     list_display = (
         'external_id', 'username', 'first_name', 'last_name',
-        'favorite_count', 'comments_count', 'is_active',
+        'favorite_count', 'comments_count', 'status',
     )
     list_display_links = ['username']
     # readonly_fields = ('external_id',)
@@ -52,6 +52,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class CityAdmin(admin.ModelAdmin):
     list_display = ('title', 'timezone',)
     search_fields = ('title',)
+
 
 @admin.register(Realty)
 class RealtyAdmin(admin.ModelAdmin):
