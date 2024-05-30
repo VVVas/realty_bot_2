@@ -8,7 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env_file_path = '../../infra/.env'
 load_dotenv(dotenv_path=env_file_path)
-TOKEN_BOT = os.getenv('TOKEN_BOT', default='XXXXXXXXXXXXX')
+TOKEN_BOT = '7186459956:AAEVCKeGIyQvlG3t4MEvxgt1nSzic3k7-7k'
+# TOKEN_BOT = os.getenv('TOKEN_BOT', default='XXXXXXXXXXXXX')
 GENERAL_URL = os.getenv('GENERAL_URL', default='https://mysite.com/')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -31,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rangefilter',
     'import_export',
     'bot.apps.BotConfig',
     'users.apps.UsersConfig',
