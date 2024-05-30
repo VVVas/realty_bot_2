@@ -8,7 +8,7 @@ from telegram.ext import (
     CallbackContext,
 )
 
-from .models import Message
+from .models import BotMessage
 
 
 HELLO, INFO, WORK = range(3)
@@ -17,7 +17,7 @@ HELLO, INFO, WORK = range(3)
 def start(update: Update, _: CallbackContext):
     reply_keyboard = [['Информация о боте', 'Начать поиск недвижимости']]
     update.message.reply_text(
-        Message.objects.filter(keyword='START')[0].text,
+        BotMessage.objects.filter(keyword='START')[0].text,
         reply_markup=ReplyKeyboardMarkup(
             reply_keyboard, one_time_keyboard=True
         )
@@ -28,7 +28,7 @@ def start(update: Update, _: CallbackContext):
 
 def info(update: Update, _: CallbackContext):
     update.message.reply_text(
-        Message.objects.filter(keyword='HELP')[0].text
+        BotMessage.objects.filter(keyword='HELP')[0].text
     )
 
     return ConversationHandler.END
@@ -42,7 +42,7 @@ def work(update: Update, _: CallbackContext):
 
 def cancel(update: Update, _: CallbackContext):
     update.message.reply_text(
-        Message.objects.filter(keyword='CANCEL')[0].text
+        BotMessage.objects.filter(keyword='CANCEL')[0].text
     )
 
     return ConversationHandler.END
