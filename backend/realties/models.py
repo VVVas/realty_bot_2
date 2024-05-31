@@ -43,25 +43,25 @@ class Realty(models.Model):
         'Название недвижимости', max_length=128, null=True
     )
     phone_number = models.TextField(
-        'Номер стационарного телефона', null=True
+        'Номер стационарного телефона', blank=True, null=True
     )
     mobile_number = models.TextField(
-        'Номер мобильного телефона', null=True
+        'Номер мобильного телефона', blank=True, null=True
     )
     number = models.TextField(
-        'Номер бесплатной линии 8800', null=True
+        'Номер бесплатной линии 8800', blank=True, null=True
     )
     address = models.CharField(
-        'Адрес', max_length=256, null=False
+        'Адрес', max_length=256, blank=True, null=False
     )
     email = models.TextField(
-        'Электронная почта', null=True
+        'Электронная почта', blank=True, null=True
     )
     site = models.TextField(
-        'Сайт', null=True
+        'Сайт', blank=True, null=True
     )
     contact_name = models.TextField(
-        'Контактное лицо', null=True
+        'Контактное лицо', blank=True, null=True
     )
     city = models.ForeignKey(
         City,
@@ -72,9 +72,10 @@ class Realty(models.Model):
         Category,
         on_delete=models.DO_NOTHING,
         verbose_name='Категория',
+        blank=True, null=True,
     )
     img = models.FileField(
-        'Фото', null=True, upload_to='images/'
+        'Фото', blank=True, null=True, upload_to='images/'
     )
     additional_information = models.TextField(
         'Дополнительная информация',
@@ -115,6 +116,9 @@ class Ad(models.Model):
         verbose_name = 'Объявление'
         verbose_name_plural = 'объявления'
 
+    def __str__(self) -> str:
+        return self.title
+
 
 class Photo(models.Model):
     """Модель фотографии к объявлению."""
@@ -130,7 +134,9 @@ class Photo(models.Model):
     user = models.ForeignKey(
         Profile, on_delete=models.DO_NOTHING, related_name='photos'
     )
-    is_validate = models.BooleanField('Премодерация админом')
+    is_published = models.BooleanField(
+        'Премодерация админом', default=False
+    )
 
     class Meta:
         verbose_name = 'Фото'
@@ -151,7 +157,9 @@ class Comment(models.Model):
     user = models.ForeignKey(
         Profile, on_delete=models.DO_NOTHING, related_name='comment'
     )
-    is_validate = models.BooleanField('Премодерация админом')
+    is_published = models.BooleanField(
+        'Премодерация админом', default=False
+        )
 
     class Meta:
         verbose_name = 'Комментарий'

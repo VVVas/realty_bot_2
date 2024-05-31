@@ -2,6 +2,7 @@ from django.contrib import admin
 from django.contrib.admin import display
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
+from rangefilter.filters import DateRangeFilterBuilder
 
 from .models import Profile, User
 
@@ -31,6 +32,9 @@ class ProfileAdmin(admin.ModelAdmin):
     list_display_links = ['username']
     # readonly_fields = ('external_id',)
     list_per_page = 10
+    list_filter = (
+        ("date", DateRangeFilterBuilder()),
+    )
 
     @display(description='Избранное')
     def favorite_count(self, user):

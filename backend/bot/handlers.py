@@ -10,7 +10,6 @@ from telegram.ext import (
 
 from models import Message
 
-
 HELLO, INFO, WORK = range(3)
 
 
@@ -44,7 +43,6 @@ async def cancel(update: Update, _: CallbackContext):
     await update.message.reply_text(
         Message.objects.filter(keyword='CANCEL')[0].text
     )
-
     return ConversationHandler.END
 
 
