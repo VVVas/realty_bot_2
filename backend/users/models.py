@@ -7,8 +7,8 @@ from users import const
 class User(AbstractUser):
 
     class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'пользователи'
+        verbose_name = 'Администратор'
+        verbose_name_plural = 'администраторы'
         ordering = ('username',)
 
     def __str__(self):
@@ -45,8 +45,8 @@ class Profile(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Профиль'
-        verbose_name_plural = 'профили'
+        verbose_name = 'Профиль телеграм'
+        verbose_name_plural = 'профили телеграм'
 
     def __str__(self):
         return f'{self.external_id} - {self.first_name} {self.last_name}'

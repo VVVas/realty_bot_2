@@ -7,12 +7,16 @@ class BotMessage(models.Model):
     Сообщение будет привязано к боту, само сообщение можно менять через админку
     """
     keyword = models.CharField(
-        'Ключ', unique=True, max_length=128,
-        verbose_name='Ключ', verbose_name_plural='Ключи')
-    title = models.CharField('Заголовок', max_length=128,
-                             verbose_name='Заголовок', verbose_name_plural='Заголовоки')
-    text = models.TextField('Текст',
-                            verbose_name='Текст', verbose_name_plural='Тексты')
+        unique=True, max_length=128,
+        verbose_name='Ключ'
+    )
+    title = models.CharField(
+        max_length=128,
+        verbose_name='Заголовок'
+    )
+    text = models.TextField(
+        verbose_name='Текст'
+    )
 
     class Meta:
         verbose_name = 'Сообщение'
