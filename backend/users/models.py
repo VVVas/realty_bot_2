@@ -62,3 +62,11 @@ class Profile(models.Model):
     @property
     def is_blocked(self):
         return self.status == const.STATUS_BLOCKED
+
+    @classmethod
+    def get_default_tg_user_profile(cls):
+        tg_user_profile, _ = Profile.objects.get_or_create(
+            first_name='Unknown', external_id='1',
+            status=const.STATUS_BLOCKED,
+        )
+        return tg_user_profile.pk
