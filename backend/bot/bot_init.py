@@ -1,7 +1,7 @@
 from django.conf import settings
 from telegram.ext import Application
 
-from handlers import handler
+from .handlers import handler
 
 
 def telegram_application():

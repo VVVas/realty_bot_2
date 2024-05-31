@@ -45,15 +45,25 @@ class CityAdmin(ImportExportModelAdmin):
         return Realty.objects.filter(city=city).count()
 
 
+class AdInline(admin.TabularInline):
+    model = Ad
+    extra = 0
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size': '40'})},
+        models.TextField: {'widget': Textarea(attrs={'rows': 2, 'cols': 40})},
+    }
+
+
 @admin.register(Realty)
 class RealtyAdmin(ImportExportModelAdmin):
     list_display = (
-        'title', 'address', 'category', 'image_preview',
+        'title', 'city', 'address', 'category', 'image_preview',
     )
     search_fields = ('title', 'city__title', 'address')
     list_filter = ()
     resource_class = RealtyResource
     autocomplete_fields = ['category', 'city']
+    inlines = (AdInline,)
 
     formfield_overrides = {
         models.CharField: {'widget': TextInput(attrs={'size': '40'})},
@@ -79,6 +89,7 @@ class AdAdmin(admin.ModelAdmin):
     list_filter = (
         ("date", DateRangeFilterBuilder(title="Дата добавления",)),
     )
+    list_editable = ('is_published',)
     autocomplete_fields = ['realty']
     actions = [make_published, make_not_published]
 
@@ -91,6 +102,7 @@ class AdAdmin(admin.ModelAdmin):
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('user', 'ad', 'text', 'date_create', 'is_published',)
     list_filter = ('is_published',)
+    list_editable = ('is_published',)
     ordering = ('is_published', 'date_create')
     actions = [make_published, make_not_published]
 
@@ -99,6 +111,7 @@ class CommentAdmin(admin.ModelAdmin):
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ('user', 'ad', 'date', 'is_published', 'image_preview',)
     list_filter = ('is_published',)
+    list_editable = ('is_published',)
     actions = [make_published, make_not_published]
 
     @mark_safe

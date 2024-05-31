@@ -8,7 +8,7 @@ from telegram.ext import (
     CallbackContext,
 )
 
-from models import Message
+from .models import BotMessage
 
 HELLO, INFO, WORK = range(3)
 
