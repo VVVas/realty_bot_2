@@ -74,11 +74,10 @@ class Realty(models.Model):
         default=City.get_default_city_pk,
         verbose_name='Город',
     )
-    category = models.ForeignKey(
+    categories = models.ManyToManyField(
         Category,
-        on_delete=models.SET_NULL,
-        verbose_name='Категория',
-        blank=True, null=True,
+        related_name='categories',
+        verbose_name='Категории'
     )
     img = models.FileField(
         'Фото', blank=True, null=True, upload_to='images/'

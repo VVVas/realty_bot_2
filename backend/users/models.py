@@ -70,3 +70,10 @@ class Profile(models.Model):
             status=const.STATUS_BLOCKED,
         )
         return tg_user_profile.pk
+
+    @staticmethod
+    def delete_profile_and_comments(user):
+        user.comment.filter(user=user).delete()
+        user.photos.filter(user=user).delete()
+        user.save()
+        user.delete()

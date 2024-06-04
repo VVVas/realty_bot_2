@@ -8,7 +8,7 @@ from django.utils.safestring import mark_safe
 from rangefilter.filters import DateRangeFilterBuilder
 
 from .models import (
-    Ad, Category, City, Comment, Photo, Realty,
+    Ad, Category, City, Comment, Photo, Realty
 )
 from .resources import CategoryResource, CityResource, RealtyResource
 
@@ -25,13 +25,13 @@ def make_not_published(modeladmin, request, queryset):
 
 @admin.register(Category)
 class CategoryAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'title', 'realty_count',)
+    list_display = ('id', 'title', 'realty_count')
     search_fields = ('title',)
     resource_class = CategoryResource
 
     @display(description='Используется')
     def realty_count(self, category):
-        return Realty.objects.filter(category=category).count()
+        return Realty.objects.filter(categories=category).count()
 
 
 @admin.register(City)
@@ -57,18 +57,26 @@ class AdInline(admin.TabularInline):
 @admin.register(Realty)
 class RealtyAdmin(ImportExportModelAdmin):
     list_display = (
-        'title', 'city', 'address', 'category', 'image_preview',
+        'title', 'city', 'address', 'get_categories', 'image_preview',
     )
     search_fields = ('title', 'city__title', 'address')
     list_filter = ()
+    filter_horizontal = ('categories',)
     resource_class = RealtyResource
-    autocomplete_fields = ['category', 'city']
+    autocomplete_fields = ['city']
     inlines = (AdInline,)
 
     formfield_overrides = {
         models.CharField: {'widget': TextInput(attrs={'size': '40'})},
         models.TextField: {'widget': Textarea(attrs={'rows': 2, 'cols': 40})},
     }
+
+    @mark_safe
+    @display(description='Категории')
+    def get_categories(self, realty):
+        return ('<br />'.join(
+            item.title for item in realty.categories.all())
+        )
 
     @mark_safe
     @display(description='Фото')
