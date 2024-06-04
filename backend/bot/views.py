@@ -1,16 +1,23 @@
-import json
+from handlers2 import *
+from django.conf import settings
 
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-from telegram import Update
-
-from .bot_init import APPLICATION
+TOKEN = settings.TOKEN_BOT
 
 
-@csrf_exempt
-def process(request):
-    data = json.loads(request.body.decode())
-    update = Update.de_json(data, APPLICATION.bot)
-    APPLICATION.process_update(update)
+class TelegramBotView(View):
+    bot = Bot(token=TOKEN)
 
-    return JsonResponse({})
+    def post(self, request, *args, **kwargs):
+        update = Update.de_json(json.loads(request.body), self.bot)
+        application = Application.builder().token(TOKEN).build()
+        application.add_handler(CommandHandler("start", start))
+        application.add_handler(CommandHandler("ads", ads))
+        application.add_handler(CommandHandler("filter_ad_category", filter_ad_category))
+        application.add_handler(conv_handler)
+
+        async def process_update():
+            await application.process_update(update)
+
+        application.create_task(process_update())
+
+        return JsonResponse({"status": "ok"})
