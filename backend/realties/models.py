@@ -6,7 +6,7 @@ from users.models import Profile
 class Category(models.Model):
     """Модель категории недвижимости."""
     title = models.CharField(
-        'Название', max_length=32, null=False
+        'Название', max_length=32,
     )
 
     class Meta:
@@ -21,7 +21,7 @@ class Category(models.Model):
 class City(models.Model):
     """Модель города."""
     title = models.CharField(
-        'Название', max_length=16, null=False
+        'Название', max_length=32,
     )
     timezone = models.CharField(
         'Часовой пояс (по UTC)', max_length=3, null=True,
@@ -36,48 +36,55 @@ class City(models.Model):
     def __str__(self) -> str:
         return self.title
 
+    @classmethod
+    def get_default_city_pk(cls):
+        city, _ = City.objects.get_or_create(title='Unknown')
+        return city.pk
+
 
 class Realty(models.Model):
     """Модель недвижимости."""
     title = models.CharField(
-        'Название недвижимости', max_length=128, null=True
+        'Название недвижимости', max_length=128, blank=True, null=True,
     )
     phone_number = models.TextField(
-        'Номер стационарного телефона', null=True
+        'Номер стационарного телефона', blank=True, null=True
     )
     mobile_number = models.TextField(
-        'Номер мобильного телефона', null=True
+        'Номер мобильного телефона', blank=True, null=True
     )
     number = models.TextField(
-        'Номер бесплатной линии 8800', null=True
+        'Номер бесплатной линии 8800', blank=True, null=True
     )
     address = models.CharField(
-        'Адрес', max_length=256, null=False
+        'Адрес', max_length=256, blank=True, null=True
     )
     email = models.TextField(
-        'Электронная почта', null=True
+        'Электронная почта', blank=True, null=True
     )
     site = models.TextField(
-        'Сайт', null=True
+        'Сайт', blank=True, null=True
     )
     contact_name = models.TextField(
-        'Контактное лицо', null=True
+        'Контактное лицо', blank=True, null=True
     )
     city = models.ForeignKey(
         City,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.SET_DEFAULT,
+        default=City.get_default_city_pk,
         verbose_name='Город',
     )
-    category = models.ForeignKey(
+    categories = models.ManyToManyField(
         Category,
-        on_delete=models.DO_NOTHING,
-        verbose_name='Категория',
+        related_name='categories',
+        verbose_name='Категории'
     )
     img = models.FileField(
-        'Фото', null=True, upload_to='images/'
+        'Фото', blank=True, null=True, upload_to='images/'
     )
     additional_information = models.TextField(
         'Дополнительная информация',
+        blank=True, null=True,
     )
 
     class Meta:
@@ -92,19 +99,20 @@ class Realty(models.Model):
 class Ad(models.Model):
     """Модель объявлений"""
     title = models.CharField(
-        'Название объявления', max_length=128, null=True
+        'Название объявления', max_length=128
     )
     realty = models.ForeignKey(
         Realty,
-        on_delete=models.DO_NOTHING,
+        on_delete=models.PROTECT,
         verbose_name='Объект',
     )
     address = models.CharField(
         'Точный адрес объявления',
-        max_length=256, null=False
+        max_length=256
     )
     additional_information = models.TextField(
         'Дополнительная информация',
+        blank=True, null=True
     )
     date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
@@ -114,6 +122,9 @@ class Ad(models.Model):
     class Meta:
         verbose_name = 'Объявление'
         verbose_name_plural = 'объявления'
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class Photo(models.Model):
@@ -125,12 +136,19 @@ class Photo(models.Model):
         'Фото', null=True
     )
     ad = models.ForeignKey(
-        Ad, on_delete=models.CASCADE, related_name='photos', null=True
+        Ad, on_delete=models.CASCADE, related_name='photos',
+        verbose_name='Объявление'
     )
     user = models.ForeignKey(
-        Profile, on_delete=models.DO_NOTHING, related_name='photos'
+        Profile,
+        on_delete=models.SET_DEFAULT,
+        default=Profile.get_default_tg_user_profile,
+        related_name='photos',
+        verbose_name='Пользователь'
     )
-    is_validate = models.BooleanField('Премодерация админом')
+    is_published = models.BooleanField(
+        'Премодерация админом', default=False
+    )
 
     class Meta:
         verbose_name = 'Фото'
@@ -142,16 +160,23 @@ class Comment(models.Model):
     date_create = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
-    text = models.TextField(
-        'Текст объявления', null=False
-    )
+    text = models.TextField('Текст комментария')
     ad = models.ForeignKey(
-        Ad, on_delete=models.CASCADE, related_name='comment', null=True
+        Ad,
+        on_delete=models.CASCADE,
+        related_name='comment',
+        verbose_name='Объявление'
     )
     user = models.ForeignKey(
-        Profile, on_delete=models.DO_NOTHING, related_name='comment'
+        Profile,
+        on_delete=models.SET_DEFAULT,
+        default=Profile.get_default_tg_user_profile,
+        related_name='comment',
+        verbose_name='Пользователь'
     )
-    is_validate = models.BooleanField('Премодерация админом')
+    is_published = models.BooleanField(
+        'Премодерация админом', default=False
+    )
 
     class Meta:
         verbose_name = 'Комментарий'

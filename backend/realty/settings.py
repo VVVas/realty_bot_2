@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-env_file_path = '../../infra/.env'
+env_file_path = '../infra/.env'
 load_dotenv(dotenv_path=env_file_path)
 TOKEN_BOT = os.getenv('TOKEN_BOT', default='XXXXXXXXXXXXX')
 GENERAL_URL = os.getenv('GENERAL_URL', default='https://mysite.com/')
@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rangefilter',
     'import_export',
     'bot.apps.BotConfig',
     'users.apps.UsersConfig',
@@ -52,7 +53,7 @@ ROOT_URLCONF = 'realty.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates',],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -101,7 +102,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru-Ru'
 
 TIME_ZONE = 'UTC'
 

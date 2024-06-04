@@ -4,7 +4,15 @@ Django==4.2.13
 # djoser==2.1.0
 # Pillow==9.3.0
 # psycopg2-binary==2.9.3
+django-admin-rangefilter==0.13.0
 django-import-export==4.0.6
 python-telegram-bot==21.2
 python-dotenv==1.0.1
 # gunicorn==20.1.0
+
+flake8==7.0.0
+pep8-naming==0.14.1
+flake8-broken-line==1.0.0
+flake8-return==1.2.0
+flake8-isort==6.1.1
+flake8-docstrings==1.7.0

@@ -7,8 +7,8 @@ from users import const
 class User(AbstractUser):
 
     class Meta:
-        verbose_name = 'Пользователь'
-        verbose_name_plural = 'пользователи'
+        verbose_name = 'Администратор'
+        verbose_name_plural = 'администраторы'
         ordering = ('username',)
 
     def __str__(self):
@@ -45,8 +45,8 @@ class Profile(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Профиль'
-        verbose_name_plural = 'профили'
+        verbose_name = 'Профиль телеграм'
+        verbose_name_plural = 'профили телеграм'
 
     def __str__(self):
         return f'{self.external_id} - {self.first_name} {self.last_name}'
@@ -62,3 +62,18 @@ class Profile(models.Model):
     @property
     def is_blocked(self):
         return self.status == const.STATUS_BLOCKED
+
+    @classmethod
+    def get_default_tg_user_profile(cls):
+        tg_user_profile, _ = Profile.objects.get_or_create(
+            first_name='Unknown', external_id='1',
+            status=const.STATUS_BLOCKED,
+        )
+        return tg_user_profile.pk
+
+    @staticmethod
+    def delete_profile_and_comments(user):
+        user.comment.filter(user=user).delete()
+        user.photos.filter(user=user).delete()
+        user.save()
+        user.delete()

@@ -10,7 +10,6 @@ class TelegramBotView(View):
     def post(self, request, *args, **kwargs):
         update = Update.de_json(json.loads(request.body), self.bot)
         application = Application.builder().token(TOKEN).build()
-
         application.add_handler(CommandHandler("start", start))
         application.add_handler(CommandHandler("ads", ads))
         application.add_handler(CommandHandler("filter_ad_category", filter_ad_category))
