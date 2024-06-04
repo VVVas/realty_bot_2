@@ -1,0 +1,33 @@
+volumes:
+  pg_data:
+  static:
+  media:
+
+services:
+  db:
+    image: postgres:16.3-alpine3.20
+    env_file: .env
+    # restart: always
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    depends_on:
+      - db
+    image: vvvas/premium_product_bot_backend
+    env_file: .env
+    # restart: always
+    volumes:
+      - static:/app/static
+      - media:/app/media
+
+  gateway:
+    depends_on:
+      - backend
+    image: vvvas/premium_product_bot_gateway
+    ports:
+      - 8000:80
+    # restart: always
+    volumes:
+      - static:/app/static
+      - media:/app/media
