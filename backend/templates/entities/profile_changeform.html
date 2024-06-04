@@ -1,0 +1,11 @@
+{% extends 'admin/change_form.html' %}
+
+{% block submit_buttons_bottom %}
+    {{ block.super }}
+    {% if object_id != None %}
+    <div class="submit-row">
+        <input onclick="return confirm('Вы уверены, что хотите удалить этого пользователя? Его комментарии останутся.')" type="submit" value="Удалить (оставить комментарии)" name="_delete-profile" style="background-color:#ba2121">
+        <input onclick="return confirm('Вы уверены, что хотите удалить этого пользователя и его комментарии?')" type="submit" value="Удалить с комментариями" name="_delete-profile-and-comments" style="background-color:#ba2121">
+    </div>
+    {% endif %}
+{% endblock %}

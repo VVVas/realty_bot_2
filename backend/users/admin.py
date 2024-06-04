@@ -3,6 +3,8 @@ from django.db import models
 from django.contrib.admin import display
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
+from django.http import HttpResponseRedirect
+from django.template.response import TemplateResponse
 from rangefilter.filters import DateRangeFilterBuilder
 
 from .models import Profile, User
@@ -37,6 +39,8 @@ class ProfileAdmin(admin.ModelAdmin):
         ("date", DateRangeFilterBuilder()),
     )
 
+    change_form_template = "entities/profile_changeform.html"
+
     @display(description='Избранное')
     def favorite_count(self, user):
         return user.favorite_ad.filter(user=user).count()
@@ -44,3 +48,21 @@ class ProfileAdmin(admin.ModelAdmin):
     @display(description='Комментарии')
     def comments_count(self, user):
         return user.comment.filter(user=user).count()
+
+    def response_change(self, request, user):
+        if "_delete-profile" in request.POST:
+            user.delete()
+            self.message_user(
+                request,
+                "Пользователь удалён"
+            )
+        if "_delete-profile-and-comments" in request.POST:
+            Profile.delete_profile_and_comments(user=user)
+            self.message_user(
+                request,
+                "Пользователь и его комментарии удалены"
+            )
+        return super().response_change(request, user)
+
+    def has_delete_permission(self, request, obj=None):
+        return False
