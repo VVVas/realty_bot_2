@@ -5,10 +5,10 @@ from django.views import View
 from telegram import Bot, Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 
-from backend.realties.models import Ad
+from realties.models import Ad
 
 
-TOKEN = settings.TOKEN_BOT
+TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
 TITLE, ADDRESS, ADDITIONAL_INFO = range(3)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
