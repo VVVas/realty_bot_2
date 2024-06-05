@@ -1,9 +1,6 @@
 name: Main PB workflow
 
 on:
-  # pull_request:
-  #   branches:
-  #     - 'prod'
   push:
     branches:
       - 'prod'
@@ -68,7 +65,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
-        # passphrase: ${{ secrets.SSH_PASSPHRASE }}
         source: "infra/docker-compose.prod.yml"
         target: "premium_product_bot"
     - name: Executing remote ssh commands to deploy
@@ -77,7 +73,6 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
-        # passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           cd premium_product_bot
           docker compose -f docker-compose.prod.yml pull
