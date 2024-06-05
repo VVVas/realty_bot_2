@@ -91,7 +91,7 @@ class RealtyAdmin(ImportExportModelAdmin):
 @admin.register(Ad)
 class AdAdmin(admin.ModelAdmin):
     list_display = (
-        'title', 'realty', 'address', 'date', 'is_published',
+        'title', 'realty', 'address', 'date', 'price', 'is_published',
         'added_in_favorites'
     )
     list_filter = (
