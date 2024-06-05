@@ -114,6 +114,10 @@ class Ad(models.Model):
         'Дополнительная информация',
         blank=True, null=True
     )
+    price = models.PositiveIntegerField(
+        'Стоимость за кв. м.',
+        blank=True, null=True
+    )
     date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
