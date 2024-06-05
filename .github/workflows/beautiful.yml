@@ -23,7 +23,7 @@ jobs:
           pip install flake8==7.0.0 pep8-naming==0.14.1 flake8-broken-line==1.0.0 flake8-return==1.2.0 flake8-isort==6.1.1 flake8-docstrings==1.7.0
       - name: Test backend with flake8
         run: |
-          python -m flake8 backend/
+          python -m flake8 --config ./backend/setup.cfg backend/
 
   send_message_after_backend_tests:
     name: Message after backend tests
