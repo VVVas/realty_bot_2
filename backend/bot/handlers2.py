@@ -1,19 +1,17 @@
-import json
 from django.conf import settings
-from django.http import JsonResponse
-from django.views import View
-from telegram import Bot, Update
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
+from telegram import Update
+from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
 
 from realties.models import Ad
-
 
 TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
 TITLE, ADDRESS, ADDITIONAL_INFO = range(3)
 
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        'Hello! Use /ads to see the list of ads, /filter <category> to filter ads by category, '
+        'Hello! Use /ads to see the list of ads, '
+        '/filter <category> to filter ads by category, '
         'and /new to create a new ad.')
 
 
@@ -47,9 +45,13 @@ async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
             chat_id=update.message.chat_id, text=response)
 
 
-async def filter_ad_category(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def filter_ad_category(
+        update: Update, context: ContextTypes.DEFAULT_TYPE
+):
     category = context.args[0]
-    ads_list = Ad.objects.filter(is_published=True, realty__category__title=category)
+    ads_list = Ad.objects.filter(
+        is_published=True, realty__category__title=category
+    )
     if ads_list:
         for ad in ads_list:
             realty = ad.realty
@@ -85,6 +87,7 @@ async def new_ad(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     return TITLE
 
+
 async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['new_ad_title'] = update.message.text
     await context.bot.send_message(
@@ -92,6 +95,7 @@ async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text='Now please send the address of the ad.'
     )
     return ADDRESS
+
 
 async def get_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
     context.user_data['new_ad_adsress'] = update.message.text
@@ -101,12 +105,16 @@ async def get_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     return ADDITIONAL_INFO
 
-async def get_additional_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+
+async def get_additional_info(
+        update: Update, context: ContextTypes.DEFAULT_TYPE
+):
     title = context.user_data['new_ad_title']
     address = context.user_data['new_ad_adsress']
     additional_information = update.message.text
     Ad.objects.create(
-        title=title, address=address, additional_information=additional_information
+        title=title, address=address,
+        additional_information=additional_information
     )
     await context.bot.send_message(
         chat_id=update.message.chat_id,
@@ -116,7 +124,6 @@ async def get_additional_info(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Cancels and ends the conversation."""
     await context.bot.send_message(
         chat_id=update.message.chat_id,
         text='Operation cancelled.')
@@ -127,7 +134,9 @@ conv_handler = ConversationHandler(
     states={
         TITLE: [CommandHandler('title', get_title)],
         ADDRESS: [CommandHandler('address', get_address)],
-        ADDITIONAL_INFO: [CommandHandler('additional_info', get_additional_info)]
+        ADDITIONAL_INFO: [CommandHandler(
+            'additional_info', get_additional_info
+        )]
     },
     fallbacks=[CommandHandler('cancel', cancel)]
 )
