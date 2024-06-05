@@ -1,4 +1,5 @@
 from .handlers2 import *
+#test
 from django.conf import settings
 
 TOKEN = settings.TOKEN_BOT
