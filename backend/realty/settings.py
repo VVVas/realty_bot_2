@@ -26,6 +26,7 @@ ALLOWED_HOSTS = [
     'pb.vvvas.ru',
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://pb.vvvas.ru']
 
 # Application definition
 
