@@ -1,15 +1,12 @@
 from django.contrib import admin
-from django.db import models
-from django.apps import apps
-from django.forms import TextInput, Textarea
-from import_export.admin import ImportExportModelAdmin
 from django.contrib.admin import display
+from django.db import models
+from django.forms import Textarea, TextInput
 from django.utils.safestring import mark_safe
+from import_export.admin import ImportExportModelAdmin
 from rangefilter.filters import DateRangeFilterBuilder
 
-from .models import (
-    Ad, Category, City, Comment, Photo, Realty
-)
+from .models import Ad, Category, City, Comment, Photo, Realty
 from .resources import CategoryResource, CityResource, RealtyResource
 
 
@@ -146,6 +143,7 @@ class CommentAdmin(admin.ModelAdmin):
         models.CharField: {'widget': TextInput(attrs={'size': '40'})},
         models.TextField: {'widget': Textarea(attrs={'rows': 5, 'cols': 100})},
     }
+
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):

@@ -1,8 +1,8 @@
-from django.core.management.base import BaseCommand
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.urls import reverse
 
-from Premium_product_bot_team_2.backend.bot.bot_init import APPLICATION
+from bot.bot_init import APPLICATION
 
 
 class Command(BaseCommand):
@@ -13,7 +13,6 @@ class Command(BaseCommand):
         if is_appointed:
             self.stdout.write(self.style.SUCCESS(
                 "Webhook was successfully appointed."
-                )
-            )
+            ))
         else:
             self.stdout.write(self.style.ERROR("Something went wrong."))
