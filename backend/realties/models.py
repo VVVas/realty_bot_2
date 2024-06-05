@@ -4,7 +4,8 @@ from users.models import Profile
 
 
 class Category(models.Model):
-    """Модель категории недвижимости."""
+    """Модель категории."""
+
     title = models.CharField(
         'Название', max_length=32,
     )
@@ -20,6 +21,7 @@ class Category(models.Model):
 
 class City(models.Model):
     """Модель города."""
+
     title = models.CharField(
         'Название', max_length=32,
     )
@@ -44,6 +46,7 @@ class City(models.Model):
 
 class Realty(models.Model):
     """Модель недвижимости."""
+
     title = models.CharField(
         'Название недвижимости', max_length=128, blank=True, null=True,
     )
@@ -97,7 +100,8 @@ class Realty(models.Model):
 
 
 class Ad(models.Model):
-    """Модель объявлений"""
+    """Модель объявлений."""
+
     title = models.CharField(
         'Название объявления', max_length=128
     )
@@ -133,6 +137,7 @@ class Ad(models.Model):
 
 class Photo(models.Model):
     """Модель фотографии к объявлению."""
+
     date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
@@ -161,6 +166,7 @@ class Photo(models.Model):
 
 class Comment(models.Model):
     """Модель комментария к объявлению."""
+
     date_create = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
@@ -190,9 +196,11 @@ class Comment(models.Model):
 class Favorite(models.Model):
     """
     Модель избранного.
+
     favorite_ad - можно получить объявления, добавленные юзером в избранное.
     favorite_users - можно получить юзеров, добавивших объявление в избранное.
     """
+
     user = models.ForeignKey(
         Profile,
         on_delete=models.CASCADE,

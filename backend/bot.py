@@ -1,10 +1,13 @@
-from telegram.ext import Updater, Filters, MessageHandler, CommandHandler
 from telegram import ReplyKeyboardMarkup
+from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
 
 TELEGRAM_TOKEN = 'value'
-GREETINGS =("привет, {name}. "
-            "Это бот, который создает единое пространство по предоставлению "
-            "информации о коммерческих площадках и их собственниках, для облегчения поиска предпринимателям.")
+GREETINGS = ("привет, {name}. "
+             "Это бот, который создает единое пространство по предоставлению "
+             "информации о коммерческих площадках и их собственниках, "
+             "для облегчения поиска предпринимателям.")
+
+
 def say_hi(update, context):
     chat = update.effective_chat
     context.bot.send_message(chat_id=chat.id, text='hi')
@@ -13,15 +16,17 @@ def say_hi(update, context):
 def start(update, context):
     chat = update.effective_chat
     markup = ReplyKeyboardMarkup([['/help']])
-    context.bot.send_message(chat_id=chat.id,
-                             text=(f'{GREETINGS.format(name = chat.first_name)}'),
-                             reply_markup=markup)
+    context.bot.send_message(
+        chat_id=chat.id,
+        text=(f'{GREETINGS.format(name = chat.first_name)}'),
+        reply_markup=markup
+    )
 
 
 def help(update, context):
     chat = update.effective_chat
     context.bot.send_message(chat_id=chat.id,
-                             text=f'help,')
+                             text='help,')
     update.message.reply_text('some settings')
 
 
