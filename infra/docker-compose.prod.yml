@@ -8,7 +8,7 @@ services:
     image: postgres:16.3-alpine3.20
     env_file: .env
     # restart: always
-        healthcheck:
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 1s
       timeout: 5s
