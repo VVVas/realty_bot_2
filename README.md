@@ -14,7 +14,7 @@
 Python 3.11, Django 4.2, Docker 26.1, nginx 1.26, PostgreSQL 16.3  
 
 ## Авторы
-Кавтырев Максим, https://github.com/h-inek  
+[Кавтырев Максим](https://github.com/h-inek)  
 Мишустин Василий, v@vvvas.ru, https://github.com/VVVas  
 Песчанов Никита, https://github.com/ItWasCain  
 Сулайманова Сайкал, https://github.com/saikal12  
