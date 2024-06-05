@@ -25,7 +25,7 @@ def make_not_published(modeladmin, request, queryset):
 
 @admin.register(Category)
 class CategoryAdmin(ImportExportModelAdmin):
-    list_display = ('id', 'title', 'realty_count')
+    list_display = ('id', 'title', 'realty_count',)
     search_fields = ('title',)
     resource_class = CategoryResource
 
@@ -47,6 +47,7 @@ class CityAdmin(ImportExportModelAdmin):
 
 class AdInline(admin.TabularInline):
     model = Ad
+    can_delete = False
     extra = 0
     formfield_overrides = {
         models.CharField: {'widget': TextInput(attrs={'size': '40'})},
@@ -59,7 +60,7 @@ class RealtyAdmin(ImportExportModelAdmin):
     list_display = (
         'title', 'city', 'address', 'get_categories', 'image_preview',
     )
-    search_fields = ('title', 'city__title', 'address')
+    search_fields = ('title', 'city__title', 'address',)
     list_filter = ()
     filter_horizontal = ('categories',)
     resource_class = RealtyResource
@@ -88,6 +89,33 @@ class RealtyAdmin(ImportExportModelAdmin):
         return 'Фото отсутствует'
 
 
+class CommentInline(admin.TabularInline):
+    model = Comment
+    fields = ('user', 'text', 'is_published',)
+    can_delete = False
+    extra = 0
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size': '40'})},
+        models.TextField: {'widget': Textarea(attrs={'rows': 3, 'cols': 50})},
+    }
+
+
+class PhotoInline(admin.TabularInline):
+    model = Photo
+    readonly_fields = ('user', 'image_preview', 'date',)
+    fields = (readonly_fields, 'is_published',)
+    exclude = ('img',)
+    can_delete = False
+    extra = 0
+
+    @mark_safe
+    @display(description='Фото')
+    def image_preview(self, photo):
+        return (
+            f'<img src="{photo.img.url}" style="max-height: 150px;">'
+        )
+
+
 @admin.register(Ad)
 class AdAdmin(admin.ModelAdmin):
     list_display = (
@@ -99,6 +127,7 @@ class AdAdmin(admin.ModelAdmin):
     )
     list_editable = ('is_published',)
     autocomplete_fields = ['realty']
+    inlines = [CommentInline, PhotoInline]
     actions = [make_published, make_not_published]
 
     @display(description='В избранных')
@@ -113,11 +142,15 @@ class CommentAdmin(admin.ModelAdmin):
     list_editable = ('is_published',)
     ordering = ('is_published', 'date_create')
     actions = [make_published, make_not_published]
-
+    formfield_overrides = {
+        models.CharField: {'widget': TextInput(attrs={'size': '40'})},
+        models.TextField: {'widget': Textarea(attrs={'rows': 5, 'cols': 100})},
+    }
 
 @admin.register(Photo)
 class PhotoAdmin(admin.ModelAdmin):
     list_display = ('user', 'ad', 'date', 'is_published', 'image_preview',)
+    readonly_fields = ('get_image',)
     list_filter = ('is_published',)
     list_editable = ('is_published',)
     actions = [make_published, make_not_published]
@@ -127,4 +160,11 @@ class PhotoAdmin(admin.ModelAdmin):
     def image_preview(self, photo):
         return (
             f'<img src="{photo.img.url}" style="max-height: 70px;">'
+        )
+
+    @mark_safe
+    @display(description='Фото')
+    def get_image(self, photo):
+        return (
+            f'<img src="{photo.img.url}" style="max-height: 500px;">'
         )
