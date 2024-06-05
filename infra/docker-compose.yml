@@ -1,0 +1,39 @@
+volumes:
+  pg_data:
+  static:
+  media:
+
+services:
+  db:
+    image: postgres:16.3-alpine3.20
+    env_file: .env
+    # restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 1s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  backend:
+    depends_on:
+      db:
+        condition: service_healthy
+    build: ../backend/
+    env_file: .env
+    # restart: always
+    volumes:
+      - static:/app/static
+      - media:/app/media
+
+  gateway:
+    depends_on:
+      - backend
+    build: ../gateway
+    ports:
+      - 8000:80
+    # restart: always
+    volumes:
+      - static:/app/static
+      - media:/app/media
