@@ -1,18 +1,24 @@
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.urls import reverse
+from telegram import Bot
+import asyncio
 
-from bot.bot_init import APPLICATION
+TELEGRAM_TOKEN = '7186459956:AAEVCKeGIyQvlG3t4MEvxgt1nSzic3k7-7k'
+WEBHOOK_URL = 'https://pb.vvvas.ru/webhook/'
 
 
 class Command(BaseCommand):
+    help = 'Устанавливает вебхук для Телеграмм бота'
 
-    def handle(self, *args, **options):
-        url = "{}{}".format(settings.GENERAL_URL, reverse("process"))
-        is_appointed = APPLICATION.bot.set_webhook(url=url)
-        if is_appointed:
-            self.stdout.write(self.style.SUCCESS(
-                "Webhook was successfully appointed."
-            ))
+    def handle(self, *arg, **kwarg):
+        bot = Bot(token=TELEGRAM_TOKEN)
+        url = "{}{}".format(settings.GENERAL_URL, reverse("webhook"))
+        response = asyncio.run(self.set_webhook(bot, url))
+        if response:
+            self.stdout.write(self.style.SUCCESS(f'Successfully set webhook: {WEBHOOK_URL}'))
         else:
-            self.stdout.write(self.style.ERROR("Something went wrong."))
+            self.stdout.write(self.style.ERROR(f'Failed to set webhook: {WEBHOOK_URL}'))
+
+    async def set_webhook(self, bot, url):
+        return await bot.set_webhook(url=url)

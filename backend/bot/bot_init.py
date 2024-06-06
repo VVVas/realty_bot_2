@@ -12,6 +12,3 @@ def telegram_application():
 
 APPLICATION = telegram_application()
 
-
-APPLICATION.updater.start_polling()
-APPLICATION.updater.idle()

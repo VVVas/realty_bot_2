@@ -1,14 +1,17 @@
 from django.conf import settings
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
+import logging
 
 from realties.models import Ad
 
 TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
 TITLE, ADDRESS, ADDITIONAL_INFO = range(3)
 
-
+# Настройте логирование
+logger = logging.getLogger(__name__)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Received /start command")
     await update.message.reply_text(
         'Hello! Use /ads to see the list of ads, '
         '/filter <category> to filter ads by category, '
@@ -16,6 +19,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Received /ads command")
     ads_list = Ad.objects.filter(is_published=True)
     if ads_list:
         for ad in ads_list:
