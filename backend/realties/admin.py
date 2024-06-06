@@ -10,6 +10,28 @@ from .models import Ad, Category, City, Comment, Photo, Realty
 from .resources import CategoryResource, CityResource, RealtyResource
 
 
+class GetImageMixIn:
+    @mark_safe
+    @display(description='Фото')
+    def get_image(self, obj):
+        if obj.img:
+            return (
+                f'<img src="{obj.img.url}" style="max-height: 500px;">'
+            )
+        return 'Фото отсутствует'
+
+
+class GetImagePreviewMixIn:
+    @mark_safe
+    @display(description='Фото')
+    def image_preview(self, obj):
+        if obj.img:
+            return (
+                f'<img src="{obj.img.url}" style="max-height: 70px;">'
+            )
+        return 'Фото отсутствует'
+
+
 @admin.action(description="Опубликовать выбранные")
 def make_published(modeladmin, request, queryset):
     queryset.update(is_published=True)
@@ -53,10 +75,14 @@ class AdInline(admin.TabularInline):
 
 
 @admin.register(Realty)
-class RealtyAdmin(ImportExportModelAdmin):
+class RealtyAdmin(
+    ImportExportModelAdmin, GetImageMixIn,
+    GetImagePreviewMixIn
+):
     list_display = (
         'title', 'city', 'address', 'get_categories', 'image_preview',
     )
+    readonly_fields = ('get_image',)
     search_fields = ('title', 'city__title', 'address',)
     list_filter = ()
     filter_horizontal = ('categories',)
@@ -76,15 +102,6 @@ class RealtyAdmin(ImportExportModelAdmin):
             item.title for item in realty.categories.all())
         )
 
-    @mark_safe
-    @display(description='Фото')
-    def image_preview(self, realty):
-        if realty.img:
-            return (
-                f'<img src="{realty.img.url}" style="max-height: 70px;">'
-            )
-        return 'Фото отсутствует'
-
 
 class CommentInline(admin.TabularInline):
     model = Comment
@@ -97,20 +114,13 @@ class CommentInline(admin.TabularInline):
     }
 
 
-class PhotoInline(admin.TabularInline):
+class PhotoInline(admin.TabularInline, GetImagePreviewMixIn):
     model = Photo
     readonly_fields = ('user', 'image_preview', 'date',)
     fields = (readonly_fields, 'is_published',)
     exclude = ('img',)
     can_delete = False
     extra = 0
-
-    @mark_safe
-    @display(description='Фото')
-    def image_preview(self, photo):
-        return (
-            f'<img src="{photo.img.url}" style="max-height: 150px;">'
-        )
 
 
 @admin.register(Ad)
@@ -146,23 +156,9 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 @admin.register(Photo)
-class PhotoAdmin(admin.ModelAdmin):
+class PhotoAdmin(admin.ModelAdmin, GetImageMixIn, GetImagePreviewMixIn):
     list_display = ('user', 'ad', 'date', 'is_published', 'image_preview',)
     readonly_fields = ('get_image',)
     list_filter = ('is_published',)
     list_editable = ('is_published',)
     actions = [make_published, make_not_published]
-
-    @mark_safe
-    @display(description='Фото')
-    def image_preview(self, photo):
-        return (
-            f'<img src="{photo.img.url}" style="max-height: 70px;">'
-        )
-
-    @mark_safe
-    @display(description='Фото')
-    def get_image(self, photo):
-        return (
-            f'<img src="{photo.img.url}" style="max-height: 500px;">'
-        )

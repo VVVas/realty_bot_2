@@ -16,7 +16,7 @@ class Category(models.Model):
         verbose_name_plural = 'категории'
 
     def __str__(self) -> str:
-        return self.title
+        return str(self.title)
 
 
 class City(models.Model):
@@ -36,7 +36,7 @@ class City(models.Model):
         verbose_name_plural = 'города'
 
     def __str__(self) -> str:
-        return self.title
+        return str(self.title)
 
     @classmethod
     def get_default_city_pk(cls):
