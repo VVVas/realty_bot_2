@@ -15,9 +15,9 @@ Python 3.11, Django 4.2, Docker 26.1, nginx 1.26, PostgreSQL 16.3
 
 ## Авторы
 [Кавтырев Максим](https://github.com/h-inek)  
-Мишустин Василий, v@vvvas.ru, https://github.com/VVVas  
-Песчанов Никита, https://github.com/ItWasCain  
-Сулайманова Сайкал, https://github.com/saikal12  
-Турубанов Евгений, https://github.com/eturubanov  
+[Мишустин Василий](https://github.com/VVVas), v@vvvas.ru   
+[Песчанов Никита](https://github.com/ItWasCain)  
+[Сулайманова Сайкал](https://github.com/saikal12)  
+[Турубанов Евгений](https://github.com/eturubanov)  
 
 Сделано в Мастерской программирования Яндекс.Практикума под руководством Александрова Романа, https://github.com/teamofroman и Гончар Маргариты  
