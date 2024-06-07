@@ -1,49 +1,150 @@
-from telegram import ReplyKeyboardMarkup, Update
-from telegram.ext import CallbackContext, CommandHandler, ConversationHandler
+import logging
 
-from .models import BotMessage
+from django.conf import settings
+from telegram import Update
+from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
 
-HELLO, INFO, WORK = range(3)
+
+from realties.models import Ad
+
+TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
+TITLE, ADDRESS, ADDITIONAL_INFO = range(3)
 
 
-async def start(update: Update, _: CallbackContext):
-    reply_keyboard = [['Информация о боте', 'Начать поиск недвижимости']]
+logger = logging.getLogger(__name__)
+
+
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Received /start command")
     await update.message.reply_text(
-        BotMessage.objects.filter(keyword='START')[0].text,
-        reply_markup=ReplyKeyboardMarkup(
-            reply_keyboard, one_time_keyboard=True
-        )
+        'Hello! Use /ads to see the list of ads, '
+        '/filter <category> to filter ads by category, '
+        'and /new to create a new ad.')
+
+
+async def ads(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    logger.info("Received /ads command")
+    ads_list = Ad.objects.filter(is_published=True)
+    if ads_list:
+        for ad in ads_list:
+            realty = ad.realty
+            caption = (
+                f"*{ad.title}*\n"
+                f"Объект: {ad.realty}\n"
+                f"Точный адрес объявления: {ad.address}"
+                f"Дополнительная информация: {ad.additional_information}\n"
+                f"Дата добавления: {ad.date}")
+            if realty.img:
+                await context.bot.send_photo(
+                    chat_id=update.message.chat_id,
+                    photo=realty.img.url,
+                    caption=caption,
+                    parse_mode='Markdown'
+                )
+            else:
+                await context.bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text=caption,
+                    parse_mode='Markdown'
+                )
+    else:
+        response = "No ads available."
+        await context.bot.send_message(
+            chat_id=update.message.chat_id, text=response)
+
+
+async def filter_ad_category(
+        update: Update, context: ContextTypes.DEFAULT_TYPE
+):
+    category = context.args[0]
+    ads_list = Ad.objects.filter(
+        is_published=True, realty__category__title=category
     )
+    if ads_list:
+        for ad in ads_list:
+            realty = ad.realty
+            caption = (
+                f"*{ad.title}*\n"
+                f"Объект: {ad.realty}\n"
+                f"Точный адрес объявления: {ad.address}"
+                f"Дополнительная информация: {ad.additional_information}\n"
+                f"Дата добавления: {ad.date}")
+            if realty.img:
+                await context.bot.send_photo(
+                    chat_id=update.message.chat_id,
+                    photo=realty.img.url,
+                    caption=caption,
+                    parse_mode='Markdown'
+                )
+            else:
+                await context.bot.send_message(
+                    chat_id=update.message.chat_id,
+                    text=caption,
+                    parse_mode='Markdown'
+                )
+    else:
+        response = "No ads available."
+        await context.bot.send_message(
+            chat_id=update.message.chat_id, text=response)
 
-    return HELLO
 
-
-async def info(update: Update, _: CallbackContext):
-    await update.message.reply_text(
-        BotMessage.objects.filter(keyword='HELP')[0].text
+async def new_ad(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text='Please send the title of the ad.'
     )
+    return TITLE
 
+
+async def get_title(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['new_ad_title'] = update.message.text
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text='Now please send the address of the ad.'
+    )
+    return ADDRESS
+
+
+async def get_address(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data['new_ad_adsress'] = update.message.text
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text='Now please send the address of the ad.'
+    )
+    return ADDITIONAL_INFO
+
+
+async def get_additional_info(
+        update: Update, context: ContextTypes.DEFAULT_TYPE
+):
+    title = context.user_data['new_ad_title']
+    address = context.user_data['new_ad_adsress']
+    additional_information = update.message.text
+    Ad.objects.create(
+        title=title, address=address,
+        additional_information=additional_information
+    )
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text=f'Thank you! Ad "{title}" created successfully!'
+    )
     return ConversationHandler.END
 
 
-async def work(update: Update, _: CallbackContext):
-    await update.message.reply_text(
-        'Здесь будет логика работы бота, но позже'
-    )
-
-
-async def cancel(update: Update, _: CallbackContext):
-    await update.message.reply_text(
-        BotMessage.objects.filter(keyword='CANCEL')[0].text
-    )
+async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await context.bot.send_message(
+        chat_id=update.message.chat_id,
+        text='Operation cancelled.')
     return ConversationHandler.END
 
-
-handler = ConversationHandler(
-    entry_points=[CommandHandler('start', start)],
+conv_handler = ConversationHandler(
+    entry_points=[CommandHandler('new_ad', new_ad)],
     states={
-        INFO: [CommandHandler('info', info)],
-        WORK: [CommandHandler('work', work)]
+        TITLE: [CommandHandler('title', get_title)],
+        ADDRESS: [CommandHandler('address', get_address)],
+        ADDITIONAL_INFO: [CommandHandler(
+            'additional_info', get_additional_info
+        )]
     },
     fallbacks=[CommandHandler('cancel', cancel)]
 )
