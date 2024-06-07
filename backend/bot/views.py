@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 
@@ -25,7 +26,8 @@ class TelegramBotView(View):
                 logger.info("Processing update")
                 await APPLICATION.process_update(update)
 
-            APPLICATION.create_task(process_update())
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(APPLICATION.create_task(process_update()))
             return JsonResponse({"status": "ok"})
         except Exception as e:
             logger.error(f"Error processing webhook: {e}")
