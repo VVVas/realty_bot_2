@@ -21,5 +21,5 @@ from bot.views import TelegramBotView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('webhook/', TelegramBotView.as_view(), name='webhook'),
+    path('webhook/', TelegramBotView.as_view(), name='webhook')
 ]
