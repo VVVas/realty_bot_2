@@ -12,12 +12,19 @@ TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
 class Command(BaseCommand):
     help = 'Устанавливает вебхук для Телеграмм бота'
 
+    async def run_bot(self, url):
+        await APPLICATION.bot.set_webhook(url=url)
+        async with APPLICATION:
+            await APPLICATION.start()
+            await APPLICATION.stop()
+
     def handle(self, *arg, **kwarg):
         url = "{}{}".format(
             settings.GENERAL_URL, reverse("webhook")
         )
-        response = asyncio.run(self.set_webhook(url))
-        if response:
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(self.run_bot(url))
+        if loop:
             self.stdout.write(self.style.SUCCESS(
                 f'Successfully set webhook: {url}')
             )
@@ -25,6 +32,3 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(
                 f'Failed to set webhook: {url}')
             )
-
-    async def set_webhook(self, url):
-        return await APPLICATION.bot.set_webhook(url=url)
