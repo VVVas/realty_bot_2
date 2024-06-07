@@ -5,7 +5,7 @@ from bot.handlers import ads, conv_handler, filter_ad_category, start
 
 
 def telegram_application():
-    application = Application.builder().token('7186459956:AAEVCKeGIyQvlG3t4MEvxgt1nSzic3k7-7k').build()
+    application = Application.builder().token(settings.TELEGRAM_TOKEN).build()
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("ads", ads))
     application.add_handler(CommandHandler(
