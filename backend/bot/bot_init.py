@@ -11,4 +11,3 @@ def telegram_application():
 
 
 APPLICATION = telegram_application()
-

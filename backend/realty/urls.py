@@ -16,10 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.http import JsonResponse
 
-from bot.views import TelegramBotView
+def test_webhook(request):
+    return JsonResponse({"status": "webhook is working"})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('webhook/', TelegramBotView.as_view(), name='webhook'),
+    path('webhook/', test_webhook, name='webhook'),
 ]
