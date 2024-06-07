@@ -1,7 +1,7 @@
 from django.conf import settings
 from telegram.ext import Application, CommandHandler
 
-from .handlers import (
+from bot.handlers import (
     ads, conv_handler, filter_ad_category, start
 )
 
