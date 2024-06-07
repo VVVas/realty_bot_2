@@ -7,8 +7,9 @@ from django.views import View
 from telegram import Bot, Update
 from telegram.ext import Application, CommandHandler
 
-from .handlers2 import (ads, conv_handler,
-                        filter_ad_category, start)
+from .handlers2 import (
+    ads, conv_handler, filter_ad_category, start
+)
 
 logger = logging.getLogger(__name__)
 TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
