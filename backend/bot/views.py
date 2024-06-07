@@ -3,6 +3,7 @@ import logging
 
 from django.http import JsonResponse
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 from telegram import Update
 
 from .bot_init import APPLICATION
@@ -11,6 +12,7 @@ from .bot_init import APPLICATION
 logger = logging.getLogger(__name__)
 
 
+@csrf_exempt
 class TelegramBotView(View):
 
     def post(self, request, *args, **kwargs):
