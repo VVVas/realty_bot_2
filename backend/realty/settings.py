@@ -7,7 +7,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # env_file_path = '../infra/.env'
 # load_dotenv(dotenv_path=env_file_path)
-TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '-1')
 GENERAL_URL = os.getenv('GENERAL_URL', default='https://mysite.com/')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
