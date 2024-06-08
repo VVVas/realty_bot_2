@@ -9,7 +9,7 @@ from simplebot.views import ptb_application
 class Command(BaseCommand):
     help = "Set new telegram webhook"
 
-    def handle(self):
+    def handle(self, *arg, **kwarg):
         webhook_path = reverse('simplebot:ptb')
         webhook_url = f'{settings.GENERAL_URL}/{webhook_path}'
 
