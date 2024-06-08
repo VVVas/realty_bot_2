@@ -34,4 +34,7 @@ async def telegram(request: HttpRequest) -> HttpResponse:
     await ptb_application.update_queue.put(
         Update.de_json(data=json.loads(request.body), bot=ptb_application.bot)
     )
+
+    await ptb_application.stop_running()
+
     return HttpResponse()
