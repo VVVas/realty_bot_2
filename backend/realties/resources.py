@@ -18,18 +18,25 @@ class RealtyResource(resources.ModelResource):
         widget=ManyToManyWidget(Category, field='title', separator='|')
     )
 
-    def before_import_row(self, row, **kwargs):
-        city = row["city"]
-        City.objects.get_or_create(title=city, defaults={"title": city})
-        categories = row["categories"].split('|')
-        for category in categories:
-            Category.objects.get_or_create(
-                title=category, defaults={"title": category}
-            )
+    # def before_import_row(self, row, **kwargs):
+    #     city = row["city"]
+    #     City.objects.get_or_create(title=city, defaults={"title": city})
+    #     categories = row["categories"].split('|')
+    #     for category in categories:
+    #         Category.objects.get_or_create(
+    #             title=category, defaults={"title": category}
+    #         )
 
 
     class Meta:
         model = Realty
+        # import_id_fields = ('title',)
+        # fields = (
+        #     'id', 'title', 'phone_number',
+        #     'mobile_number', 'number', 'address',
+        #     'email', 'site', 'contact_name', 'city',
+        #     'categories', 'additional_information'
+        # )
 
 
 class CategoryResource(resources.ModelResource):
