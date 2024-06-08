@@ -37,6 +37,7 @@ ptb_application = (
 ptb_application.add_handler(CommandHandler("start", start))
 
 
+@csrf_exempt
 async def telegram(request: HttpRequest) -> HttpResponse:
     """Handle incoming Telegram updates by putting them into the `update_queue`."""
     try:
