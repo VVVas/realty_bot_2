@@ -19,8 +19,7 @@ class RealtyResource(resources.ModelResource):
     def before_import_row(self, row, **kwargs):
         city = row["city"]
         City.objects.get_or_create(title=city, defaults={"title": city})
-        categories = row["categories"].split('|')
-        for category in categories:
+        for category in row["categories"].split('|'):
             Category.objects.get_or_create(
                 title=category, defaults={"title": category}
             )
