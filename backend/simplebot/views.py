@@ -2,7 +2,7 @@
 import json
 
 from django.conf import settings
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpRequest, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from telegram import Update
 from telegram.ext import Application, CommandHandler
@@ -48,5 +48,4 @@ async def telegram(request: HttpRequest) -> HttpResponse:
         # Update.de_json(data=json.loads(request.body), bot=ptb_application.bot)
         Update.de_json(data=json_message, bot=ptb_application.bot)
     )
-    # return HttpResponse()
-    return JsonResponse({"status": "ok"})
+    return HttpResponse('OK')
