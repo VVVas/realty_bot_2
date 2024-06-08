@@ -29,7 +29,7 @@ async def telegram(request: HttpRequest) -> HttpResponse:
 
     ptb_application.add_handler(CommandHandler("start", start))
 
-    await ptb_application.start()
+    await ptb_application.run_webhook()
 
     await ptb_application.update_queue.put(
         Update.de_json(data=json.loads(request.body), bot=ptb_application.bot)
