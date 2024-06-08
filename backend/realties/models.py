@@ -23,7 +23,7 @@ class City(models.Model):
     """Модель города."""
 
     title = models.CharField(
-        'Название', max_length=32,
+        'Название', max_length=32
     )
     timezone = models.CharField(
         'Часовой пояс (по UTC)', max_length=3, null=True,
@@ -48,7 +48,7 @@ class Realty(models.Model):
     """Модель недвижимости."""
 
     title = models.CharField(
-        'Название недвижимости', max_length=128, blank=True, null=True,
+        'Название недвижимости', max_length=128
     )
     phone_number = models.TextField(
         'Номер стационарного телефона', blank=True, null=True
@@ -80,7 +80,8 @@ class Realty(models.Model):
     categories = models.ManyToManyField(
         Category,
         related_name='categories',
-        verbose_name='Категории'
+        verbose_name='Категории',
+        blank=True
     )
     img = models.FileField(
         'Фото', blank=True, null=True, upload_to='images/'
