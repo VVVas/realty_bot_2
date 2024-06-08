@@ -16,7 +16,6 @@ class RealtyResource(resources.ModelResource):
         widget=ManyToManyWidget(model=Category, field='title', separator='|'),
     )
 
-
     def before_import_row(self, row, **kwargs):
         city = row["city"]
         City.objects.get_or_create(title=city, defaults={"title": city})
@@ -26,18 +25,9 @@ class RealtyResource(resources.ModelResource):
                 title=category, defaults={"title": category}
             )
 
-
     class Meta:
         model = Realty
         exclude = ('img')
-        # import_id_fields = ('title',)
-        # fields = (
-        #     'id', 'title', 'phone_number',
-        #     'mobile_number', 'number', 'address',
-        #     'email', 'site', 'contact_name', 'city',
-        #     'categories', 'additional_information'
-        # )
-        # fields = (... 'categories__title')
 
 
 class CategoryResource(resources.ModelResource):
