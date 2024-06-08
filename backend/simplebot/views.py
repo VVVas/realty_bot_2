@@ -30,7 +30,8 @@ async def start(update: Update) -> None:
 
 
 ptb_application = (
-    Application.builder().token(settings.VVVAS_TELEGRAM_TOKEN).updater(None).build()
+    # Application.builder().token(settings.VVVAS_TELEGRAM_TOKEN).updater(None).build()
+    Application.builder().token(settings.VVVAS_TELEGRAM_TOKEN).build()
 )
 
 # register handlers
@@ -48,4 +49,4 @@ async def telegram(request: HttpRequest) -> HttpResponse:
         # Update.de_json(data=json.loads(request.body), bot=ptb_application.bot)
         Update.de_json(data=json_message, bot=ptb_application.bot)
     )
-    return HttpResponse('OK')
+    return HttpResponse()
