@@ -3,8 +3,6 @@ from django.contrib.admin import display
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from rangefilter.filters import DateRangeFilterBuilder
-from import_export import resources
-from import_export.admin import ImportExportModelAdmin
 
 from .models import Profile, User
 
