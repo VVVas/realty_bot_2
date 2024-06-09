@@ -7,7 +7,7 @@ class Category(models.Model):
     """Модель категории."""
 
     title = models.CharField(
-        'Название', max_length=32, unique=True
+        'Название', max_length=32, unique=True, null=False
     )
 
     class Meta:
@@ -23,7 +23,7 @@ class City(models.Model):
     """Модель города."""
 
     title = models.CharField(
-        'Название', max_length=32, unique=True
+        'Название', max_length=32, unique=True,
     )
     timezone = models.CharField(
         'Часовой пояс (по UTC)', max_length=3, null=True,

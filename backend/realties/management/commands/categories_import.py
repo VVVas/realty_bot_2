@@ -27,5 +27,7 @@ class Command(BaseCommand):
                 for row in reader:
                     _, created = Category.objects.get_or_create(**row)
         except FileNotFoundError:
-            raise CommandError('Добавьте файл categories.csv в директорию data')
+            raise CommandError(
+                'Добавьте файл categories.csv в директорию data'
+            )
         logging.warning('Успешно загружено')

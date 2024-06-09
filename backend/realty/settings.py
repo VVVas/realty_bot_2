@@ -30,6 +30,7 @@ CSRF_TRUSTED_ORIGINS = ['https://pb.vvvas.ru']
 # Application definition
 
 INSTALLED_APPS = [
+    'admin_reorder',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -51,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'admin_reorder.middleware.ModelAdminReorder',
 ]
 
 ROOT_URLCONF = 'realty.urls'
@@ -144,3 +146,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
 
 IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+ADMIN_REORDER = (
+    {
+        'app': 'realties',
+        'label': 'Недвижимость и объявления',
+        'models': (
+            'realties.Realty',
+            'realties.Ad',
+            'realties.Category',
+            'realties.City',
+        )
+    },
+    {
+        'app': 'realties',
+        'label': 'Комментарии пользователей',
+        'models': (
+            'realties.Comment',
+            'realties.Photo'
+        )
+    },
+    {
+        'app': 'bot',
+    },
+    {
+        'app': 'users',
+        'models': ('users.User', 'users.Profile')
+    },
+)
