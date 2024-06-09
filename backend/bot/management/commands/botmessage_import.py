@@ -27,5 +27,7 @@ class Command(BaseCommand):
                 for row in reader:
                     _, created = BotMessage.objects.get_or_create(**row)
         except FileNotFoundError:
-            raise CommandError('Добавьте файл botmessage.csv в директорию data')
+            raise CommandError(
+                'Добавьте файл botmessage.csv в директорию data'
+            )
         logging.warning('Успешно загружено')
