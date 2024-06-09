@@ -29,7 +29,7 @@ class ProfileAdmin(admin.ModelAdmin):
         'favorite_count', 'comments_count', 'status',
     )
     list_editable = ('status',)
-    list_display_links = ['username']
+    list_display_links = ['id', 'first_name']
     # readonly_fields = ('external_id',)
     list_per_page = 10
     list_filter = (
