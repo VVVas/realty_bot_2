@@ -38,11 +38,6 @@ class City(models.Model):
     def __str__(self) -> str:
         return str(self.title)
 
-    @classmethod
-    def get_default_city_pk(cls):
-        city, _ = City.objects.get_or_create(title='Unknown')
-        return city.pk
-
 
 class Realty(models.Model):
     """Модель недвижимости."""
@@ -73,13 +68,14 @@ class Realty(models.Model):
     )
     city = models.ForeignKey(
         City,
-        on_delete=models.SET_DEFAULT,
-        default=City.get_default_city_pk,
+        on_delete=models.SET_NULL,
         verbose_name='Город',
+        related_name='realties',
+        blank=True, null=True,
     )
     categories = models.ManyToManyField(
         Category,
-        related_name='categories',
+        related_name='realties',
         verbose_name='Категории',
         blank=True
     )
@@ -95,6 +91,12 @@ class Realty(models.Model):
         verbose_name = 'Недвижимость'
         verbose_name_plural = 'недвижимость'
         ordering = ('title',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'city'],
+                name='unique_title_city'
+            )
+        ]
 
     def __str__(self) -> str:
         return self.title
@@ -109,6 +111,7 @@ class Ad(models.Model):
     realty = models.ForeignKey(
         Realty,
         on_delete=models.PROTECT,
+        related_name='ads',
         verbose_name='Объект',
     )
     address = models.CharField(
@@ -146,7 +149,8 @@ class Photo(models.Model):
         'Фото', null=True
     )
     ad = models.ForeignKey(
-        Ad, on_delete=models.CASCADE, related_name='photos',
+        Ad, on_delete=models.CASCADE,
+        related_name='photos',
         verbose_name='Объявление'
     )
     user = models.ForeignKey(
@@ -195,12 +199,7 @@ class Comment(models.Model):
 
 
 class Favorite(models.Model):
-    """
-    Модель избранного.
-
-    favorite_ad - можно получить объявления, добавленные юзером в избранное.
-    favorite_users - можно получить юзеров, добавивших объявление в избранное.
-    """
+    """Модель избранного."""
 
     user = models.ForeignKey(
         Profile,
