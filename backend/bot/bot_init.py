@@ -2,7 +2,7 @@ from django.conf import settings
 from telegram.ext import Application, CommandHandler
 
 
-from .handlers2 import ads, conv_handler, filter_ad_category, start
+from .handlers import ads, conv_handler, filter_ad_category, start
 
 
 class TGBot:
