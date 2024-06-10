@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path
 
-from bot.views import TelegramBotView
+# from bot.views import TelegramBotView
 from main import webhook
 
 urlpatterns = [
