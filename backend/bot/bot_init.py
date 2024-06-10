@@ -10,7 +10,7 @@ class TGBot:
         self.ptb_app = (
             Application
             .builder()
-            .token('7186459956:AAEVCKeGIyQvlG3t4MEvxgt1nSzic3k7-7k')
+            .token(settings.TELEGRAM_TOKEN)
             .updater(None)
             .build()
         )
