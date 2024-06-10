@@ -4,7 +4,9 @@ from django.db import models
 from django.forms import Textarea, TextInput
 from django.utils.safestring import mark_safe
 from import_export.admin import ImportExportModelAdmin
-from rangefilter.filters import DateRangeFilterBuilder
+from rangefilter.filters import (
+    DateRangeFilterBuilder, NumericRangeFilterBuilder
+)
 
 from .models import Ad, Category, City, Comment, Photo, Realty
 from .resources import CategoryResource, CityResource, RealtyResource
@@ -76,7 +78,8 @@ class AdInline(admin.TabularInline):
 
 @admin.register(Realty)
 class RealtyAdmin(
-    ImportExportModelAdmin, GetImageMixIn,
+    ImportExportModelAdmin,
+    GetImageMixIn,
     GetImagePreviewMixIn
 ):
     list_display = (
@@ -131,6 +134,7 @@ class AdAdmin(admin.ModelAdmin):
     )
     list_filter = (
         ("date", DateRangeFilterBuilder(title="Дата добавления",)),
+        ("price", NumericRangeFilterBuilder(title="Стоимость за кв. м.",)),
     )
     list_editable = ('is_published',)
     autocomplete_fields = ['realty']
