@@ -18,7 +18,7 @@ from tg_bot import tgbot_core  # noqa E402
 
 
 URL = settings.GENERAL_URL  # Set URL for WebHook
-PORT = 8000
+PORT = 8500
 
 
 @csrf_exempt
