@@ -38,7 +38,7 @@ async def main():
             app=get_asgi_application(),
             port=PORT,
             use_colors=True,
-            host='0.0.0.0',
+            host='localhost',
             log_level=logging.DEBUG,
         )
     )
