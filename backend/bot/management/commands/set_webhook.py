@@ -12,6 +12,7 @@ TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
 
 
 class Command(BaseCommand):
+    help = 'Устанавливает вебхук для Телеграмм бота'
 
     async def run_bot(self):
         url = "{}{}".format(settings.GENERAL_URL, reverse('webhook'))

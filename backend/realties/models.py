@@ -7,7 +7,7 @@ class Category(models.Model):
     """Модель категории."""
 
     title = models.CharField(
-        'Название', max_length=32,
+        'Название', max_length=32, unique=True, null=False
     )
 
     class Meta:
@@ -16,14 +16,14 @@ class Category(models.Model):
         verbose_name_plural = 'категории'
 
     def __str__(self) -> str:
-        return self.title
+        return str(self.title)
 
 
 class City(models.Model):
     """Модель города."""
 
     title = models.CharField(
-        'Название', max_length=32,
+        'Название', max_length=32, unique=True,
     )
     timezone = models.CharField(
         'Часовой пояс (по UTC)', max_length=3, null=True,
@@ -36,19 +36,14 @@ class City(models.Model):
         verbose_name_plural = 'города'
 
     def __str__(self) -> str:
-        return self.title
-
-    @classmethod
-    def get_default_city_pk(cls):
-        city, _ = City.objects.get_or_create(title='Unknown')
-        return city.pk
+        return str(self.title)
 
 
 class Realty(models.Model):
     """Модель недвижимости."""
 
     title = models.CharField(
-        'Название недвижимости', max_length=128, blank=True, null=True,
+        'Название недвижимости', max_length=128
     )
     phone_number = models.TextField(
         'Номер стационарного телефона', blank=True, null=True
@@ -73,14 +68,16 @@ class Realty(models.Model):
     )
     city = models.ForeignKey(
         City,
-        on_delete=models.SET_DEFAULT,
-        default=City.get_default_city_pk,
+        on_delete=models.SET_NULL,
         verbose_name='Город',
+        related_name='realties',
+        blank=True, null=True,
     )
     categories = models.ManyToManyField(
         Category,
-        related_name='categories',
-        verbose_name='Категории'
+        related_name='realties',
+        verbose_name='Категории',
+        blank=True
     )
     img = models.FileField(
         'Фото', blank=True, null=True, upload_to='images/'
@@ -94,6 +91,12 @@ class Realty(models.Model):
         verbose_name = 'Недвижимость'
         verbose_name_plural = 'недвижимость'
         ordering = ('title',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'city'],
+                name='unique_title_city'
+            )
+        ]
 
     def __str__(self) -> str:
         return self.title
@@ -108,6 +111,7 @@ class Ad(models.Model):
     realty = models.ForeignKey(
         Realty,
         on_delete=models.PROTECT,
+        related_name='ads',
         verbose_name='Объект',
     )
     address = models.CharField(
@@ -145,7 +149,8 @@ class Photo(models.Model):
         'Фото', null=True
     )
     ad = models.ForeignKey(
-        Ad, on_delete=models.CASCADE, related_name='photos',
+        Ad, on_delete=models.CASCADE,
+        related_name='photos',
         verbose_name='Объявление'
     )
     user = models.ForeignKey(
@@ -194,12 +199,7 @@ class Comment(models.Model):
 
 
 class Favorite(models.Model):
-    """
-    Модель избранного.
-
-    favorite_ad - можно получить объявления, добавленные юзером в избранное.
-    favorite_users - можно получить юзеров, добавивших объявление в избранное.
-    """
+    """Модель избранного."""
 
     user = models.ForeignKey(
         Profile,
