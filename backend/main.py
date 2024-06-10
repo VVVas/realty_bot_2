@@ -14,7 +14,7 @@ from telegram import Update
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'realty.settings')
 django.setup()
 
-from bot.bot_init import tgbot  # noqa
+from tg_bot import tgbot_core  # noqa E402
 
 
 URL = settings.GENERAL_URL  # Set URL for WebHook
@@ -24,10 +24,10 @@ PORT = 8000
 @csrf_exempt
 async def webhook(request: HttpRequest) -> HttpResponse:
     """Обрабатываем полученное от бота сообщение."""
-    await tgbot.ptb_app.update_queue.put(
+    await tgbot_core.ptb_app.update_queue.put(
         Update.de_json(
             data=json.loads(request.body),
-            bot=tgbot.ptb_app.bot)
+            bot=tgbot_core.ptb_app.bot)
     )
     return HttpResponse()
 
@@ -43,15 +43,15 @@ async def main():
         )
     )
 
-    await tgbot.ptb_app.bot.setWebhook(
+    await tgbot_core.ptb_app.bot.setWebhook(
         url=f'{URL}/webhook/',
         allowed_updates=Update.ALL_TYPES,
     )
 
-    async with tgbot.ptb_app:
-        await tgbot.ptb_app.start()
+    async with tgbot_core.ptb_app:
+        await tgbot_core.ptb_app.start()
         await webserver.serve()
-        await tgbot.ptb_app.stop()
+        await tgbot_core.ptb_app.stop()
 
 
 if __name__ == '__main__':
