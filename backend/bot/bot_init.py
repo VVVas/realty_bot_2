@@ -7,7 +7,7 @@ from .handlers2 import ads, conv_handler, filter_ad_category, start
 
 class TGBot:
     def __init__(self):
-        """Создаём бота и добавляем в него обработчики сообщений"""
+        """Создаём бота и добавляем в него обработчики сообщений."""
         self.ptb_app = (
             Application
             .builder()

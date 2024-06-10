@@ -14,7 +14,6 @@ from telegram import Update
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'realty.settings')
 django.setup()
 
-
 from bot.bot_init import tgbot  # noqa
 
 
@@ -24,8 +23,10 @@ PORT = 8000
 
 @csrf_exempt
 async def webhook(request: HttpRequest) -> HttpResponse:
-    """Handle incoming Telegram updates by putting them
-    into the `update_queue`"""
+    """
+    Handle incoming Telegram updates by putting them
+    into the `update_queue`
+    """
     await tgbot.ptb_app.update_queue.put(
         Update.de_json(
             data=json.loads(request.body),
