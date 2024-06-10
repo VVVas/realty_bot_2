@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 
 from bot.views import TelegramBotView
-from bot2 import webhook
+from main import webhook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
