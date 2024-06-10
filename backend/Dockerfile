@@ -7,4 +7,5 @@ RUN pip install -r requirements.txt --no-cache-dir
 COPY . .
 
 # CMD ["gunicorn", "--bind", "0.0.0.0:8000", "realty.wsgi"]
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "realty.asgi:application", "-k", "uvicorn.workers.UvicornWorker"]
+# CMD ["gunicorn", "--bind", "0.0.0.0:8000", "realty.asgi:application", "-k", "uvicorn.workers.UvicornWorker"]
+CMD ["python", "main.py"]
