@@ -2,12 +2,12 @@ from django.conf import settings
 from telegram.ext import Application, CommandHandler
 
 
-from .handlers2 import (CommandHandler, ads, conv_handler,
-                        filter_ad_category, start)
+from .handlers2 import ads, conv_handler, filter_ad_category, start
 
 
 class TGBot:
     def __init__(self):
+        """Создаём бота и добавляем в него обработчики сообщений"""
         self.ptb_app = (
             Application
             .builder()
