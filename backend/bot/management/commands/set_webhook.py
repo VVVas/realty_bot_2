@@ -1,18 +1,32 @@
+import asyncio
+
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.urls import reverse
+from telegram import Update
 
-from bot.bot_init import APPLICATION
+from bot.bot_init import tgbot
+
+
+TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN
 
 
 class Command(BaseCommand):
 
+    async def run_bot(self):
+        url = "{}{}".format(settings.GENERAL_URL, reverse('webhook'))
+        await tgbot.ptb_app.bot.set_webhook(
+            url=url,
+            allowed_updates=Update.ALL_TYPES
+        )
+        async with tgbot.ptb_app:
+            await tgbot.ptb_app.start()
+            await tgbot.ptb_app.stop()
+
     def handle(self, *args, **options):
-        url = "{}{}".format(settings.GENERAL_URL, reverse("process"))
-        is_appointed = APPLICATION.bot.set_webhook(url=url)
-        if is_appointed:
-            self.stdout.write(self.style.SUCCESS(
-                "Webhook was successfully appointed."
-            ))
-        else:
-            self.stdout.write(self.style.ERROR("Something went wrong."))
+
+        try:
+            # asyncio.get_event_loop().run_until_complete(self.run_bot())
+            self.stdout.write(self.style.SUCCESS("Бот запущен"))
+        except Exception as e:
+            self.stdout.write(self.style.ERROR(f"Something went wrong. {e}"))

@@ -1,39 +1,60 @@
-from telegram import ReplyKeyboardMarkup
-from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
+import asyncio
+import json
+import logging
+import os
 
-TELEGRAM_TOKEN = 'value'
-GREETINGS = ("привет, {name}. "
-             "Это бот, который создает единое пространство по предоставлению "
-             "информации о коммерческих площадках и их собственниках, "
-             "для облегчения поиска предпринимателям.")
+import django
+import uvicorn
+from django.conf import settings
+from django.core.asgi import get_asgi_application
+from django.http import HttpRequest, HttpResponse
+from django.views.decorators.csrf import csrf_exempt
+from telegram import Update
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'realty.settings')
+django.setup()
 
 
-def say_hi(update, context):
-    chat = update.effective_chat
-    context.bot.send_message(chat_id=chat.id, text='hi')
+from bot.bot_init import tgbot  # noqa
 
 
-def start(update, context):
-    chat = update.effective_chat
-    markup = ReplyKeyboardMarkup([['/help']])
-    context.bot.send_message(
-        chat_id=chat.id,
-        text=(f'{GREETINGS.format(name = chat.first_name)}'),
-        reply_markup=markup
+URL = settings.GENERAL_URL  # Set URL for WebHook
+PORT = 8000
+
+
+@csrf_exempt
+async def webhook(request: HttpRequest) -> HttpResponse:
+    """Handle incoming Telegram updates by putting them
+    into the `update_queue`"""
+    await tgbot.ptb_app.update_queue.put(
+        Update.de_json(
+            data=json.loads(request.body),
+            bot=tgbot.ptb_app.bot)
+    )
+    return HttpResponse()
+
+
+async def main():
+    webserver = uvicorn.Server(
+        config=uvicorn.Config(
+            app=get_asgi_application(),
+            port=PORT,
+            use_colors=True,
+            host='localhost',
+            log_level=logging.DEBUG,
+        )
     )
 
+    await tgbot.ptb_app.bot.setWebhook(
+        url=f'{URL}/webhook/',
+        allowed_updates=Update.ALL_TYPES,
+    )
 
-def help(update, context):
-    chat = update.effective_chat
-    context.bot.send_message(chat_id=chat.id,
-                             text='help,')
-    update.message.reply_text('some settings')
+    async with tgbot.ptb_app:
+        await tgbot.ptb_app.start()
+        await webserver.serve()
+        await tgbot.ptb_app.stop()
 
 
-updater = Updater(token=TELEGRAM_TOKEN)
-dp = updater.dispatcher
-dp.add_handler(CommandHandler('start', start))
-dp.add_handler(CommandHandler('help', help))
-dp.add_handler(MessageHandler(Filters.text, say_hi))
-updater.start_polling()
-updater.idle()
+if __name__ == '__main__':
+    asyncio.run(main())
