@@ -23,10 +23,7 @@ PORT = 8000
 
 @csrf_exempt
 async def webhook(request: HttpRequest) -> HttpResponse:
-    """
-    Handle incoming Telegram updates by putting them
-    into the `update_queue`
-    """
+    """Обрабатываем полученное от бота сообщение."""
     await tgbot.ptb_app.update_queue.put(
         Update.de_json(
             data=json.loads(request.body),
