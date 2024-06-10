@@ -5,7 +5,7 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# env_file_path = '../infra/.env'
+# # env_file_path = '../infra/.env'
 # load_dotenv(dotenv_path=env_file_path)
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '-1')
 GENERAL_URL = os.getenv('GENERAL_URL', default='https://mysite.com/')
@@ -171,6 +171,32 @@ ADMIN_REORDER = (
     },
     {
         'app': 'users',
-        'models': ('users.User', 'users.Profile')
+        'models': (
+            'users.User',
+            'users.Profile'
+        )
     },
 )
+
+ADMIN_PERMISSIONS = [
+    'change_profile',
+    'view_profile',
+    'add_ad',
+    'change_ad',
+    'view_ad',
+    'add_category',
+    'change_category',
+    'view_category',
+    'add_city',
+    'change_city',
+    'view_city',
+    'add_comment',
+    'change_comment',
+    'view_comment',
+    'add_realty',
+    'change_realty',
+    'view_realty',
+    'add_photo',
+    'change_photo',
+    'view_photo',
+]
