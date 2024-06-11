@@ -4,7 +4,6 @@ from django.conf import settings
 from telegram import Update
 from telegram.ext import CommandHandler, ContextTypes, ConversationHandler
 
-
 from realties.models import Ad
 
 TELEGRAM_TOKEN = settings.TELEGRAM_TOKEN

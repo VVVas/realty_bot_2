@@ -6,6 +6,7 @@ import django
 import uvicorn
 from django.conf import settings
 from django.core.asgi import get_asgi_application
+from django.urls import reverse
 from telegram import Update
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'realty.settings')
@@ -13,8 +14,6 @@ os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 django.setup()
 
 from bot import bot_init  # noqa E402
-
-URL = settings.GENERAL_URL  # Set URL for WebHook
 
 
 async def main():
@@ -28,8 +27,9 @@ async def main():
         )
     )
 
+    webhook_path = reverse('webhook')
     await bot_init.tgbot.ptb_app.bot.setWebhook(
-        url=f'{URL}/webhook/',
+        url=f'{settings.GENERAL_URL}{webhook_path}',
         allowed_updates=Update.ALL_TYPES,
     )
 
