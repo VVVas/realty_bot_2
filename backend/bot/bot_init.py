@@ -16,13 +16,13 @@ class TGBot:
             .updater(None)
             .build()
         )
+        self.ptb_app.add_handler(search_conv_handler)
         # self.ptb_app.add_handler(CommandHandler("start", start))
         self.ptb_app.add_handler(CommandHandler("ads", ads))
         self.ptb_app.add_handler(CommandHandler(
             "filter_ad_category", filter_ad_category
         ))
         self.ptb_app.add_handler(conv_handler)
-        self.ptb_app.add_handler(search_conv_handler)
 
 
 tgbot = TGBot()
