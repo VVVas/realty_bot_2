@@ -27,11 +27,11 @@ async def main():
         )
     )
 
-    # webhook_path = reverse('webhook')
-    # await bot_init.tgbot.ptb_app.bot.setWebhook(
-    #     url=f'{settings.GENERAL_URL}{webhook_path}',
-    #     allowed_updates=Update.ALL_TYPES,
-    # )
+    webhook_path = reverse('webhook')
+    await bot_init.tgbot.ptb_app.bot.setWebhook(
+        url=f'{settings.GENERAL_URL}{webhook_path}',
+        allowed_updates=Update.ALL_TYPES,
+    )
 
     async with bot_init.tgbot.ptb_app:
         await bot_init.tgbot.ptb_app.start()
