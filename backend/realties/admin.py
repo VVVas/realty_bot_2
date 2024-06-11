@@ -4,9 +4,8 @@ from django.db import models
 from django.forms import Textarea, TextInput
 from django.utils.safestring import mark_safe
 from import_export.admin import ImportExportModelAdmin
-from rangefilter.filters import (
-    DateRangeFilterBuilder, NumericRangeFilterBuilder
-)
+from rangefilter.filters import (DateRangeFilterBuilder,
+                                 NumericRangeFilterBuilder)
 
 from .models import Ad, Category, City, Comment, Photo, Realty
 from .resources import CategoryResource, CityResource, RealtyResource

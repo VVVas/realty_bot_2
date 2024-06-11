@@ -4,6 +4,7 @@ import os
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
+
 from realties.models import Category
 
 DATA = os.path.join(settings.BASE_DIR, 'data')
