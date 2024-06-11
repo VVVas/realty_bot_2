@@ -3,7 +3,7 @@ from sys import stdout
 
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
-                          MessageHandler, filters,)
+                          filters, MessageHandler,)
 
 from realties.models import City, Category # noqa
 
