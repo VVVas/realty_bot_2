@@ -5,7 +5,7 @@ from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
                           filters, MessageHandler,)
 
-from realties.models import City, Category # noqa
+from realties.models import Category, City # noqa
 
 START, CITY, CITY_CHOICE, CATEGORY = range(4)
 
