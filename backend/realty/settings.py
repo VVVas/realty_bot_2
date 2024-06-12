@@ -1,14 +1,12 @@
 import os
 from pathlib import Path
 
-# from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# # env_file_path = '../infra/.env'
-# load_dotenv(dotenv_path=env_file_path)
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN', '-1')
-GENERAL_URL = os.getenv('GENERAL_URL', default='https://mysite.com/')
+GENERAL_URL = os.getenv('GENERAL_URL', 'https://example.com')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -25,7 +23,8 @@ ALLOWED_HOSTS = [
     'pb.vvvas.ru',
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://pb.vvvas.ru']
+# CSRF_TRUSTED_ORIGINS = ['https://pb.vvvas.ru']
+CSRF_TRUSTED_ORIGINS = [GENERAL_URL]
 
 # Application definition
 
