@@ -24,3 +24,6 @@ class BotMessage(models.Model):
         verbose_name = 'Сообщение'
         verbose_name_plural = 'Сообщения'
         ordering = ('keyword',)
+
+    def __str__(self):
+        return f'{self.keyword} - {self.title}'
