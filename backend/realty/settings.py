@@ -29,13 +29,13 @@ CSRF_TRUSTED_ORIGINS = ['https://pb.vvvas.ru']
 # Application definition
 
 INSTALLED_APPS = [
-    'admin_reorder',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'admin_reorder',
     'rangefilter',
     'import_export',
     'bot.apps.BotConfig',
@@ -149,7 +149,7 @@ IMPORT_EXPORT_USE_TRANSACTIONS = True
 ADMIN_REORDER = (
     {
         'app': 'realties',
-        'label': 'Недвижимость и объявления',
+        'label': 'Недвижимость и объявления ',
         'models': (
             'realties.Realty',
             'realties.Ad',
@@ -176,6 +176,14 @@ ADMIN_REORDER = (
         )
     },
 )
+
+# JAZZMIN_SETTINGS = {
+#     "show_sidebar": False,
+#     "topmenu_links": [
+#         {"name": "Главная",  "url": "admin:index", "permissions": ["auth.view_user"]},
+#     ],
+# }
+# JAZZMIN_SETTINGS["show_ui_builder"] = True
 
 ADMIN_PERMISSIONS = [
     'change_profile',

@@ -30,7 +30,7 @@ class ProfileAdmin(admin.ModelAdmin):
     )
     list_editable = ('status',)
     list_display_links = ['external_id', 'first_name']
-    # readonly_fields = ('external_id',)
+    readonly_fields = ('external_id',)
     list_per_page = 10
     list_filter = (
         ("date", DateRangeFilterBuilder()),
