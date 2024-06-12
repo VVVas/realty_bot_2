@@ -9,3 +9,9 @@ from .resources import BotMessageResource
 class MessageAdmin(ImportExportModelAdmin):
     list_display = ('title', 'keyword', 'text')
     resource_class = BotMessageResource
+    # readonly_fields = ('keyword',)
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['keyword']
+        return []
