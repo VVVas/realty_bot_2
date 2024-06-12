@@ -24,7 +24,6 @@ ALLOWED_HOSTS = [
 ]
 
 CSRF_TRUSTED_ORIGINS = ['https://pb.vvvas.ru']
-# CSRF_TRUSTED_ORIGINS = [GENERAL_URL]
 
 # Application definition
 
