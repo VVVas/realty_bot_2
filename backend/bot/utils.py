@@ -4,6 +4,7 @@ def get_botmessage_by_keyword(keyword):
         keyword=keyword
     ).values_list('text', flat=True).first()
 
+
 async def aget_botmessage_by_keyword(keyword):
     from bot.models import BotMessage
     return BotMessage.objects.filter(
