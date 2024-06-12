@@ -6,7 +6,7 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
                           MessageHandler, filters)
 
 from realties.models import Category, City
-from .utils import get_botmessage_by_keyword
+from .utils import aget_botmessage_by_keyword
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 
@@ -24,7 +24,7 @@ def stdout_message(update):
 
 
 async def start(update: Update, context: CallbackContext) -> int:
-    greeting_message = get_botmessage_by_keyword('WELCOME')
+    greeting_message = await aget_botmessage_by_keyword('WELCOME')
 
     # greeting_message = (
     #     'Тут будет приветствие. \n'
@@ -47,7 +47,8 @@ async def start(update: Update, context: CallbackContext) -> int:
 
 
 async def help_command(update: Update, context: CallbackContext) -> int:
-    bot_description = 'Тут будет описание работы'
+    bot_description = await aget_botmessage_by_keyword('BOT_DESCRIPTION')
+    # bot_description = 'Тут будет описание работы'
     stdout_message(update)
     await update.message.reply_text(bot_description)
     return START
