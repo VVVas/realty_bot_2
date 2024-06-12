@@ -37,10 +37,10 @@ docker compose exec backend python manage.py createsuperuser
 ```
 
 ## Как развернуть на сервере
-Установите на сервер Docker и nginx  
-Пробросьте запросы от внешнего nginx к nginx в контейнере  
-Создайте файл `.env` и заполните его по образцу `.env.example`
-Скопируйте на сервер `.env` и `docker-compose.prod.yml`  
+Установите на сервер Docker и nginx.  
+Пробросьте запросы от внешнего nginx к nginx в контейнере.  
+Создайте файл `.env` и заполните его по образцу `.env.example`.  
+Скопируйте на сервер `.env` и `docker-compose.prod.yml`.  
 Запустите докер:  
 ```
 docker compose -f docker-compose.prod.yml up -d  
@@ -76,6 +76,7 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py createsu
 - измените названия образов (значение `tags:`) для публикации в DockerHub для бэкэнда и гейтвея.  
 - укажите директорию назначения на сервере для копирования `docker-compose.prod.yml` (значение `target`).  
 - добавьте значения секретов в настройках репозитария (Settings → Secrets and variables → Actions).  
+
 Создайте файл `.env` и заполните его по образцу `.env.example`.  
 Скопируйте на сервер `.env` в директорию для копирования `docker-compose.prod.yml`.  
 Одобрите пулреквест в ветку `prod`.  
