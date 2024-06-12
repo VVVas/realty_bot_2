@@ -11,7 +11,7 @@ START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
-    Profile.objects.create(
+    Profile.objects.get_or_create(
         external_id=update.message.from_user.id,
         username=update.message.from_user.username,
         first_name=update.message.from_user.first_name,
