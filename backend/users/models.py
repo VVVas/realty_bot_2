@@ -26,13 +26,13 @@ class Profile(models.Model):
         unique=True,
     )
     username = models.CharField(
-        'Имя пользователя', max_length=255, blank=True
+        'Имя пользователя', max_length=255, blank=True, null=True
     )
     first_name = models.CharField(
         'Имя', max_length=255,
     )
     last_name = models.CharField(
-        'Фамилия', max_length=255, blank=True
+        'Фамилия', max_length=255, blank=True, null=True
     )
     date = models.DateTimeField(
         'Дата регистрации', auto_now_add=True
