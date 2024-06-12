@@ -10,6 +10,11 @@ from realties.models import Category, City
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 
 
+def chunks(lst, chunk_size):
+    for i in range(0, len(lst), chunk_size):
+        yield lst[i:i + chunk_size]
+
+
 def stdout_message(update):
     return stdout.write(f"{datetime.datetime.now()}"
                         f"Бот получил сообщение {update.message.text} "
@@ -74,19 +79,18 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
 
 
 async def select_city(update: Update, context: CallbackContext) -> int:
-    list_button = [[]]
     list_names = [category.title for category in Category.objects.all()]
-    for category in list_names:
-        list_button[0].append(category)
+    chunk_size = 3
+    list_chunks = list(chunks(list_names, chunk_size))
+    keyboard = [chunk for chunk in list_chunks]
     stdout_message(update)
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
         'Отлично! Теперь необходимо выбрать категорию',
         reply_markup=ReplyKeyboardMarkup(
-            list_button,
-            one_time_keyboard=True,
-            resize_keyboard=True
+            keyboard,
+            one_time_keyboard=True
         )
     )
 
@@ -118,7 +122,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         f"Вот параметры выборки, который вы выбрали: \n"
         f"Город: {city}\n"
         f"Категория: {category}\n"
-        f"Цена: {price}\n"
+        f"Цена: {update.message.text}\n"
         f"В данном примере выборка выглядела бы вот так:\n"
         f"Ad.objects.filter(realty__in=Realty.objects.filter(city={city}, "
         f"category={category}), "
