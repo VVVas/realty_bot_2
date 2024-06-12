@@ -6,32 +6,20 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
                           MessageHandler, filters)
 
 from realties.models import Category, City
-from .utils import get_botmessage_by_keyword
+from users.models import Profile
+from .utils import get_botmessage_by_keyword, chunks
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 
 
-def chunks(lst, chunk_size):
-    for i in range(0, len(lst), chunk_size):
-        yield lst[i:i + chunk_size]
-
-
-def stdout_message(update):
-    return stdout.write(f"{datetime.datetime.now()}"
-                        f"Бот получил сообщение {update.message.text} "
-                        f"от {update.message.from_user.first_name} "
-                        f"{update.message.from_user.last_name}\n")
-
-
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
-
-    # greeting_message = (
-    #     'Тут будет приветствие. \n'
-    #     'Выберите действие открыв клавиатуру \n'
-    #     'Или нажав на кнопку в компьютерной версии.'
-    # )
-    stdout_message(update)
+    Profile.objects.create(
+        external_id=update.message.from_user.id,
+        username=update.message.from_user.username,
+        first_name=update.message.from_user.first_name,
+        last_name=update.message.from_user.last_name
+    )
     keyboard = [['Начало работы', 'О боте']]
 
     await update.message.reply_text(
@@ -48,14 +36,11 @@ async def start(update: Update, context: CallbackContext) -> int:
 
 async def help_command(update: Update, context: CallbackContext) -> int:
     bot_description = get_botmessage_by_keyword('BOT_DESCRIPTION')
-    # bot_description = 'Тут будет описание работы'
-    stdout_message(update)
     await update.message.reply_text(bot_description)
     return START
 
 
 async def start_work(update: Update, context: CallbackContext) -> int:
-    stdout_message(update)
     await update.message.reply_text(
         "Давайте начнем поиск объявлений. Пожалуйста, введите название города:"
     )
@@ -70,7 +55,6 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
     for city in list_names:
         if city.startswith(city_name):
             list_button[0].append(city)
-    stdout_message(update)
     await update.message.reply_text(
         'Вот какие города я нашёл. Выберите нужный из списка:',
         reply_markup=ReplyKeyboardMarkup(
@@ -87,7 +71,6 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     chunk_size = 3
     list_chunks = list(chunks(list_names, chunk_size))
     keyboard = [chunk for chunk in list_chunks]
-    stdout_message(update)
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
@@ -102,7 +85,6 @@ async def select_city(update: Update, context: CallbackContext) -> int:
 
 
 async def select_category(update: Update, context: CallbackContext) -> int:
-    stdout_message(update)
     selected_category = update.message.text
     context.user_data['selected_category'] = selected_category
     await update.message.reply_text(
@@ -115,7 +97,6 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 
 
 async def select_price(update: Update, context: CallbackContext) -> int:
-    stdout_message(update)
     selected_price = update.message.text.replace(' ', '').split('-')
     context.user_data['selected_price'] = selected_price
     city = context.user_data['selected_city']
