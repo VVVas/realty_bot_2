@@ -27,6 +27,7 @@ class RealtyResource(resources.ModelResource):
     class Meta:
         model = Realty
         exclude = ('img')
+        import_id_fields = ('id',)
 
 
 class CategoryResource(resources.ModelResource):

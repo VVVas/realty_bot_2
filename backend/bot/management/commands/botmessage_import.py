@@ -26,7 +26,10 @@ class Command(BaseCommand):
             ) as csv_file:
                 reader = DictReader(csv_file)
                 for row in reader:
-                    _, created = BotMessage.objects.get_or_create(**row)
+                    _, created = BotMessage.objects.update_or_create(
+                        keyword=row['keyword'],
+                        defaults=row
+                    )
         except FileNotFoundError:
             raise CommandError(
                 'Добавьте файл botmessage.csv в директорию data'

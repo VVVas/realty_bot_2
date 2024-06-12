@@ -5,6 +5,5 @@ psycopg[binary]==3.1.19
 django-admin-rangefilter==0.13.0
 django-import-export==4.0.6
 django-modeladmin-reorder==0.3.1
-
 uvicorn==0.30.1
 # Pillow==9.3.0
