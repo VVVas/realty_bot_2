@@ -26,6 +26,10 @@ class Command(BaseCommand):
             ) as csv_file:
                 reader = DictReader(csv_file)
                 for row in reader:
+                    if BotMessage.objects.filter(
+                        keyword=row['keyword']
+                    ).exists:
+                        continue
                     _, created = BotMessage.objects.update_or_create(
                         keyword=row['keyword'],
                         defaults=row
