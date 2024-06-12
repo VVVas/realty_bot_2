@@ -93,13 +93,13 @@ class Realty(models.Model):
         ordering = ('title',)
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'city'],
-                name='unique_title_city'
+                fields=['title', 'city', 'address'],
+                name='unique_title_city_address'
             )
         ]
 
     def __str__(self) -> str:
-        return self.title
+        return f'{self.title} в {self.city} по адресу {self.address}'
 
 
 class Ad(models.Model):
