@@ -1,6 +1,3 @@
-import datetime
-from sys import stdout
-
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
                           MessageHandler, filters)
