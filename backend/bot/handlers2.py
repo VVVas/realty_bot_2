@@ -1,11 +1,11 @@
 import datetime
 from sys import stdout
 
-from telegram import Update, ReplyKeyboardMarkup
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
-                          filters, MessageHandler,)
+                          MessageHandler, filters)
 
-from realties.models import Category, City # noqa
+from realties.models import Category, City
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 
