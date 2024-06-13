@@ -16,7 +16,7 @@ COMMENT, FAVORITE, DELETE_FAVORITE = range(5, 8)
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
     try:
-        user = Profile.objects.get(external_id=update.message.from_user.id)
+        Profile.objects.get(external_id=update.message.from_user.id)
         keyboard = [
             ['Начало работы', 'О боте', 'Избранное', 'Удалить учетную запись']]
     except ObjectDoesNotExist:
