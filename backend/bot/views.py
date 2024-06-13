@@ -10,9 +10,13 @@ from . import bot_init
 @csrf_exempt
 async def webhook(request: HttpRequest) -> HttpResponse:
     """Обрабатываем полученное от бота сообщение."""
+    try:
+        json_message = json.loads(request.body)
+    except json.decoder.JSONDecodeError:
+        pass
     await bot_init.tgbot.ptb_app.update_queue.put(
         Update.de_json(
-            data=json.loads(request.body),
+            data=json_message,
             bot=bot_init.tgbot.ptb_app.bot)
     )
     return HttpResponse()
