@@ -1,6 +1,6 @@
 from django.db.models import Q
-from telegram import ReplyKeyboardMarkup, Update, InlineKeyboardButton, \
-    InlineKeyboardMarkup
+from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
+                      InlineKeyboardMarkup)
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
                           MessageHandler, filters, CallbackQueryHandler)
 
@@ -104,12 +104,13 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     category = context.user_data['selected_category']
     price = context.user_data['selected_price']
     queryset = Ad.objects.filter(
-            Q(realty__in=Realty.objects.filter(
+        Q(
+            realty__in=Realty.objects.filter(
                 city__title=city,
                 categories__title=category
-            )),
-            Q(price__gte=int(price[0]),
-              price__lte=int(price[1])) | Q(price=None)
+            )
+        ),
+        Q(price__gte=int(price[0]), price__lte=int(price[1])) | Q(price=None)
     )
     if len(queryset.all()) > 0:
         for ad in queryset:
