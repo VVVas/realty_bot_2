@@ -1,3 +1,5 @@
+import logging
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
@@ -5,12 +7,23 @@ from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
                           MessageHandler, filters, CallbackQueryHandler)
 
-from realties.models import Category, City, Ad, Realty, Favorite
+from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
+
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+)
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
+
+
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-COMMENT, FAVORITE, DELETE_FAVORITE = range(5, 8)
+COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 9)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
@@ -50,10 +63,10 @@ async def start_work(update: Update, context: CallbackContext) -> int:
 
 async def city_choice(update: Update, context: CallbackContext) -> int:
     list_button = [[]]
-    city_name = update.message.text
+    city_name = update.message.text.lower()
     list_names = [city.title for city in City.objects.all()]
     for city in list_names:
-        if city.istartswith(city_name):
+        if city.lower().startswith(city_name):
             list_button[0].append(city)
     await update.message.reply_text(
         'Вот какие города я нашёл. Выберите нужный из списка:',
@@ -117,7 +130,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 [
                     InlineKeyboardButton(
                         "Добавить в избранное",
-                        callback_data=f'{str(FAVORITE)},{ad.pk}'
+                        callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
                     ),
                     InlineKeyboardButton(
                         "Комментарии",
@@ -158,11 +171,27 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
 
 async def comment(update: Update, context: CallbackContext):
-    pass
+    query = update.callback_query
+    await query.answer()
+    query_data = query.data.split(',')
+    comments = Comment.objects.filter(ad=query_data[1])
+    await query.edit_message_text(
+        f'{[comment.text for comment in comments]}'
+    )
 
 
-async def ad_to_favorite(update: Update, context: CallbackContext):
-    pass
+async def add_to_favorite(update: Update, context: CallbackContext):
+    query = update.callback_query
+    await query.answer()
+    query_data = query.data.split(',')
+
+    fav,_ = Favorite.objects.get_or_create(
+        user__external_id=update.effective_user.id,
+        ad_id=query_data[1]
+    )
+    await query.edit_message_text(
+        'Объявление добавлено в избранное.'
+    )
 
 
 async def favorite(update: Update, context: CallbackContext):
@@ -231,7 +260,9 @@ search_conv_handler = ConversationHandler(
     fallbacks=[],
 )
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
-favorite_handler = CallbackQueryHandler(favorite, pattern="^" + str(FAVORITE))
+favorite_handler = CallbackQueryHandler(
+    add_to_favorite, pattern="^" + str(ADD_FAVORITE)
+)
 delete_favorite_handler = CallbackQueryHandler(
     delete_favorite,
     pattern="^" + str(DELETE_FAVORITE)
