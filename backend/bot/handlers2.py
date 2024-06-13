@@ -10,7 +10,7 @@ from .utils import get_botmessage_by_keyword, chunks
 
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 9)
+COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 10)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
@@ -46,7 +46,8 @@ async def help_command(update: Update, context: CallbackContext) -> int:
 
 async def start_work(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(
-        "Давайте начнем поиск объявлений. Пожалуйста, введите название города:"
+        "Давайте начнем поиск объявлений. "
+        "Пожалуйста, введите название города"
     )
 
     return CITY_CHOICE
@@ -75,47 +76,61 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     chunk_size = 3
     list_chunks = list(chunks(list_names, chunk_size))
     keyboard = [chunk for chunk in list_chunks]
+    keyboard.append(['Пропустить'])
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
-        'Отлично! Теперь необходимо выбрать категорию',
+        'Отлично! Теперь необходимо '
+        'выбрать категорию или пропустить этот шаг.',
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True
         )
     )
-
     return CATEGORY
 
 
 async def select_category(update: Update, context: CallbackContext) -> int:
     selected_category = update.message.text
-    context.user_data['selected_category'] = selected_category
-    await update.message.reply_text(
-        'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
-        'Введите его, разделяя цифры тире (-).\n'
-        'Например: 10000-20000'
-    )
+    if selected_category.lower() != "пропустить":
+        context.user_data['selected_category'] = selected_category
+        await update.message.reply_text(
+            'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
+            'Введите его, разделяя цифры тире (-).\n'
+            'Например: 10000-20000',
+            reply_markup=ReplyKeyboardMarkup(
+                [['Пропустить']],
+                one_time_keyboard=True
+            )
+        )
 
-    return PRICE
+        return PRICE
+    else:
+        context.user_data['selected_category'] = None
+        return await select_price(update, context)
 
 
 async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
-    context.user_data['selected_price'] = selected_price
+    if (selected_price[0].lower() != "пропустить"
+            or int(selected_price[0]) != 0):
+        context.user_data['selected_price'] = selected_price
+    else:
+        context.user_data['selected_price'] = None
     city = context.user_data['selected_city']
     category = context.user_data['selected_category']
     price = context.user_data['selected_price']
-    queryset = Ad.objects.filter(
-        Q(
-            realty__in=Realty.objects.filter(
-                city__title=city,
-                categories__title=category
-            )
-        ),
-        Q(price__gte=int(price[0]), price__lte=int(price[1])) | Q(price=None)
-    )
-    if len(queryset.all()) > 0:
+    filters = Q()
+    if city:
+        filters &= Q(realty__city__title=city)
+    if category:
+        filters &= Q(realty__categories__title=category)
+    if price:
+        filters &= Q(
+            price__gte=int(price[0]), price__lte=int(price[1])
+        ) | Q(price=None)
+    queryset = Ad.objects.filter(filters)
+    if queryset.exists():
         for ad in queryset:
             keyboard = [
                 [
@@ -127,6 +142,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                         "Комментарии",
                         callback_data=f'{str(COMMENT)},{ad.pk}'
                     ),
+                    InlineKeyboardButton(
+                        "Добавить комментарий",
+                        callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                    )
                 ],
             ]
             if ad.price is not None:
@@ -145,15 +164,21 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             'Мы не смогли найти объявления по заданным критериям\n'
             'Вот здания, которые подходят под Ваш запрос:'
         )
-        for realty in Realty.objects.filter(
-                city__title=city,
-                categories__title=category
-        ):
+        realty_queryset = Realty.objects.filter(
+            city__title=city,
+            categories__title=category
+        )
+        if realty_queryset.exists():
+            for realty in realty_queryset:
+                await update.message.reply_text(
+                    f'{realty.pk}\n'
+                    f'{realty.title}\n'
+                    f'{realty.number}\n'
+                    f'{realty.email}'
+                )
+        else:
             await update.message.reply_text(
-                f'{realty.pk}\n'
-                f'{realty.title}\n'
-                f'{realty.number}\n'
-                f'{realty.email}'
+                'Не найдено ни одного здания по заданным критериям.'
             )
 
     context.user_data.clear()
@@ -178,6 +203,33 @@ async def comment(update: Update, context: CallbackContext):
         )
 
 
+async def add_comment(update: Update, context: CallbackContext):
+    """Добавить комментарий к обьявлению"""
+    query = update.callback_query
+    ad_id = query.data.split(',')[1]
+    context.user_data['ad_id'] = ad_id
+
+    await query.answer()
+    await query.edit_message_text(text="Пожалуйста, введите ваш комментарий:")
+
+    return COMMENT_INPUT
+
+
+async def comment_input(update: Update, context: CallbackContext):
+    user_comment = update.message.text
+    ad_id = context.user_data['ad_id']
+    user_id = update.message.from_user.id
+    comment = Comment(
+        ad_id=ad_id, user_id=user_id, text=user_comment)
+    comment.save()
+    await update.message.reply_text(
+        "Ваш комментарий был добавлен и "
+        "будет опубликован после проверки администратором."
+    )
+
+    return ConversationHandler.END
+
+
 async def add_to_favorite(update: Update, context: CallbackContext):
     """Добавить объявление в избранное."""
     query = update.callback_query
@@ -195,9 +247,13 @@ async def add_to_favorite(update: Update, context: CallbackContext):
 
 
 async def favorite(update: Update, context: CallbackContext):
-    for favorite_ad in Favorite.objects.filter(
-            user__external_id=update.message.from_user.id
-    ):
+    user_id = update.message.from_user.id
+    favorite_ads = Favorite.objects.filter(
+        user__external_id=user_id
+    )
+    if not favorite_ads.exists():
+        await update.message.reply_text('У вас нет избранных объявлений.')
+    for favorite_ad in favorite_ads:
         keyboard = [
             [
                 InlineKeyboardButton(
@@ -222,12 +278,26 @@ async def favorite(update: Update, context: CallbackContext):
 
 async def delete_favorite(update: Update, context: CallbackContext):
     query_data = update.callback_query.data.split(',')
-    Favorite.objects.get(
-        user__external_id=query_data[2], ad__pk=query_data[1]
-    ).delete()
-    await update.callback_query.edit_message_text(
-        'Запись удалена из избранного!'
-    )
+    if len(query_data) != 3:
+        await update.callback_query.edit_message_text(
+            'Некорректные данные для удаления.'
+        )
+        return
+    try:
+        Favorite.objects.get(
+            user__external_id=query_data[2], ad__pk=query_data[1]
+        ).delete()
+        await update.callback_query.edit_message_text(
+            'Запись удалена из избранного!'
+        )
+    except Favorite.DoesNotExist:
+        await update.callback_query.edit_message_text(
+            'Эта запись не найдена в вашем избранном.'
+        )
+    except Exception:
+        await update.callback_query.edit_message_text(
+            'Произошла ошибка при удалении записи из избранного.'
+        )
 
 
 async def delete_user(update: Update, context: CallbackContext):
@@ -257,9 +327,13 @@ search_conv_handler = ConversationHandler(
         PRICE: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, select_price)
         ],
+        COMMENT_INPUT: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
+        ],
     },
     fallbacks=[],
 )
+
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
 favorite_handler = CallbackQueryHandler(
     add_to_favorite, pattern="^" + str(ADD_FAVORITE)
@@ -267,4 +341,7 @@ favorite_handler = CallbackQueryHandler(
 delete_favorite_handler = CallbackQueryHandler(
     delete_favorite,
     pattern="^" + str(DELETE_FAVORITE)
+)
+add_comment_handler = CallbackQueryHandler(
+    add_comment, pattern="^" + str(ADD_COMMENT)
 )
