@@ -1,5 +1,3 @@
-import logging
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
@@ -10,16 +8,6 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
-
-
-# Enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
-)
-# set higher logging level for httpx to avoid all GET and POST requests being logged
-logging.getLogger("httpx").setLevel(logging.WARNING)
-
-logger = logging.getLogger(__name__)
 
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
@@ -171,26 +159,35 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
 
 async def comment(update: Update, context: CallbackContext):
+    """Вывести комментарии к объявлению."""
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
     comments = Comment.objects.filter(ad=query_data[1])
-    await query.edit_message_text(
-        f'{[comment.text for comment in comments]}'
-    )
+    for comment in comments:
+        await update._bot.send_message(
+            text=(
+                f'_{comment.user.first_name}_\n'
+                f'{comment.text}'
+            ),
+            chat_id=query.message.chat.id,
+            parse_mode='Markdown'
+        )
 
 
 async def add_to_favorite(update: Update, context: CallbackContext):
+    """Добавить объявление в избранное."""
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
+    user = Profile.objects.get(external_id=update.effective_user.id)
 
     fav,_ = Favorite.objects.get_or_create(
-        user__external_id=update.effective_user.id,
+        user=user,
         ad_id=query_data[1]
     )
     await query.edit_message_text(
-        'Объявление добавлено в избранное.'
+        "Объявление добавлено в избранное."
     )
 
 
