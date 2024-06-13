@@ -232,7 +232,8 @@ async def delete_favorite(update: Update, context: CallbackContext):
 
 async def delete_user(update: Update, context: CallbackContext):
     Profile.objects.get(external_id=update.message.from_user.id).delete()
-    await update.message.reply_text('Учетная запись удалена!')
+    delete_profile_message = get_botmessage_by_keyword('DELETE_PROFILE')
+    await update.message.reply_text(delete_profile_message)
 
 
 search_conv_handler = ConversationHandler(
