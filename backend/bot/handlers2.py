@@ -23,7 +23,7 @@ async def start(update: Update, context: CallbackContext) -> int:
         last_name=update.message.from_user.last_name
     )
     keyboard = [
-        ['Начало работы', 'О боте']
+        ['Начало работы', 'О боте'],
         ['Избранное', 'Удалить учетную запись']
     ]
 
