@@ -87,6 +87,11 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py createsu
 docker compose -f docker-compose.prod.yml exec backend python manage.py createsuperuser  
 ```
 
+## Инструкции  
+
+Создайте пользователя в административном разделе на сайте, дайте ему статус персонала и добавьте в группу «Администратор».  
+Подробнее в [видеоинструкции](https://youtu.be/pqCblYN6W84).
+
 
 ## Стек технологий
 Python 3.11, Django 5.0, PTB 21.2, Docker 26.1, nginx 1.26, PostgreSQL 16.3  
