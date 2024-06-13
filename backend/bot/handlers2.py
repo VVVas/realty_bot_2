@@ -46,7 +46,7 @@ async def start_work(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(
         "Давайте начнем поиск объявлений. "
         "Пожалуйста, введите название города или "
-        "нажмите 'Пропустить', чтобы пропустить этот шаг.",
+        "нажмите <Пропустить>, чтобы пропустить этот шаг.",
         reply_markup=reply_markup
     )
 
