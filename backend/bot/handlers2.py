@@ -8,10 +8,10 @@ from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
-
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 10)
 ADD_COMMENT = "add_comment_action"
+
 
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
