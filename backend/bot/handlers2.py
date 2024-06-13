@@ -159,6 +159,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
 
 async def comment(update: Update, context: CallbackContext):
+    # id_ad = update.callback_query.data.split(',')[1] - id объявления
     pass
 
 
