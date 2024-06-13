@@ -10,7 +10,7 @@ from .utils import get_botmessage_by_keyword, chunks
 
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 9)
+COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 10)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
@@ -45,13 +45,9 @@ async def help_command(update: Update, context: CallbackContext) -> int:
 
 
 async def start_work(update: Update, context: CallbackContext) -> int:
-    keyboard = [['Пропустить']]
-    reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True)
     await update.message.reply_text(
         "Давайте начнем поиск объявлений. "
-        "Пожалуйста, введите название города или "
-        "нажмите <Пропустить>, чтобы пропустить этот шаг.",
-        reply_markup=reply_markup
+        "Пожалуйста, введите название города"
     )
 
     return CITY_CHOICE
@@ -82,19 +78,15 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     keyboard = [chunk for chunk in list_chunks]
     keyboard.append(['Пропустить'])
     selected_city = update.message.text
-    if selected_city.lower() != "пропустить":
-        context.user_data['selected_city'] = selected_city
-        await update.message.reply_text(
-            'Отлично! Теперь необходимо выбрать категорию',
-            reply_markup=ReplyKeyboardMarkup(
-                keyboard,
-                one_time_keyboard=True
-            )
+    context.user_data['selected_city'] = selected_city
+    await update.message.reply_text(
+        'Отлично! Теперь необходимо выбрать категорию или пропустить этот шаг.',
+        reply_markup=ReplyKeyboardMarkup(
+            keyboard,
+            one_time_keyboard=True
         )
-        return CATEGORY
-    else:
-        context.user_data['selected_city'] = None
-        return await select_category(update, context)
+    )
+    return CATEGORY
 
 
 async def select_category(update: Update, context: CallbackContext) -> int:
@@ -119,7 +111,8 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 
 async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
-    if selected_price[0].lower() != "пропустить":
+    if (selected_price[0].lower() != "пропустить"
+            or int(selected_price[0]) != 0):
         context.user_data['selected_price'] = selected_price
     else:
         context.user_data['selected_price'] = None
@@ -148,6 +141,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                         "Комментарии",
                         callback_data=f'{str(COMMENT)},{ad.pk}'
                     ),
+                    InlineKeyboardButton(
+                        "Добавить комментарий",
+                        callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                    )
                 ],
             ]
             if ad.price is not None:
@@ -201,6 +198,33 @@ async def comment(update: Update, context: CallbackContext):
             chat_id=query.message.chat.id,
             parse_mode='Markdown'
         )
+
+
+async def add_comment(update: Update, context: CallbackContext):
+    """Добавить комментарий к обьявлению"""
+    query = update.callback_query
+    ad_id = query.data.split(',')[1]
+    context.user_data['ad_id'] = ad_id
+
+    await query.answer()
+    await query.edit_message_text(text="Пожалуйста, введите ваш комментарий:")
+
+    return COMMENT_INPUT
+
+
+async def comment_input(update: Update, context: CallbackContext):
+    user_comment = update.message.text
+    ad_id = context.user_data['ad_id']
+    user_id = update.message.from_user.id
+    comment = Comment(
+        ad_id=ad_id, user_id=user_id, text=user_comment)
+    comment.save()
+    await update.message.reply_text(
+        "Ваш комментарий был добавлен и "
+        "будет опубликован после проверки администратором."
+    )
+
+    return ConversationHandler.END
 
 
 async def add_to_favorite(update: Update, context: CallbackContext):
@@ -299,9 +323,13 @@ search_conv_handler = ConversationHandler(
         PRICE: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, select_price)
         ],
+        COMMENT_INPUT: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
+        ],
     },
     fallbacks=[],
 )
+
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
 favorite_handler = CallbackQueryHandler(
     add_to_favorite, pattern="^" + str(ADD_FAVORITE)
@@ -310,3 +338,4 @@ delete_favorite_handler = CallbackQueryHandler(
     delete_favorite,
     pattern="^" + str(DELETE_FAVORITE)
 )
+add_comment_handler = CallbackQueryHandler(add_comment, pattern="^" + str(ADD_COMMENT))
