@@ -203,7 +203,7 @@ async def add_to_favorite(update: Update, context: CallbackContext):
     query_data = query.data.split(',')
     user = Profile.objects.get(external_id=update.effective_user.id)
 
-    fav,_ = Favorite.objects.get_or_create(
+    fav, _ = Favorite.objects.get_or_create(
         user=user,
         ad_id=query_data[1]
     )
