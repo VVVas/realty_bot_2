@@ -1,12 +1,15 @@
-from telegram import ReplyKeyboardMarkup, Update
+from django.db.models import Q
+from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
+                      InlineKeyboardMarkup)
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
-                          MessageHandler, filters)
+                          MessageHandler, filters, CallbackQueryHandler)
 
-from realties.models import Category, City
+from realties.models import Category, City, Ad, Realty
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
+COMMENT, FAVORITE = range(5, 7)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
@@ -17,6 +20,7 @@ async def start(update: Update, context: CallbackContext) -> int:
         first_name=update.message.from_user.first_name,
         last_name=update.message.from_user.last_name
     )
+    # if update.message.from_user.id in Profile.objects.all() - другие кнопки
     keyboard = [['Начало работы', 'О боте']]
 
     await update.message.reply_text(
@@ -50,7 +54,7 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
     city_name = update.message.text
     list_names = [city.title for city in City.objects.all()]
     for city in list_names:
-        if city.startswith(city_name):
+        if city.istartswith(city_name):
             list_button[0].append(city)
     await update.message.reply_text(
         'Вот какие города я нашёл. Выберите нужный из списка:',
@@ -99,20 +103,68 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     city = context.user_data['selected_city']
     category = context.user_data['selected_category']
     price = context.user_data['selected_price']
-    await update.message.reply_text(
-        f"Отлично! "
-        f"Вот параметры выборки, который вы выбрали: \n"
-        f"Город: {city}\n"
-        f"Категория: {category}\n"
-        f"Цена: {update.message.text}\n"
-        f"В данном примере выборка выглядела бы вот так:\n"
-        f"Ad.objects.filter(realty__in=Realty.objects.filter(city={city}, "
-        f"category={category}), "
-        f"price__gte={int(price[0])}, price__lte={int(price[1])})"
+    queryset = Ad.objects.filter(
+        Q(
+            realty__in=Realty.objects.filter(
+                city__title=city,
+                categories__title=category
+            )
+        ),
+        Q(price__gte=int(price[0]), price__lte=int(price[1])) | Q(price=None)
     )
+    if len(queryset.all()) > 0:
+        for ad in queryset:
+            keyboard = [
+                [
+                    InlineKeyboardButton(
+                        "Добавить в избранное",
+                        callback_data=f'{str(FAVORITE)},{ad.pk}'
+                    ),
+                    InlineKeyboardButton(
+                        "Комментарии",
+                        callback_data=f'{str(COMMENT)},{ad.pk}'
+                    ),
+                ],
+            ]
+            if ad.price is not None:
+                price_in_ad = ad.price
+            else:
+                price_in_ad = 'Цена не указана'
+            await update.message.reply_text(
+                f'{ad.pk}\n'
+                f'{ad.title.upper()}\n'
+                f'{price_in_ad}\n'
+                f'{ad.address}\n',
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+    else:
+        await update.message.reply_text(
+            'Мы не смогли найти объявления по заданным критериям\n'
+            'Вот здания, которые подходят под Ваш запрос:'
+        )
+        for realty in Realty.objects.filter(
+                city__title=city,
+                categories__title=category
+        ):
+            await update.message.reply_text(
+                f'{realty.pk}\n'
+                f'{realty.title}\n'
+                f'{realty.number}\n'
+                f'{realty.email}'
+            )
+
     context.user_data.clear()
 
     return ConversationHandler.END
+
+
+async def comment(update: Update, context: CallbackContext):
+    # id_ad = update.callback_query.data.split(',')[1] - id объявления
+    pass
+
+
+async def favorite(update: Update, context: CallbackContext):
+    pass
 
 
 search_conv_handler = ConversationHandler(
@@ -137,3 +189,5 @@ search_conv_handler = ConversationHandler(
     },
     fallbacks=[],
 )
+comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
+favorite_handler = CallbackQueryHandler(favorite, pattern="^" + str(FAVORITE))

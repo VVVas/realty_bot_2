@@ -1,8 +1,7 @@
 from django.conf import settings
-from telegram.ext import Application, CommandHandler
+from telegram.ext import Application
 
-from .handlers import ads, conv_handler, filter_ad_category
-from .handlers2 import search_conv_handler
+from .handlers2 import search_conv_handler, comment_handler, favorite_handler
 
 
 class TGBot:
@@ -16,12 +15,8 @@ class TGBot:
             .build()
         )
         self.ptb_app.add_handler(search_conv_handler)
-        # self.ptb_app.add_handler(CommandHandler("start", start))
-        self.ptb_app.add_handler(CommandHandler("ads", ads))
-        self.ptb_app.add_handler(CommandHandler(
-            "filter_ad_category", filter_ad_category
-        ))
-        self.ptb_app.add_handler(conv_handler)
+        self.ptb_app.add_handler(comment_handler)
+        self.ptb_app.add_handler(favorite_handler)
 
 
 tgbot = TGBot()
