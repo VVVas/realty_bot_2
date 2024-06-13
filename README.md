@@ -26,6 +26,7 @@ docker compose exec backend python manage.py collectstatic --no-input
 
 Импорт стартовых данных:  
 ```
+docker compose exec backend python manage.py admin_permissions_set
 docker compose exec backend python manage.py cities_import
 docker compose exec backend python manage.py categories_import
 docker compose exec backend python manage.py botmessage_import
@@ -59,6 +60,7 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py collects
 
 Импорт стартовых данных:  
 ```
+docker compose -f docker-compose.prod.yml exec backend python manage.py admin_permissions_set
 docker compose -f docker-compose.prod.yml exec backend python manage.py cities_import  
 docker compose -f docker-compose.prod.yml exec backend python manage.py categories_import  
 docker compose -f docker-compose.prod.yml exec backend python manage.py botmessage_import  
@@ -80,7 +82,7 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py createsu
 Создайте файл `.env` и заполните его по образцу `.env.example`.  
 Скопируйте на сервер `.env` в директорию для копирования `docker-compose.prod.yml`.  
 Одобрите пулреквест в ветку `prod`.  
-Создайте суперпользователя на сервере:  
+Создайте суперпользователя выполнив на сервере:  
 ```
 docker compose -f docker-compose.prod.yml exec backend python manage.py createsuperuser  
 ```
