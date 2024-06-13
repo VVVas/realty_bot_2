@@ -11,7 +11,7 @@ from .utils import get_botmessage_by_keyword, chunks
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 10)
-
+ADD_COMMENT = "add_comment_action"
 
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
@@ -105,9 +105,8 @@ async def select_category(update: Update, context: CallbackContext) -> int:
         )
 
         return PRICE
-    else:
-        context.user_data['selected_category'] = None
-        return await select_price(update, context)
+    context.user_data['selected_category'] = None
+    return await select_price(update, context)
 
 
 async def select_price(update: Update, context: CallbackContext) -> int:
@@ -204,7 +203,7 @@ async def comment(update: Update, context: CallbackContext):
 
 
 async def add_comment(update: Update, context: CallbackContext):
-    """Добавить комментарий к обьявлению"""
+    """Добавить комментарий к обьявлению."""
     query = update.callback_query
     ad_id = query.data.split(',')[1]
     context.user_data['ad_id'] = ad_id
