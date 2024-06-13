@@ -12,8 +12,8 @@ async def webhook(request: HttpRequest) -> HttpResponse:
     """Обрабатываем полученное от бота сообщение."""
     try:
         json_message = json.loads(request.body)
-    except json.decoder.JSONDecodeError:
-        pass
+    except json.decoder.JSONDecodeError as err:
+        return HttpResponse(str(err))
     await bot_init.tgbot.ptb_app.update_queue.put(
         Update.de_json(
             data=json_message,
