@@ -189,7 +189,7 @@ async def ad_to_favorite(update: Update, context: CallbackContext):
 async def favorite(update: Update, context: CallbackContext):
     user_id = update.message.from_user.id
     favorite_ads = Favorite.objects.filter(
-            user__external_id=user_id
+        user__external_id=user_id
     )
     if not favorite_ads.exists():
         await update.message.reply_text('У вас нет избранных объявлений.')
