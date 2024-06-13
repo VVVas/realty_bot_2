@@ -1,27 +1,26 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
                       InlineKeyboardMarkup)
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
                           MessageHandler, filters, CallbackQueryHandler)
 
-from realties.models import Category, City, Ad, Realty
+from realties.models import Category, City, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-COMMENT, FAVORITE = range(5, 7)
+COMMENT, FAVORITE, DELETE_FAVORITE = range(5, 8)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
-    Profile.objects.get_or_create(
-        external_id=update.message.from_user.id,
-        username=update.message.from_user.username,
-        first_name=update.message.from_user.first_name,
-        last_name=update.message.from_user.last_name
-    )
-    # if update.message.from_user.id in Profile.objects.all() - другие кнопки
-    keyboard = [['Начало работы', 'О боте']]
+    try:
+        Profile.objects.get(external_id=update.message.from_user.id)
+        keyboard = [
+            ['Начало работы', 'О боте', 'Избранное', 'Удалить учетную запись']]
+    except ObjectDoesNotExist:
+        keyboard = [['Начало работы', 'О боте']]
 
     await update.message.reply_text(
         greeting_message,
@@ -159,12 +158,52 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
 
 async def comment(update: Update, context: CallbackContext):
-    # id_ad = update.callback_query.data.split(',')[1] - id объявления
+    pass
+
+
+async def ad_to_favorite(update: Update, context: CallbackContext):
     pass
 
 
 async def favorite(update: Update, context: CallbackContext):
-    pass
+    for favorite_ad in Favorite.objects.filter(
+            user__external_id=update.message.from_user.id
+    ):
+        keyboard = [
+            [
+                InlineKeyboardButton(
+                    "Удалить из избранного",
+                    callback_data=f'{str(DELETE_FAVORITE)},'
+                                  f'{favorite_ad.pk},'
+                                  f'{update.message.from_user.id}'
+                ),
+                InlineKeyboardButton(
+                    "Комментарии",
+                    callback_data=f'{str(COMMENT)},{favorite_ad.pk}'
+                ),
+            ],
+        ]
+        await update.message.reply_text(
+            f'{favorite_ad.ad.pk}\n'
+            f'{favorite_ad.ad.title}\n'
+            f'{favorite_ad.ad.price}\n',
+            reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+
+
+async def delete_favorite(update: Update, context: CallbackContext):
+    query_data = update.callback_query.data.split(',')
+    Favorite.objects.get(
+        user__external_id=query_data[2], ad__pk=query_data[1]
+    ).delete()
+    await update.callback_query.edit_message_text(
+        'Запись удалена из избранного!'
+    )
+
+
+async def delete_user(update: Update, context: CallbackContext):
+    Profile.objects.get(external_id=update.message.from_user.id).delete()
+    await update.message.reply_text('Учетная запись удалена!')
 
 
 search_conv_handler = ConversationHandler(
@@ -172,7 +211,9 @@ search_conv_handler = ConversationHandler(
     states={
         START: [
             MessageHandler(filters.Regex('^(О боте)$'), help_command),
-            MessageHandler(filters.Regex('^(Начало работы)$'), start_work)
+            MessageHandler(filters.Regex('^(Начало работы)$'), start_work),
+            MessageHandler(filters.Regex('^(Избранное)$'), favorite),
+            MessageHandler(filters.Regex('^(Удалить)'), delete_user),
         ],
         CITY_CHOICE: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, city_choice)
@@ -191,3 +232,7 @@ search_conv_handler = ConversationHandler(
 )
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
 favorite_handler = CallbackQueryHandler(favorite, pattern="^" + str(FAVORITE))
+delete_favorite_handler = CallbackQueryHandler(
+    delete_favorite,
+    pattern="^" + str(DELETE_FAVORITE)
+)
