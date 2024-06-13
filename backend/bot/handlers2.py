@@ -163,16 +163,20 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             'Мы не смогли найти объявления по заданным критериям\n'
             'Вот здания, которые подходят под Ваш запрос:'
         )
-        for realty in Realty.objects.filter(
+        realty_queryset = Realty.objects.filter(
                 city__title=city,
                 categories__title=category
-        ):
-            await update.message.reply_text(
-                f'{realty.pk}\n'
-                f'{realty.title}\n'
-                f'{realty.number}\n'
-                f'{realty.email}'
-            )
+        )
+        if realty_queryset.exists():
+            for realty in realty_queryset:
+                await update.message.reply_text(
+                    f'{realty.pk}\n'
+                    f'{realty.title}\n'
+                    f'{realty.number}\n'
+                    f'{realty.email}'
+                )
+        else:
+            await update.message.reply_text('Не найдено ни одного здания по заданным критериям.')
 
     context.user_data.clear()
 
