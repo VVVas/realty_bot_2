@@ -80,7 +80,8 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
-        'Отлично! Теперь необходимо выбрать категорию или пропустить этот шаг.',
+        'Отлично! Теперь необходимо '
+        'выбрать категорию или пропустить этот шаг.',
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True
@@ -164,8 +165,8 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             'Вот здания, которые подходят под Ваш запрос:'
         )
         realty_queryset = Realty.objects.filter(
-                city__title=city,
-                categories__title=category
+            city__title=city,
+            categories__title=category
         )
         if realty_queryset.exists():
             for realty in realty_queryset:
@@ -176,7 +177,9 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                     f'{realty.email}'
                 )
         else:
-            await update.message.reply_text('Не найдено ни одного здания по заданным критериям.')
+            await update.message.reply_text(
+                'Не найдено ни одного здания по заданным критериям.'
+            )
 
     context.user_data.clear()
 
@@ -338,4 +341,6 @@ delete_favorite_handler = CallbackQueryHandler(
     delete_favorite,
     pattern="^" + str(DELETE_FAVORITE)
 )
-add_comment_handler = CallbackQueryHandler(add_comment, pattern="^" + str(ADD_COMMENT))
+add_comment_handler = CallbackQueryHandler(
+    add_comment, pattern="^" + str(ADD_COMMENT)
+)
