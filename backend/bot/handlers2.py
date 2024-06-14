@@ -171,15 +171,15 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
     else:
-        await update.message.reply_text(
-            'Мы не смогли найти объявления по заданным критериям\n'
-            'Вот здания, которые подходят под Ваш запрос:'
-        )
         realty_queryset = Realty.objects.filter(
             city__title=city,
             categories__title=category
         )
         if realty_queryset.exists():
+            await update.message.reply_text(
+                'Мы не смогли найти объявления по заданным критериям\n'
+                'Вот здания, которые подходят под Ваш запрос:'
+            )
             for realty in realty_queryset:
                 await update.message.reply_text(
                     f'{realty.pk}\n'
@@ -189,7 +189,8 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 )
         else:
             await update.message.reply_text(
-                'Не найдено ни одного здания по заданным критериям.'
+                'Мы не смогли найти объявления по заданным критериям\n'
+                'И не найдено ни одного здания по заданным критериям.'
             )
 
     context.user_data.clear()
