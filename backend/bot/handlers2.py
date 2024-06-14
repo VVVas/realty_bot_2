@@ -155,12 +155,28 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                         "Комментарии",
                         callback_data=f'{str(COMMENT)},{ad.pk}'
                     ),
-                    InlineKeyboardButton(
-                        "Добавить комментарий",
-                        callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
-                    )
                 ],
             ]
+            user_profile = Profile.objects.get(
+                external_id=update.effective_user.id
+            )
+            if user_profile.is_active:
+                keyboard = [
+                    [
+                        InlineKeyboardButton(
+                            "Добавить в избранное",
+                            callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Комментарии",
+                            callback_data=f'{str(COMMENT)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Добавить комментарий",
+                            callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                        )
+                    ],
+                ]
             if ad.price is not None:
                 price_in_ad = ad.price
             else:
