@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
-COMMENT, COMMENT_INPUT, ADD_COMMENT = range(8, 11)
+COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
