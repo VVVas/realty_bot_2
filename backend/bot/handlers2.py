@@ -1,5 +1,3 @@
-import logging
-
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
                       InlineKeyboardMarkup)
@@ -10,15 +8,6 @@ from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
-# Enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.DEBUG
-)
-# set higher logging level for httpx to avoid all GET and POST requests
-logging.getLogger("httpx").setLevel(logging.WARNING)
-
-logger = logging.getLogger(__name__)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
@@ -229,9 +218,12 @@ async def add_comment(update: Update, context: CallbackContext):
 async def comment_input(update: Update, context: CallbackContext):
     user_comment = update.message.text
     ad_id = context.user_data['ad_id']
-    user_id = update.message.from_user.id
-    comment = Comment(
-        ad_id=ad_id, user_id=user_id, text=user_comment)
+    user_id = Profile.objects.get(external_id=update.message.from_user.id).id
+    comment = Comment.objects.create(
+        ad_id=ad_id,
+        user_id=user_id,
+        text=user_comment
+    )
     comment.save()
     await update.message.reply_text(
         "Ваш комментарий был добавлен и "
@@ -256,7 +248,7 @@ async def add_to_favorite(update: Update, context: CallbackContext):
             "Объявление добавлено в избранное."
         )
     else:
-        await query.edit_message_reply_markup(
+        await query.edit_message_text(
             "Данное объявление уже добавлено в избранное."
         )
 
@@ -359,4 +351,7 @@ delete_favorite_handler = CallbackQueryHandler(
 )
 add_comment_handler = CallbackQueryHandler(
     add_comment, pattern="^" + str(ADD_COMMENT)
+)
+comment_input_handler = MessageHandler(
+    filters.TEXT & ~filters.COMMAND, comment_input
 )
