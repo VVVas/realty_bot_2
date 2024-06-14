@@ -11,12 +11,13 @@ from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
 
-
 # Enable logging
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.DEBUG
 )
-# set higher logging level for httpx to avoid all GET and POST requests being logged
+# set higher logging level for httpx
+# to avoid all GET and POST requests being logged
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
@@ -107,30 +108,30 @@ async def select_city(update: Update, context: CallbackContext) -> int:
 
 async def select_category(update: Update, context: CallbackContext) -> int:
     selected_category = update.message.text
-    if selected_category.lower() != "пропустить":
+    if selected_category.lower() == "пропустить":
+        context.user_data['selected_category'] = None
+    else:
         context.user_data['selected_category'] = selected_category
-        await update.message.reply_text(
-            'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
-            'Введите его, разделяя цифры тире (-).\n'
-            'Например: 10000-20000',
-            reply_markup=ReplyKeyboardMarkup(
-                [['Пропустить']],
-                one_time_keyboard=True
-            )
+    await update.message.reply_text(
+        'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
+        'Введите его, разделяя цифры тире (-).\n'
+        'Например: 10000-20000',
+        reply_markup=ReplyKeyboardMarkup(
+            [['Пропустить']],
+            one_time_keyboard=True
         )
+    )
 
-        return PRICE
-    context.user_data['selected_category'] = None
-    return await select_price(update, context)
+    return PRICE
 
 
 async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
-    if (selected_price[0].lower() != "пропустить"
-            or int(selected_price[0]) != 0):
-        context.user_data['selected_price'] = selected_price
-    else:
+    if (selected_price[0].lower() == "пропустить"
+            or int(selected_price[0]) == 0):
         context.user_data['selected_price'] = None
+    else:
+        context.user_data['selected_price'] = selected_price
     city = context.user_data['selected_city']
     category = context.user_data['selected_category']
     price = context.user_data['selected_price']
