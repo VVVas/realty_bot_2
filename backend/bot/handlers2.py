@@ -16,6 +16,9 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
+    if context.user_data.get('START_OVER'):
+        greeting_message = 'Выберите нужное действие'
+
     if not Profile.objects.filter(
         external_id=update.effective_user.id
         # external_id=update.message.from_user.id
@@ -191,7 +194,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
     context.user_data.clear()
 
-    return ConversationHandler.END
+    return await cancel(update, context)
 
 
 async def comment(update: Update, context: CallbackContext):
@@ -290,6 +293,8 @@ async def favorite(update: Update, context: CallbackContext):
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
+    return await cancel(update, context)
+
 
 async def delete_favorite(update: Update, context: CallbackContext):
     query_data = update.callback_query.data.split(',')
@@ -319,10 +324,11 @@ async def delete_user(update: Update, context: CallbackContext):
     Profile.objects.get(external_id=update.message.from_user.id).delete()
     delete_profile_message = get_botmessage_by_keyword('DELETE_PROFILE')
     await update.message.reply_text(delete_profile_message)
+    return await cancel(update, context)
 
 
 async def cancel(update: Update, context: CallbackContext) -> int:
-    context.user_data.clear()
+    context.user_data['START_OVER'] = True
     return await start(update, context)
 
 
