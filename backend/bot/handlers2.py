@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
                       InlineKeyboardMarkup)
@@ -8,9 +10,22 @@ from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
+
+
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+)
+# set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
+
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 10)
-ADD_COMMENT = "add_comment_action"
+(
+    COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE,
+    ADD_COMMENT
+) = range(5, 11)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
@@ -235,14 +250,18 @@ async def add_to_favorite(update: Update, context: CallbackContext):
     await query.answer()
     query_data = query.data.split(',')
     user = Profile.objects.get(external_id=update.effective_user.id)
-
-    fav, _ = Favorite.objects.get_or_create(
+    fav, res = Favorite.objects.get_or_create(
         user=user,
         ad_id=query_data[1]
     )
-    await query.edit_message_text(
-        "Объявление добавлено в избранное."
-    )
+    if res:
+        await query.edit_message_text(
+            "Объявление добавлено в избранное."
+        )
+    else:
+        await query.edit_message_reply_markup(
+            "Данное объявление уже добавлено в избранное."
+        )
 
 
 async def favorite(update: Update, context: CallbackContext):
