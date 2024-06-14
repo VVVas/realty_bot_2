@@ -10,22 +10,19 @@ from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
-
-
 # Enable logging
 logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.DEBUG
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.DEBUG
 )
-# set higher logging level for httpx to avoid all GET and POST requests being logged
+# set higher logging level for httpx to avoid all GET and POST requests
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
 logger = logging.getLogger(__name__)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-(
-    COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE,
-    ADD_COMMENT
-) = range(5, 11)
+FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
+COMMENT, COMMENT_INPUT, ADD_COMMENT = range(8, 11)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
