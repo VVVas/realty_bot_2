@@ -1,5 +1,3 @@
-import logging
-
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
                       InlineKeyboardMarkup)
