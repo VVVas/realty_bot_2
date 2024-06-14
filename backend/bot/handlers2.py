@@ -1,3 +1,5 @@
+import logging
+
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
                       InlineKeyboardMarkup)
@@ -8,9 +10,19 @@ from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.DEBUG
+)
+# set higher logging level for httpx to avoid all GET and POST requests
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
+logger = logging.getLogger(__name__)
+
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-COMMENT_INPUT, COMMENT, FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 10)
-ADD_COMMENT = "add_comment_action"
+FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
+COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 
 async def start(update: Update, context: CallbackContext) -> int:
@@ -92,30 +104,30 @@ async def select_city(update: Update, context: CallbackContext) -> int:
 
 async def select_category(update: Update, context: CallbackContext) -> int:
     selected_category = update.message.text
-    if selected_category.lower() != "пропустить":
+    if selected_category.lower() == "пропустить":
+        context.user_data['selected_category'] = None
+    else:
         context.user_data['selected_category'] = selected_category
-        await update.message.reply_text(
-            'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
-            'Введите его, разделяя цифры тире (-).\n'
-            'Например: 10000-20000',
-            reply_markup=ReplyKeyboardMarkup(
-                [['Пропустить']],
-                one_time_keyboard=True
-            )
+    await update.message.reply_text(
+        'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
+        'Введите его, разделяя цифры тире (-).\n'
+        'Например: 10000-20000',
+        reply_markup=ReplyKeyboardMarkup(
+            [['Пропустить']],
+            one_time_keyboard=True
         )
+    )
 
-        return PRICE
-    context.user_data['selected_category'] = None
-    return await select_price(update, context)
+    return PRICE
 
 
 async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
-    if (selected_price[0].lower() != "пропустить"
-            or int(selected_price[0]) != 0):
-        context.user_data['selected_price'] = selected_price
-    else:
+    if (selected_price[0].lower() == "пропустить"
+            or int(selected_price[0]) == 0):
         context.user_data['selected_price'] = None
+    else:
+        context.user_data['selected_price'] = selected_price
     city = context.user_data['selected_city']
     category = context.user_data['selected_category']
     price = context.user_data['selected_price']
@@ -235,14 +247,18 @@ async def add_to_favorite(update: Update, context: CallbackContext):
     await query.answer()
     query_data = query.data.split(',')
     user = Profile.objects.get(external_id=update.effective_user.id)
-
-    fav, _ = Favorite.objects.get_or_create(
+    fav, res = Favorite.objects.get_or_create(
         user=user,
         ad_id=query_data[1]
     )
-    await query.edit_message_text(
-        "Объявление добавлено в избранное."
-    )
+    if res:
+        await query.edit_message_text(
+            "Объявление добавлено в избранное."
+        )
+    else:
+        await query.edit_message_reply_markup(
+            "Данное объявление уже добавлено в избранное."
+        )
 
 
 async def favorite(update: Update, context: CallbackContext):
