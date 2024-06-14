@@ -126,7 +126,7 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
     if (selected_price[0].lower() == "пропустить"
-            or int(selected_price[0]) == 0):
+            or int(selected_price[1]) == 0):
         context.user_data['selected_price'] = None
     else:
         context.user_data['selected_price'] = selected_price
@@ -155,12 +155,28 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                         "Комментарии",
                         callback_data=f'{str(COMMENT)},{ad.pk}'
                     ),
-                    InlineKeyboardButton(
-                        "Добавить комментарий",
-                        callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
-                    )
                 ],
             ]
+            user_profile = Profile.objects.get(
+                external_id=update.effective_user.id
+            )
+            if user_profile.is_active:
+                keyboard = [
+                    [
+                        InlineKeyboardButton(
+                            "Добавить в избранное",
+                            callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Комментарии",
+                            callback_data=f'{str(COMMENT)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Добавить комментарий",
+                            callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                        )
+                    ],
+                ]
             if ad.price is not None:
                 price_in_ad = ad.price
             else:
@@ -173,10 +189,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
     else:
-        realty_queryset = Realty.objects.filter(
-            city__title=city,
-            categories__title=category
-        )
+        realty_filters = Q(city__title=city)
+        if category:
+            realty_filters &= Q(categories__title=category)
+        realty_queryset = Realty.objects.filter(realty_filters)
         if realty_queryset.exists():
             await update.message.reply_text(
                 'Мы не смогли найти объявления по заданным критериям\n'
