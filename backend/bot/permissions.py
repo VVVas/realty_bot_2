@@ -13,7 +13,7 @@ def restricted(func):
             user_profile = Profile.objects.get(external_id=user_id)
             if user_profile and user_profile.is_blocked:
                 print(f"Unauthorized access denied for {user_id}.")
-                return
+                return None
             return await func(update, context, *args, **kwargs)
         except ObjectDoesNotExist:
             return await func(update, context, *args, **kwargs)
