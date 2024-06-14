@@ -6,6 +6,7 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 
 from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
+from .permissions import restricted
 from .utils import get_botmessage_by_keyword, chunks
 
 
@@ -14,6 +15,7 @@ FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 
+@restricted
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
@@ -171,15 +173,15 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
     else:
-        await update.message.reply_text(
-            'Мы не смогли найти объявления по заданным критериям\n'
-            'Вот здания, которые подходят под Ваш запрос:'
-        )
         realty_queryset = Realty.objects.filter(
             city__title=city,
             categories__title=category
         )
         if realty_queryset.exists():
+            await update.message.reply_text(
+                'Мы не смогли найти объявления по заданным критериям\n'
+                'Вот здания, которые подходят под Ваш запрос:'
+            )
             for realty in realty_queryset:
                 await update.message.reply_text(
                     f'{realty.pk}\n'
@@ -189,7 +191,8 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 )
         else:
             await update.message.reply_text(
-                'Не найдено ни одного здания по заданным критериям.'
+                'Мы не смогли найти объявления по заданным критериям\n'
+                'И не найдено ни одного здания по заданным критериям.'
             )
 
     context.user_data.clear()
