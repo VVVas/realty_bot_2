@@ -15,32 +15,33 @@ def text_ad(ad):
         price_in_ad = ad.price
     else:
         price_in_ad = 'Цена не указана'
-    return (f'{ad.pk}\n '
-            f'{ad.title.upper()}\n '
-            f'Цена: {price_in_ad}\n '
-            f'Адрес: {ad.address}\n '
+    return (f'{ad.pk}\n'
+            f'{ad.title.upper()}\n'
+            f'Цена: {price_in_ad}\n'
+            f'Адрес: {ad.address}\n'
             f'Дополнительная информация: {ad.additional_information}\n'
             f'\n'
             f'Находится в здании: {ad.realty.title}\n'
             f'По адресу: {ad.realty.address}'
-            f'Номера для связи: '
+            f'Номера для связи:'
             f'{ad.realty.phone_number} '
             f'{ad.realty.mobile_number} '
-            f'{ad.realty.number}\n '
-            f'Электронная почта для связи: {ad.realty.email}\n '
-            f'айт организации: {ad.realty.site}\n'
+            f'{ad.realty.number}\n'
+            f'Электронная почта для связи: {ad.realty.email}\n'
+            f'Cайт организации: {ad.realty.site}\n'
             f'Дополнительная информация:  {ad.realty.additional_information}')
 
 
 def text_realty(realty):
-    return (f'{realty.title}\n'
-            f'По адресу: {realty.address}'
-            f'Номера для связи: '
+    return (f'Некоммерческая площадь: '
+            f'{realty.title}\n'
+            f'По адресу: {realty.address}\n'
+            f'Номера для связи:'
             f'{realty.phone_number} '
             f'{realty.mobile_number} '
             f'{realty.number}\n '
-            f'Электронная почта для связи: {realty.email}\n '
-            f'айт организации: {realty.site}\n'
+            f'Электронная почта для связи: {realty.email}\n'
+            f'Cайт организации: {realty.site}\n'
             f'Дополнительная информация:  {realty.additional_information}')
 
 
