@@ -8,7 +8,9 @@ from rangefilter.filters import (DateRangeFilterBuilder,
                                  NumericRangeFilterBuilder)
 
 from .models import Ad, Category, City, Comment, Photo, Realty
-from .resources import CategoryResource, CityResource, RealtyResource
+from .resources import (
+    AdResource, CategoryResource, CityResource, RealtyResource
+)
 
 
 class GetImageMixIn:
@@ -82,7 +84,7 @@ class RealtyAdmin(
     GetImagePreviewMixIn
 ):
     list_display = (
-        'title', 'city', 'address', 'get_categories', 'image_preview',
+        'id', 'title', 'city', 'address', 'get_categories', 'image_preview',
     )
     readonly_fields = ('get_image',)
     search_fields = ('title', 'city__title', 'address',)
@@ -126,7 +128,7 @@ class PhotoInline(admin.TabularInline, GetImagePreviewMixIn):
 
 
 @admin.register(Ad)
-class AdAdmin(admin.ModelAdmin):
+class AdAdmin(ImportExportModelAdmin):
     list_display = (
         'title', 'realty', 'address', 'date', 'price', 'is_published',
         'added_in_favorites'
@@ -139,6 +141,7 @@ class AdAdmin(admin.ModelAdmin):
     autocomplete_fields = ['realty']
     inlines = [CommentInline, PhotoInline]
     actions = [make_published, make_not_published]
+    resource_class = AdResource
 
     @display(description='В избранных')
     def added_in_favorites(self, ad):

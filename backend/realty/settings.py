@@ -176,14 +176,6 @@ ADMIN_REORDER = (
     },
 )
 
-# JAZZMIN_SETTINGS = {
-#     "show_sidebar": False,
-#     "topmenu_links": [
-#         {"name": "Главная",  "url": "admin:index", "permissions": ["auth.view_user"]},
-#     ],
-# }
-# JAZZMIN_SETTINGS["show_ui_builder"] = True
-
 ADMIN_PERMISSIONS = [
     'change_profile',
     'view_profile',

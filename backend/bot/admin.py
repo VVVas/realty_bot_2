@@ -7,7 +7,7 @@ from .resources import BotMessageResource
 
 @admin.register(BotMessage)
 class MessageAdmin(ImportExportModelAdmin):
-    list_display = ('title', 'keyword', 'text')
+    list_display = ('id', 'title', 'keyword', 'text')
     resource_class = BotMessageResource
     # readonly_fields = ('keyword',)
 

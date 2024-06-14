@@ -8,6 +8,7 @@ from .models import Profile, User
 
 admin.site.empty_value_display = '_пусто_'
 admin.site.unregister(Group)
+admin.site.site_url = None
 
 
 @admin.register(User)
