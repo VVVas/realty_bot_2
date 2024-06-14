@@ -7,6 +7,9 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks, text_ad, text_realty
+from .permissions import restricted
+
+
 
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
@@ -14,6 +17,7 @@ FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 
+@restricted
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
@@ -124,7 +128,7 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
     if (selected_price[0].lower() == "пропустить"
-            or int(selected_price[0]) == 0):
+            or int(selected_price[1]) == 0):
         context.user_data['selected_price'] = None
     else:
         context.user_data['selected_price'] = selected_price
@@ -153,33 +157,50 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                         "Комментарии",
                         callback_data=f'{str(COMMENT)},{ad.pk}'
                     ),
-                    InlineKeyboardButton(
-                        "Добавить комментарий",
-                        callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
-                    )
                 ],
             ]
+            user_profile = Profile.objects.get(
+                external_id=update.effective_user.id
+            )
+            if user_profile.is_active:
+                keyboard = [
+                    [
+                        InlineKeyboardButton(
+                            "Добавить в избранное",
+                            callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Комментарии",
+                            callback_data=f'{str(COMMENT)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Добавить комментарий",
+                            callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                        )
+                    ],
+                ]
             await update.message.reply_text(
                 text=text_ad(ad),
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
     else:
-        await update.message.reply_text(
-            'Мы не смогли найти объявления по заданным критериям\n'
-            'Вот здания, которые подходят под Ваш запрос:'
-        )
-        realty_queryset = Realty.objects.filter(
-            city__title=city,
-            categories__title=category
-        )
+        realty_filters = Q(city__title=city)
+        if category:
+            realty_filters &= Q(categories__title=category)
+        realty_queryset = Realty.objects.filter(realty_filters)
         if realty_queryset.exists():
+            await update.message.reply_text(
+                'Мы не смогли найти объявления по заданным критериям\n'
+                'Вот здания, которые подходят под Ваш запрос:'
+            )
             for realty in realty_queryset:
                 await update.message.reply_text(
                     text_realty(realty)
                 )
         else:
             await update.message.reply_text(
-                'Не найдено ни одного здания по заданным критериям.'
+                'Мы не смогли найти объявления по заданным критериям\n'
+                'И не найдено ни одного здания по заданным критериям.'
             )
 
     context.user_data.clear()
