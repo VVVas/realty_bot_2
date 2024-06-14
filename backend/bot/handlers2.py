@@ -6,7 +6,7 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 
 from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
-from .utils import get_botmessage_by_keyword, chunks
+from .utils import get_botmessage_by_keyword, chunks, text_ad, text_realty
 
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
@@ -159,15 +159,8 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                     )
                 ],
             ]
-            if ad.price is not None:
-                price_in_ad = ad.price
-            else:
-                price_in_ad = 'Цена не указана'
             await update.message.reply_text(
-                f'{ad.pk}\n'
-                f'{ad.title.upper()}\n'
-                f'{price_in_ad}\n'
-                f'{ad.address}\n',
+                text=text_ad(ad),
                 reply_markup=InlineKeyboardMarkup(keyboard)
             )
     else:
@@ -182,10 +175,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if realty_queryset.exists():
             for realty in realty_queryset:
                 await update.message.reply_text(
-                    f'{realty.pk}\n'
-                    f'{realty.title}\n'
-                    f'{realty.number}\n'
-                    f'{realty.email}'
+                    text_realty(realty)
                 )
         else:
             await update.message.reply_text(
@@ -287,9 +277,7 @@ async def favorite(update: Update, context: CallbackContext):
             ],
         ]
         await update.message.reply_text(
-            f'{favorite_ad.ad.pk}\n'
-            f'{favorite_ad.ad.title}\n'
-            f'{favorite_ad.ad.price}\n',
+            text_ad(favorite_ad.ad),
             reply_markup=InlineKeyboardMarkup(keyboard)
         )
 
