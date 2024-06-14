@@ -6,6 +6,7 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 
 from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
+from .permissions import restricted
 from .utils import get_botmessage_by_keyword, chunks
 
 
@@ -14,6 +15,7 @@ FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 
+@restricted
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
