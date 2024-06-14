@@ -17,7 +17,8 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if not Profile.objects.filter(
-        external_id=update.effective_user.id
+        # external_id=update.effective_user.id
+        external_id=update.message.from_user.id
     ).exists():
         Profile.objects.create(
             external_id=update.message.from_user.id,
