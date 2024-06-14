@@ -10,8 +10,6 @@ from .utils import get_botmessage_by_keyword, chunks, text_ad, text_realty
 from .permissions import restricted
 
 
-
-
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
@@ -135,7 +133,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     city = context.user_data.get('selected_city')
     category = context.user_data.get('selected_category')
     price = context.user_data.get('selected_price')
-    filters = Q()
+    filters = Q(is_published=True)
     if city:
         filters &= Q(realty__city__title=city)
     if category:
