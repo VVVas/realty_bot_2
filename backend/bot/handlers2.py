@@ -212,12 +212,19 @@ async def comment(update: Update, context: CallbackContext):
     await query.answer()
     query_data = query.data.split(',')
     comments = Comment.objects.filter(ad=query_data[1], is_published=True)
-    for comment in comments:
+    if comments.exists():
+        for comment in comments:
+            await update._bot.send_message(
+                text=(
+                    f'_{comment.user.first_name}_\n'
+                    f'{comment.text}'
+                ),
+                chat_id=query.message.chat.id,
+                parse_mode='Markdown'
+            )
+    else:
         await update._bot.send_message(
-            text=(
-                f'_{comment.user.first_name}_\n'
-                f'{comment.text}'
-            ),
+            text='К этому объявлению нет комментариев.',
             chat_id=query.message.chat.id,
             parse_mode='Markdown'
         )
@@ -230,7 +237,11 @@ async def add_comment(update: Update, context: CallbackContext):
     context.user_data['ad_id'] = ad_id
 
     await query.answer()
-    await query.edit_message_text(text="Пожалуйста, введите ваш комментарий:")
+    await update._bot.send_message(
+        text="Пожалуйста, введите ваш комментарий:",
+        chat_id=query.message.chat.id,
+        parse_mode='Markdown'
+    )
 
     return COMMENT_INPUT
 
