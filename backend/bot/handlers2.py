@@ -193,7 +193,7 @@ async def comment(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
-    comments = Comment.objects.filter(ad=query_data[1])
+    comments = Comment.objects.filter(ad=query_data[1], is_published=True)
     for comment in comments:
         await update._bot.send_message(
             text=(
