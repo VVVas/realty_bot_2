@@ -55,7 +55,7 @@ class Realty(models.Model):
         'Номер бесплатной линии 8800', blank=True, null=True
     )
     address = models.CharField(
-        'Адрес', max_length=256, blank=True, null=True
+        'Адрес', max_length=1024, blank=True, null=True
     )
     email = models.TextField(
         'Электронная почта', blank=True, null=True
