@@ -1,5 +1,3 @@
-import logging
-
 from django.db.models import Q
 from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
                       InlineKeyboardMarkup)
@@ -10,15 +8,6 @@ from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
 from .utils import get_botmessage_by_keyword, chunks
 
-# Enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.DEBUG
-)
-# set higher logging level for httpx to avoid all GET and POST requests
-logging.getLogger("httpx").setLevel(logging.WARNING)
-
-logger = logging.getLogger(__name__)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
@@ -27,12 +16,14 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
-    Profile.objects.get_or_create(
-        external_id=update.message.from_user.id,
-        username=update.message.from_user.username,
-        first_name=update.message.from_user.first_name,
-        last_name=update.message.from_user.last_name
-    )
+    user_profile = Profile.objects.get(external_id=update.effective_user.id)
+    if not user_profile:
+        Profile.objects.create(
+            external_id=update.message.from_user.id,
+            username=update.message.from_user.username,
+            first_name=update.message.from_user.first_name,
+            last_name=update.message.from_user.last_name
+        )
     keyboard = [
         ['Начало работы', 'О боте'],
         ['Избранное', 'Удалить учетную запись']
@@ -128,9 +119,9 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         context.user_data['selected_price'] = None
     else:
         context.user_data['selected_price'] = selected_price
-    city = context.user_data['selected_city']
-    category = context.user_data['selected_category']
-    price = context.user_data['selected_price']
+    city = context.user_data.get('selected_city')
+    category = context.user_data.get('selected_category')
+    price = context.user_data.get('selected_price')
     filters = Q()
     if city:
         filters &= Q(realty__city__title=city)
@@ -202,7 +193,7 @@ async def comment(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
-    comments = Comment.objects.filter(ad=query_data[1])
+    comments = Comment.objects.filter(ad=query_data[1], is_published=True)
     for comment in comments:
         await update._bot.send_message(
             text=(
@@ -228,10 +219,13 @@ async def add_comment(update: Update, context: CallbackContext):
 
 async def comment_input(update: Update, context: CallbackContext):
     user_comment = update.message.text
-    ad_id = context.user_data['ad_id']
-    user_id = update.message.from_user.id
-    comment = Comment(
-        ad_id=ad_id, user_id=user_id, text=user_comment)
+    ad_id = context.user_data.get('ad_id')
+    user_id = Profile.objects.get(external_id=update.message.from_user.id).id
+    comment = Comment.objects.create(
+        ad_id=ad_id,
+        user_id=user_id,
+        text=user_comment
+    )
     comment.save()
     await update.message.reply_text(
         "Ваш комментарий был добавлен и "
@@ -256,7 +250,7 @@ async def add_to_favorite(update: Update, context: CallbackContext):
             "Объявление добавлено в избранное."
         )
     else:
-        await query.edit_message_reply_markup(
+        await query.edit_message_text(
             "Данное объявление уже добавлено в избранное."
         )
 
@@ -321,6 +315,11 @@ async def delete_user(update: Update, context: CallbackContext):
     await update.message.reply_text(delete_profile_message)
 
 
+async def cancel(update: Update, context: CallbackContext) -> int:
+    context.user_data.clear()
+    return await start(update, context)
+
+
 search_conv_handler = ConversationHandler(
     entry_points=[CommandHandler("start", start)],
     states={
@@ -346,7 +345,7 @@ search_conv_handler = ConversationHandler(
             MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
         ],
     },
-    fallbacks=[],
+    fallbacks=[CommandHandler('cancel', cancel)],
 )
 
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
@@ -359,4 +358,7 @@ delete_favorite_handler = CallbackQueryHandler(
 )
 add_comment_handler = CallbackQueryHandler(
     add_comment, pattern="^" + str(ADD_COMMENT)
+)
+comment_input_handler = MessageHandler(
+    filters.TEXT & ~filters.COMMAND, comment_input
 )
