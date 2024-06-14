@@ -18,12 +18,21 @@ async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
         greeting_message = 'Выберите нужное действие'
-    Profile.objects.get_or_create(
-        external_id=update.message.from_user.id,
-        username=update.message.from_user.username,
-        first_name=update.message.from_user.first_name,
-        last_name=update.message.from_user.last_name
-    )
+
+    if not Profile.objects.filter(
+        external_id=update.effective_user.id
+        # external_id=update.message.from_user.id
+    ).exists():
+        Profile.objects.create(
+            # external_id=update.message.from_user.id,
+            # username=update.message.from_user.username,
+            # first_name=update.message.from_user.first_name,
+            # last_name=update.message.from_user.last_name
+            external_id=update.effective_user.id,
+            username=update.effective_user.username,
+            first_name=update.effective_user.first_name,
+            last_name=update.effective_user.last_name
+        )
     keyboard = [
         ['Начало работы', 'О боте'],
         ['Избранное', 'Удалить учетную запись']
@@ -193,7 +202,7 @@ async def comment(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
-    comments = Comment.objects.filter(ad=query_data[1])
+    comments = Comment.objects.filter(ad=query_data[1], is_published=True)
     for comment in comments:
         await update._bot.send_message(
             text=(
