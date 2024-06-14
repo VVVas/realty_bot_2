@@ -16,12 +16,14 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
-    Profile.objects.get_or_create(
-        external_id=update.message.from_user.id,
-        username=update.message.from_user.username,
-        first_name=update.message.from_user.first_name,
-        last_name=update.message.from_user.last_name
-    )
+    user_profile = Profile.objects.get(external_id=update.effective_user.id)
+    if not user_profile:
+        Profile.objects.create(
+            external_id=update.message.from_user.id,
+            username=update.message.from_user.username,
+            first_name=update.message.from_user.first_name,
+            last_name=update.message.from_user.last_name
+        )
     keyboard = [
         ['Начало работы', 'О боте'],
         ['Избранное', 'Удалить учетную запись']
@@ -191,7 +193,7 @@ async def comment(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
-    comments = Comment.objects.filter(ad=query_data[1])
+    comments = Comment.objects.filter(ad=query_data[1], is_published=True)
     for comment in comments:
         await update._bot.send_message(
             text=(
