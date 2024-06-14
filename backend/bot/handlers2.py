@@ -117,9 +117,9 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         context.user_data['selected_price'] = None
     else:
         context.user_data['selected_price'] = selected_price
-    city = context.user_data['selected_city']
-    category = context.user_data['selected_category']
-    price = context.user_data['selected_price']
+    city = context.user_data.get('selected_city')
+    category = context.user_data.get('selected_category')
+    price = context.user_data.get('selected_price')
     filters = Q()
     if city:
         filters &= Q(realty__city__title=city)
@@ -217,7 +217,7 @@ async def add_comment(update: Update, context: CallbackContext):
 
 async def comment_input(update: Update, context: CallbackContext):
     user_comment = update.message.text
-    ad_id = context.user_data['ad_id']
+    ad_id = context.user_data.get('ad_id')
     user_id = Profile.objects.get(external_id=update.message.from_user.id).id
     comment = Comment.objects.create(
         ad_id=ad_id,
@@ -313,6 +313,11 @@ async def delete_user(update: Update, context: CallbackContext):
     await update.message.reply_text(delete_profile_message)
 
 
+async def cancel(update: Update, context: CallbackContext) -> int:
+    context.user_data.clear()
+    return await start(update, context)
+
+
 search_conv_handler = ConversationHandler(
     entry_points=[CommandHandler("start", start)],
     states={
@@ -338,7 +343,7 @@ search_conv_handler = ConversationHandler(
             MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
         ],
     },
-    fallbacks=[],
+    fallbacks=[CommandHandler('cancel', cancel)],
 )
 
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
