@@ -1,4 +1,5 @@
 def get_botmessage_by_keyword(keyword):
+    """Сообщение бота из БД."""
     from bot.models import BotMessage
     return BotMessage.objects.filter(
         keyword=keyword
@@ -6,11 +7,13 @@ def get_botmessage_by_keyword(keyword):
 
 
 def chunks(lst, chunk_size):
+    """Создание чанков для кнопок. По 3 в ряд."""
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
 
 
 def text_ad(ad):
+    """Текст выводимый для объявлений."""
     if ad.price is not None:
         price_in_ad = ad.price
     else:
@@ -33,6 +36,7 @@ def text_ad(ad):
 
 
 def text_realty(realty):
+    """Текст выводимый для недвижимости."""
     return (f'Некоммерческая площадь: '
             f'{realty.title}\n'
             f'По адресу: {realty.address}\n'
@@ -45,8 +49,5 @@ def text_realty(realty):
             f'Дополнительная информация:  {realty.additional_information}')
 
 
-# async def aget_botmessage_by_keyword(keyword):
-#     from bot.models import BotMessage
-#     return BotMessage.objects.filter(
-#         keyword=keyword
-#     ).values_list('text', flat=True).afirst()
+def split_query(update):
+    return update.callback_query.data.replace(' ', '').split(',')
