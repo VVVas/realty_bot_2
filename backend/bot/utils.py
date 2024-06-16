@@ -1,3 +1,11 @@
+from django.core.paginator import Paginator
+
+
+def paginate(queryset, page_number):
+    paginator = Paginator(queryset, 3)
+    return paginator.get_page(page_number)
+
+
 def get_botmessage_by_keyword(keyword):
     """Сообщение бота из БД."""
     from bot.models import BotMessage
