@@ -141,7 +141,6 @@ class AdAdmin(admin.ModelAdmin):
     autocomplete_fields = ['realty']
     inlines = [CommentInline, PhotoInline]
     actions = [make_published, make_not_published]
-    resource_class = AdResource
 
     @display(description='В избранных')
     def added_in_favorites(self, ad):
