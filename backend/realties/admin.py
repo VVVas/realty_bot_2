@@ -9,7 +9,7 @@ from rangefilter.filters import (DateRangeFilterBuilder,
 
 from .models import Ad, Category, City, Comment, Photo, Realty
 from .resources import (
-    AdResource, CategoryResource, CityResource, RealtyResource
+    CategoryResource, CityResource, RealtyResource
 )
 
 
@@ -128,7 +128,7 @@ class PhotoInline(admin.TabularInline, GetImagePreviewMixIn):
 
 
 @admin.register(Ad)
-class AdAdmin(ImportExportModelAdmin):
+class AdAdmin(admin.ModelAdmin):
     list_display = (
         'title', 'realty', 'address', 'date', 'price', 'is_published',
         'added_in_favorites'
