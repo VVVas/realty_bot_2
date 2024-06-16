@@ -109,7 +109,8 @@ async def select_city(update: Update, context: CallbackContext) -> int:
         get_botmessage_by_keyword('CATEGORY_CHOICE'),
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
-            one_time_keyboard=True
+            one_time_keyboard=True,
+            resize_keyboard=True
         )
     )
     return CATEGORY
@@ -123,12 +124,11 @@ async def select_category(update: Update, context: CallbackContext) -> int:
     else:
         context.user_data['selected_category'] = selected_category
     await update.message.reply_text(
-        'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
-        'Введите его, разделяя цифры тире (-).\n'
-        'Например: 10000-20000',
+        get_botmessage_by_keyword('PRICE_INPUT'),
         reply_markup=ReplyKeyboardMarkup(
             [['Пропустить']],
-            one_time_keyboard=True
+            one_time_keyboard=True,
+            resize_keyboard=True
         )
     )
 
