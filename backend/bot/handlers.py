@@ -69,9 +69,6 @@ async def start_work(update: Update, context: CallbackContext) -> int:
 
 async def city_choice(update: Update, context: CallbackContext) -> int:
     """Выбор города. Название переводим в нижний кейс."""
-    await update.message.reply_text(
-        "Пожалуйста, введите название города"
-    )
     city_name = update.message.text.lower()
     list_names = [city.title for city in City.objects.all()]
     list_cities = []
@@ -80,13 +77,13 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
             list_cities.append(city)
     if len(list_cities) < 1:
         await update.message.reply_text(
-            'Ни одного города не нашлось, попробуйте ввести другой город',
+            get_botmessage_by_keyword('CITY_CHOICE_NOT')
         )
         return CITY_CHOICE
     list_chunks = list(chunks(list_cities))
     keyboard = [chunk for chunk in list_chunks]
     await update.message.reply_text(
-        'Вот какие города я нашёл. Выберите нужный из списка:',
+        get_botmessage_by_keyword('CITY_CHOICE'),
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True,
