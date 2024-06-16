@@ -215,7 +215,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                     text_realty(item)
                 )
             if items.has_next:
-                context.user_data['CURRENT_PAGE_ITEMS'] = items.next_page_number
+                context.user_data['CURRENT_PAGE'] = items.next_page_number
                 await update.message.reply_text(
                     f'{items.next_page_number}',
                     reply_markup=ReplyKeyboardMarkup(
