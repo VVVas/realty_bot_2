@@ -201,7 +201,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         realty_queryset = Realty.objects.filter(realty_filters)
 
         items = paginate(realty_queryset, 1)
-        
+    
         if realty_queryset.exists():
             await update.message.reply_text(
                 get_botmessage_by_keyword('ADS_NOT_FOUND')
