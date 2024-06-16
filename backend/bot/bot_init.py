@@ -1,9 +1,9 @@
 from django.conf import settings
 from telegram.ext import Application
 
-from .handlers2 import (search_conv_handler, comment_handler, favorite_handler,
-                        delete_favorite_handler, add_comment_handler,
-                        comment_input_handler)
+from .handlers import (search_conv_handler, comment_handler, favorite_handler,
+                       delete_favorite_handler, add_comment_handler,
+                       comment_input_handler)
 
 
 class TGBot:
