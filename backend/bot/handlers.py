@@ -109,7 +109,8 @@ async def select_city(update: Update, context: CallbackContext) -> int:
         get_botmessage_by_keyword('CATEGORY_CHOICE'),
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
-            one_time_keyboard=True
+            one_time_keyboard=True,
+            resize_keyboard=True
         )
     )
     return CATEGORY
@@ -123,12 +124,11 @@ async def select_category(update: Update, context: CallbackContext) -> int:
     else:
         context.user_data['selected_category'] = selected_category
     await update.message.reply_text(
-        'Остался последний шаг! Необходимо выбрать ценовой диапозон.\n'
-        'Введите его, разделяя цифры тире (-).\n'
-        'Например: 10000-20000',
+        get_botmessage_by_keyword('PRICE_INPUT'),
         reply_markup=ReplyKeyboardMarkup(
             [['Пропустить']],
-            one_time_keyboard=True
+            one_time_keyboard=True,
+            resize_keyboard=True
         )
     )
 
@@ -201,8 +201,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         realty_queryset = Realty.objects.filter(realty_filters)
         if realty_queryset.exists():
             await update.message.reply_text(
-                'Мы не смогли найти объявления по заданным критериям\n'
-                'Вот здания, которые подходят под Ваш запрос:'
+                get_botmessage_by_keyword('ADS_NOT_FOUND')
             )
             for realty in realty_queryset:
                 await update.message.reply_text(
@@ -210,8 +209,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 )
         else:
             await update.message.reply_text(
-                'Мы не смогли найти объявления по заданным критериям\n'
-                'И не найдено ни одного здания по заданным критериям.'
+                get_botmessage_by_keyword('REALTIES_NOT_FOUND')
             )
 
     context.user_data.clear()
