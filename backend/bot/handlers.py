@@ -21,11 +21,11 @@ async def start(update: Update, context: CallbackContext) -> int:
     """Вход в диалог."""
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
-        greeting_message = 'Выберите нужное действие'
+        greeting_message = get_botmessage_by_keyword('START_OVER')
     context.user_data.clear()
+
     if not Profile.objects.filter(
         external_id=update.effective_user.id
-        # external_id=update.message.from_user.id
     ).exists():
         Profile.objects.create(
             external_id=update.effective_user.id,
