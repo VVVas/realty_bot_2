@@ -55,7 +55,7 @@ async def help_command(update: Update, context: CallbackContext) -> int:
     await update.message.reply_text(
         get_botmessage_by_keyword('BOT_DESCRIPTION')
     )
-    return START
+    return await cancel(update, context)
 
 
 async def start_work(update: Update, context: CallbackContext) -> int:
