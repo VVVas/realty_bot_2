@@ -76,8 +76,11 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
     for city in list_names:
         if city.lower().startswith(city_name):
             list_cities.append(city)
-    # chunk_size = 3
-    # list_chunks = list(chunks(list_cities, chunk_size))
+    if len(list_cities) < 1:
+        await update.message.reply_text(
+            'Ни одного города не нашлось, попробуйте ввести другой город',
+        )
+        return CITY_CHOICE
     list_chunks = list(chunks(list_cities))
     keyboard = [chunk for chunk in list_chunks]
     await update.message.reply_text(
@@ -98,8 +101,6 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     Возможно пропустить.
     """
     list_names = [category.title for category in Category.objects.all()]
-    # chunk_size = 3
-    # list_chunks = list(chunks(list_names, chunk_size))
     list_chunks = list(chunks(list_names))
     keyboard = [chunk for chunk in list_chunks]
     keyboard.append(['Пропустить'])
