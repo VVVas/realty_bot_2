@@ -21,11 +21,11 @@ async def start(update: Update, context: CallbackContext) -> int:
     """Вход в диалог."""
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
-        greeting_message = 'Выберите нужное действие'
+        greeting_message = get_botmessage_by_keyword('START_OVER')
     context.user_data.clear()
+
     if not Profile.objects.filter(
         external_id=update.effective_user.id
-        # external_id=update.message.from_user.id
     ).exists():
         Profile.objects.create(
             external_id=update.effective_user.id,
@@ -61,8 +61,7 @@ async def help_command(update: Update, context: CallbackContext) -> int:
 async def start_work(update: Update, context: CallbackContext) -> int:
     """Начало диалоговой цепочки о поиске объявлений."""
     await update.message.reply_text(
-        "Давайте начнем поиск объявлений. "
-        "Пожалуйста, введите название города"
+        get_botmessage_by_keyword('START_WORK')
     )
 
     return CITY_CHOICE
@@ -70,6 +69,9 @@ async def start_work(update: Update, context: CallbackContext) -> int:
 
 async def city_choice(update: Update, context: CallbackContext) -> int:
     """Выбор города. Название переводим в нижний кейс."""
+    await update.message.reply_text(
+        "Пожалуйста, введите название города"
+    )
     city_name = update.message.text.lower()
     list_names = [city.title for city in City.objects.all()]
     list_cities = []
