@@ -7,7 +7,7 @@ def get_botmessage_by_keyword(keyword):
 
 
 def chunks(lst, chunk_size):
-    """СОздание чанков для кнопок. По 3 в ряд."""
+    """Создание чанков для кнопок. По 3 в ряд."""
     for i in range(0, len(lst), chunk_size):
         yield lst[i:i + chunk_size]
 

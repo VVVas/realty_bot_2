@@ -89,8 +89,10 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
 
 async def select_city(update: Update, context: CallbackContext) -> int:
     """
-    Предоставляем выбор из загруженных в БД категорий. Возможно пропустить.
+    Предоставляем выбор из загруженных в БД категорий.
+    Возможно пропустить.
     """
+
     list_names = [category.title for category in Category.objects.all()]
     chunk_size = 3
     list_chunks = list(chunks(list_names, chunk_size))
@@ -362,6 +364,7 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     Выход из диалога на любом этапе.
     START_OVER для изменения приветственного сообщения.
     """
+
     context.user_data['START_OVER'] = True
     return await start(update, context)
 
