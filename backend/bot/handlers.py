@@ -6,7 +6,7 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 
 from realties.models import Category, City, Comment, Ad, Realty, Favorite
 from users.models import Profile
-from .utils import (get_botmessage_by_keyword, chunks, split_query,
+from .utils import (get_botmessage_by_keyword, chunks, paginate, split_query,
                     text_ad, text_realty)
 from .permissions import restricted
 
@@ -199,13 +199,29 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if category:
             realty_filters &= Q(categories__title=category)
         realty_queryset = Realty.objects.filter(realty_filters)
+
+        items = paginate(realty_queryset, 1)
+
         if realty_queryset.exists():
             await update.message.reply_text(
                 get_botmessage_by_keyword('ADS_NOT_FOUND')
             )
-            for realty in realty_queryset:
+            # for realty in realty_queryset:
+            #     await update.message.reply_text(
+            #         text_realty(realty)
+            #     )
+            for item in items:
                 await update.message.reply_text(
-                    text_realty(realty)
+                    text_realty(item)
+                )
+            if items.has_next:
+                await update.message.reply_text(
+                    f'{items.next_page_number()}',
+                    reply_markup=ReplyKeyboardMarkup(
+                        [['Дальше']],
+                        one_time_keyboard=True,
+                        resize_keyboard=True
+                    )
                 )
         else:
             await update.message.reply_text(
