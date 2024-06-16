@@ -201,7 +201,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         realty_queryset = Realty.objects.filter(realty_filters)
 
         items = paginate(realty_queryset, 1)
-
+        
         if realty_queryset.exists():
             await update.message.reply_text(
                 get_botmessage_by_keyword('ADS_NOT_FOUND')
@@ -215,7 +215,9 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                     text_realty(item)
                 )
             if items.has_next:
+                context.user_data['CURRENT_PAGE_ITEMS'] = items.next_page_number
                 await update.message.reply_text(
+                    f'{items.next_page_number}',
                     reply_markup=ReplyKeyboardMarkup(
                         [['Дальше']],
                         one_time_keyboard=True,
