@@ -17,36 +17,32 @@ def text_ad(ad):
     if ad.price is not None:
         price_in_ad = ad.price
     else:
-        price_in_ad = 'Цена не указана'
-    return (f'{ad.pk}\n'
-            f'{ad.title.upper()}\n'
+        price_in_ad = 'не указана'
+    return (f'{ad.title.upper()}\n\n'
             f'Цена: {price_in_ad}\n'
-            f'Адрес: {ad.address}\n'
-            f'Дополнительная информация: {ad.additional_information}\n'
-            f'\n'
-            f'Находится в здании: {ad.realty.title}\n'
-            f'По адресу: {ad.realty.address}'
-            f'Номера для связи:'
+            f'{ad.additional_information}\n\n'
+            f'Расположение\n'
+            f'{ad.realty.title}\n'
+            f'{ad.realty.address}\n'
+            f'{ad.address}\n'
             f'{ad.realty.phone_number} '
             f'{ad.realty.mobile_number} '
             f'{ad.realty.number}\n'
-            f'Электронная почта для связи: {ad.realty.email}\n'
-            f'Cайт организации: {ad.realty.site}\n'
-            f'Дополнительная информация:  {ad.realty.additional_information}')
+            f'{ad.realty.email}\n'
+            f'{ad.realty.site}\n\n'
+            f'{ad.realty.additional_information}')
 
 
 def text_realty(realty):
     """Текст выводимый для недвижимости."""
-    return (f'Некоммерческая площадь: '
-            f'{realty.title}\n'
-            f'По адресу: {realty.address}\n'
-            f'Номера для связи:'
+    return (f'{realty.title}\n\n'
+            f'{realty.address}\n'
             f'{realty.phone_number} '
             f'{realty.mobile_number} '
             f'{realty.number}\n '
-            f'Электронная почта для связи: {realty.email}\n'
-            f'Cайт организации: {realty.site}\n'
-            f'Дополнительная информация:  {realty.additional_information}')
+            f'{realty.email}\n'
+            f'{realty.site}\n\n'
+            f'{realty.additional_information}')
 
 
 def split_query(update):
