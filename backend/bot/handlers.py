@@ -70,20 +70,19 @@ async def start_work(update: Update, context: CallbackContext) -> int:
 
 async def city_choice(update: Update, context: CallbackContext) -> int:
     """Выбор города. Название переводим в нижний кейс."""
-    # list_button = [[]]
-    list_cities = []
     city_name = update.message.text.lower()
     list_names = [city.title for city in City.objects.all()]
+    list_cities = []
     for city in list_names:
         if city.lower().startswith(city_name):
             list_cities.append(city)
-    chunk_size = 3
-    list_chunks = list(chunks(list_cities, chunk_size))
+    # chunk_size = 3
+    # list_chunks = list(chunks(list_cities, chunk_size))
+    list_chunks = list(chunks(list_cities))
     keyboard = [chunk for chunk in list_chunks]
     await update.message.reply_text(
         'Вот какие города я нашёл. Выберите нужный из списка:',
         reply_markup=ReplyKeyboardMarkup(
-            # list_button,
             keyboard,
             one_time_keyboard=True,
             resize_keyboard=True
@@ -99,8 +98,9 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     Возможно пропустить.
     """
     list_names = [category.title for category in Category.objects.all()]
-    chunk_size = 3
-    list_chunks = list(chunks(list_names, chunk_size))
+    # chunk_size = 3
+    # list_chunks = list(chunks(list_names, chunk_size))
+    list_chunks = list(chunks(list_names))
     keyboard = [chunk for chunk in list_chunks]
     keyboard.append(['Пропустить'])
     selected_city = update.message.text
