@@ -1,15 +1,16 @@
 from django.db.models import Q
-from telegram import (ReplyKeyboardMarkup, Update, InlineKeyboardButton,
-                      InlineKeyboardMarkup)
-from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
-                          MessageHandler, filters, CallbackQueryHandler)
+from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
+                      ReplyKeyboardMarkup, Update)
+from telegram.ext import (CallbackContext, CallbackQueryHandler,
+                          CommandHandler, ConversationHandler, MessageHandler,
+                          filters)
 
-from realties.models import Category, City, Comment, Ad, Realty, Favorite
+from realties.models import Ad, Category, City, Comment, Favorite, Realty
 from users.models import Profile
-from .utils import (get_botmessage_by_keyword, chunks, text_ad, text_realty,
-                    split_query)
-from .permissions import restricted
 
+from .permissions import restricted
+from .utils import (chunks, get_botmessage_by_keyword, split_query, text_ad,
+                    text_realty)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
@@ -199,7 +200,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if category:
             realty_filters &= Q(categories__title=category)
         realty_queryset = Realty.objects.filter(realty_filters)
-        
         if realty_queryset.exists():
             await update.message.reply_text(
                 get_botmessage_by_keyword('ADS_NOT_FOUND')
