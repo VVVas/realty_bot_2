@@ -106,8 +106,7 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
-        'Отлично! Теперь необходимо '
-        'выбрать категорию или пропустить этот шаг.',
+        get_botmessage_by_keyword('CATEGORY_CHOICE'),
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True
