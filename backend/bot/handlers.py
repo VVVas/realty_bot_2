@@ -61,8 +61,7 @@ async def help_command(update: Update, context: CallbackContext) -> int:
 async def start_work(update: Update, context: CallbackContext) -> int:
     """Начало диалоговой цепочки о поиске объявлений."""
     await update.message.reply_text(
-        "Давайте начнем поиск объявлений. "
-        "Пожалуйста, введите название города"
+        get_botmessage_by_keyword('START_WORK')
     )
 
     return CITY_CHOICE
@@ -70,6 +69,9 @@ async def start_work(update: Update, context: CallbackContext) -> int:
 
 async def city_choice(update: Update, context: CallbackContext) -> int:
     """Выбор города. Название переводим в нижний кейс."""
+    await update.message.reply_text(
+        "Пожалуйста, введите название города"
+    )
     city_name = update.message.text.lower()
     list_names = [city.title for city in City.objects.all()]
     list_cities = []
