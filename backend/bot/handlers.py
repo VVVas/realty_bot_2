@@ -17,7 +17,7 @@ FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 
 
-@restricted
+# @restricted
 async def start(update: Update, context: CallbackContext) -> int:
     """Вход в диалог."""
     greeting_message = get_botmessage_by_keyword('WELCOME')
