@@ -25,15 +25,15 @@ async def start(update: Update, context: CallbackContext) -> int:
         greeting_message = get_botmessage_by_keyword('START_OVER')
     context.user_data.clear()
 
-    if not Profile.objects.filter(
-        external_id=update.effective_user.id
-    ).exists():
-        Profile.objects.create(
-            external_id=update.effective_user.id,
-            username=update.effective_user.username,
-            first_name=update.effective_user.first_name,
-            last_name=update.effective_user.last_name
-        )
+    # if not Profile.objects.filter(
+    #     external_id=update.effective_user.id
+    # ).exists():
+    #     Profile.objects.create(
+    #         external_id=update.effective_user.id,
+    #         username=update.effective_user.username,
+    #         first_name=update.effective_user.first_name,
+    #         last_name=update.effective_user.last_name
+    #     )
     keyboard = [
         ['Начало работы', 'О боте'],
         ['Избранное', 'Удалить учетную запись']
@@ -373,8 +373,7 @@ async def cancel(update: Update, context: CallbackContext) -> int:
 
 
 search_conv_handler = ConversationHandler(
-    # entry_points=[CommandHandler('start', start)],
-    entry_points=[CommandHandler('cancel', cancel)],
+    entry_points=[CommandHandler('start', start)],
     states={
         START: [
             MessageHandler(filters.Regex('^(О боте)$'), help_command),
