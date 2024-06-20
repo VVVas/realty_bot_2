@@ -25,15 +25,15 @@ async def start(update: Update, context: CallbackContext) -> int:
         greeting_message = get_botmessage_by_keyword('START_OVER')
     context.user_data.clear()
 
-    # if not Profile.objects.filter(
-    #     external_id=update.effective_user.id
-    # ).exists():
-    #     Profile.objects.create(
-    #         external_id=update.effective_user.id,
-    #         username=update.effective_user.username,
-    #         first_name=update.effective_user.first_name,
-    #         last_name=update.effective_user.last_name
-    #     )
+    if not Profile.objects.filter(
+        external_id=update.effective_user.id
+    ).exists():
+        Profile.objects.create(
+            external_id=update.effective_user.id,
+            username=update.effective_user.username,
+            first_name=update.effective_user.first_name,
+            last_name=update.effective_user.last_name
+        )
     keyboard = [
         ['Начало работы', 'О боте'],
         ['Избранное', 'Удалить учетную запись']
@@ -41,11 +41,11 @@ async def start(update: Update, context: CallbackContext) -> int:
 
     await update.message.reply_text(
         greeting_message,
-        reply_markup=ReplyKeyboardMarkup(
-            keyboard,
-            one_time_keyboard=True,
-            resize_keyboard=True
-        )
+        # reply_markup=ReplyKeyboardMarkup(
+        #     keyboard,
+        #     one_time_keyboard=True,
+        #     resize_keyboard=True
+        # )
     )
 
     return START
