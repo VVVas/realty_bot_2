@@ -369,8 +369,7 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     START_OVER для изменения приветственного сообщения.
     """
     context.user_data['START_OVER'] = True
-    # return await start(update, context)
-    return ConversationHandler.END
+    return await start(update, context)
 
 
 search_conv_handler = ConversationHandler(
