@@ -373,7 +373,7 @@ async def cancel(update: Update, context: CallbackContext) -> int:
 
 
 search_conv_handler = ConversationHandler(
-    entry_points=[CommandHandler("start", start)],
+    entry_points=[CommandHandler('start', start)],
     states={
         START: [
             MessageHandler(filters.Regex('^(О боте)$'), help_command),
@@ -400,7 +400,6 @@ search_conv_handler = ConversationHandler(
     fallbacks=[CommandHandler('cancel', cancel)],
 )
 
-start_handler = CommandHandler('start', start)
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
 favorite_handler = CallbackQueryHandler(
     add_to_favorite, pattern="^" + str(ADD_FAVORITE)
