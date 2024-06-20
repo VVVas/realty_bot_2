@@ -40,13 +40,12 @@ async def start(update: Update, context: CallbackContext) -> int:
     ]
 
     await update.message.reply_text(
-        'текст старт'
-        # greeting_message,
-        # reply_markup=ReplyKeyboardMarkup(
-        #     keyboard,
-        #     one_time_keyboard=True,
-        #     resize_keyboard=True
-        # )
+        greeting_message,
+        reply_markup=ReplyKeyboardMarkup(
+            keyboard,
+            one_time_keyboard=True,
+            resize_keyboard=True
+        )
     )
 
     return START
@@ -370,7 +369,8 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     START_OVER для изменения приветственного сообщения.
     """
     context.user_data['START_OVER'] = True
-    return await start(update, context)
+    # return await start(update, context)
+    return ConversationHandler.END
 
 
 search_conv_handler = ConversationHandler(
