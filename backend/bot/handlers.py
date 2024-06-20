@@ -40,7 +40,8 @@ async def start(update: Update, context: CallbackContext) -> int:
     ]
 
     await update.message.reply_text(
-        greeting_message,
+        'текст старт'
+        # greeting_message,
         # reply_markup=ReplyKeyboardMarkup(
         #     keyboard,
         #     one_time_keyboard=True,
