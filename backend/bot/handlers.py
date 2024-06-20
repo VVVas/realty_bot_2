@@ -398,6 +398,7 @@ search_conv_handler = ConversationHandler(
         ],
     },
     fallbacks=[CommandHandler('cancel', cancel)],
+    allow_reentry=True,
 )
 
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
