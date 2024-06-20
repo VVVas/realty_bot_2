@@ -23,7 +23,7 @@ async def start(update: Update, context: CallbackContext) -> int:
     greeting_message = get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
         greeting_message = get_botmessage_by_keyword('START_OVER')
-    # context.user_data.clear()
+    context.user_data.clear()
 
     if not Profile.objects.filter(
         external_id=update.effective_user.id
@@ -373,7 +373,8 @@ async def cancel(update: Update, context: CallbackContext) -> int:
 
 
 search_conv_handler = ConversationHandler(
-    entry_points=[CommandHandler('start', start)],
+    # entry_points=[CommandHandler('start', start)],
+    entry_points=[CommandHandler('cancel', cancel)],
     states={
         START: [
             MessageHandler(filters.Regex('^(О боте)$'), help_command),
