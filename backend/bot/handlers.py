@@ -21,9 +21,11 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
 async def start(update: Update, context: CallbackContext) -> int:
     """Вход в диалог."""
     greeting_message = get_botmessage_by_keyword('WELCOME')
-    # if context.user_data.get('START_OVER'):
-    #     greeting_message = get_botmessage_by_keyword('START_OVER')
-    # context.user_data.clear()
+    # greeting_message = 'Это с нуля'
+    if context.user_data.get('START_OVER'):
+        greeting_message = get_botmessage_by_keyword('START_OVER')
+        # greeting_message = 'Это возврат'
+        context.user_data.clear()
 
     if not Profile.objects.filter(
         external_id=update.effective_user.id
