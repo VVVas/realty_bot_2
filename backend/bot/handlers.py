@@ -191,10 +191,18 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                         )
                     ],
                 ]
-            await update.message.reply_text(
-                text=text_ad(ad),
-                reply_markup=InlineKeyboardMarkup(keyboard)
-            )
+            img = Realty.objects.get(pk=ad.realty_id).img
+            if img:
+                await update.message.reply_photo(
+                    photo=img,
+                    caption=text_ad(ad),
+                    reply_markup=InlineKeyboardMarkup(keyboard)
+                )
+            else:
+                await update.message.reply_text(
+                    text=text_ad(ad),
+                    reply_markup=InlineKeyboardMarkup(keyboard)
+                )
     else:
         realty_filters = Q(city__title=city)
         if category:
@@ -205,9 +213,15 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 get_botmessage_by_keyword('ADS_NOT_FOUND')
             )
             for realty in realty_queryset:
-                await update.message.reply_text(
-                    text_realty(realty)
-                )
+                if realty.img:
+                    await update.message.reply_photo(
+                        photo=realty.img,
+                        caption=text_realty(realty)
+                    )
+                else:
+                    await update.message.reply_text(
+                        text_realty(realty)
+                    )
         else:
             await update.message.reply_text(
                 get_botmessage_by_keyword('REALTIES_NOT_FOUND')
