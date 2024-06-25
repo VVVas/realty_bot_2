@@ -161,7 +161,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         page_size = 10
         current_page = 0
         if 'page' in context.user_data:
-            current_page = context.['page']
+            current_page = context.user_data['page']
 
         start_index = current_page * page_size
         end_index = start_index + page_size
