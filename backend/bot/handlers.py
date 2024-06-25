@@ -158,7 +158,16 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         ) | Q(price=None)
     queryset = Ad.objects.filter(filters)
     if queryset.exists():
-        for ad in queryset:
+        page_size = 10
+        current_page = 0
+        if 'page' in context.user_data:
+            current_page = context.['page']
+
+        start_index = current_page * page_size
+        end_index = start_index + page_size
+
+        ads_to_display = queryset[start_index:end_index]
+        for ad in ads_to_display:
             keyboard = [
                 [
                     InlineKeyboardButton(
@@ -196,13 +205,19 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 await update.message.reply_photo(
                     photo=img,
                     caption=text_ad(ad),
-                    reply_markup=InlineKeyboardMarkup(keyboard)
+                    reply_markup=InlineKeyboardMarkup(keyboard),
                 )
             else:
                 await update.message.reply_text(
                     text=text_ad(ad),
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
+        if end_index < len(queryset):
+            keyboard = [[InlineKeyboardButton("Показать далее", callback_data='next_page')]]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            update.message.reply_text("Нажмите 'Показать далее' для следующей страницы", reply_markup=reply_markup)
+
+        context.user_data['page'] = current_page + 1
     else:
         realty_filters = Q(city__title=city)
         if category:
@@ -230,6 +245,14 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()
 
     return await cancel(update, context)
+
+
+async def handle_next_page(update, context):
+    query = update.callback_query
+    query.answer()
+
+    # Переотправляем следующую страницу объявлений
+    await select_price(update, context)
 
 
 async def comment(update: Update, context: CallbackContext):
