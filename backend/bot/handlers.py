@@ -213,9 +213,17 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
         if end_index < len(queryset):
-            keyboard = [[InlineKeyboardButton("Показать далее", callback_data='next_page')]]
+            keyboard = [
+                [InlineKeyboardButton(
+                    "Показать далее",
+                    callback_data='next_page'
+                )]
+            ]
             reply_markup = InlineKeyboardMarkup(keyboard)
-            update.message.reply_text("Нажмите 'Показать далее' для следующей страницы", reply_markup=reply_markup)
+            await update.message.reply_text(
+                "Нажмите 'Показать далее' для следующей страницы",
+                reply_markup=reply_markup
+            )
 
         context.user_data['page'] = current_page + 1
     else:
