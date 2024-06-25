@@ -460,3 +460,4 @@ add_comment_handler = CallbackQueryHandler(
 comment_input_handler = MessageHandler(
     filters.TEXT & ~filters.COMMAND, comment_input
 )
+next_page = CallbackQueryHandler(handle_next_page, pattern='^next_page$')
