@@ -343,7 +343,8 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         ) | Q(price=None)
     queryset = Ad.objects.filter(filters)
     if queryset.exists():
-        items = paginate(queryset)
+
+        items = paginate(queryset, page)
 
         # for ad in queryset:
 
