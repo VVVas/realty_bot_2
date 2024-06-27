@@ -9,8 +9,8 @@ from realties.models import Ad, Category, City, Comment, Favorite, Realty
 from users.models import Profile
 
 from .permissions import restricted
-from .utils import (chunks, get_botmessage_by_keyword, split_query, text_ad,
-                    text_realty)
+from .utils import (chunks, get_botmessage_by_keyword, paginate, split_query,
+                    text_ad, text_realty)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
@@ -208,24 +208,158 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if category:
             realty_filters &= Q(categories__title=category)
         realty_queryset = Realty.objects.filter(realty_filters)
+
+        page = 1
+
         if realty_queryset.exists():
             await update.message.reply_text(
                 get_botmessage_by_keyword('ADS_NOT_FOUND')
             )
-            for realty in realty_queryset:
-                if realty.img:
+
+            items = paginate(realty_queryset, page)
+
+            # for realty in realty_queryset:
+
+            for item in items:
+
+                # if realty.img:
+                #     await update.message.reply_photo(
+                #         photo=realty.img,
+                #         caption=text_realty(realty)
+                #     )
+                # else:
+                #     await update.message.reply_text(
+                #         text_realty(realty)
+                #     )
+                if item.img:
                     await update.message.reply_photo(
-                        photo=realty.img,
-                        caption=text_realty(realty)
+                        photo=item.img,
+                        caption=text_realty(item)
                     )
                 else:
                     await update.message.reply_text(
-                        text_realty(realty)
+                        text_realty(item)
                     )
+
+            if items.has_next():
+                context.user_data['page'] = items.next_page_number()
+                await update.message.reply_text(
+                    f'{items.next_page_number()}',
+                    reply_markup=ReplyKeyboardMarkup(
+                        [['Дальше']],
+                        one_time_keyboard=True,
+                        resize_keyboard=True
+                    )
+                )
+                return next_page(update, context)
         else:
             await update.message.reply_text(
                 get_botmessage_by_keyword('REALTIES_NOT_FOUND')
             )
+
+    context.user_data.clear()
+
+    return await cancel(update, context)
+    # return NEXT_PAGE
+
+
+async def next_page(update: Update, context: CallbackContext) -> int:
+    """Следующая страинца."""
+    city = context.user_data.get('selected_city')
+    category = context.user_data.get('selected_category')
+    price = context.user_data.get('selected_price')
+    page = context.user_data.get('page')
+    filters = Q(is_published=True)
+    if city:
+        filters &= Q(realty__city__title=city)
+    if category:
+        filters &= Q(realty__categories__title=category)
+    if price:
+        filters &= Q(
+            price__gte=int(price[0]), price__lte=int(price[1])
+        ) | Q(price=None)
+    queryset = Ad.objects.filter(filters)
+    if queryset.exists():
+        for ad in queryset:
+            keyboard = [
+                [
+                    InlineKeyboardButton(
+                        "Добавить в избранное",
+                        callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                    ),
+                    InlineKeyboardButton(
+                        "Комментарии",
+                        callback_data=f'{str(COMMENT)},{ad.pk}'
+                    ),
+                ],
+            ]
+            user_profile = Profile.objects.get(
+                external_id=update.effective_user.id
+            )
+            if user_profile.is_active:
+                keyboard = [
+                    [
+                        InlineKeyboardButton(
+                            "Добавить в избранное",
+                            callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Комментарии",
+                            callback_data=f'{str(COMMENT)},{ad.pk}'
+                        ),
+                        InlineKeyboardButton(
+                            "Добавить комментарий",
+                            callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                        )
+                    ],
+                ]
+            img = Realty.objects.get(pk=ad.realty_id).img
+            if img:
+                await update.message.reply_photo(
+                    photo=img,
+                    caption=text_ad(ad),
+                    reply_markup=InlineKeyboardMarkup(keyboard)
+                )
+            else:
+                await update.message.reply_text(
+                    text=text_ad(ad),
+                    reply_markup=InlineKeyboardMarkup(keyboard)
+                )
+    else:
+        realty_filters = Q(city__title=city)
+        if category:
+            realty_filters &= Q(categories__title=category)
+        realty_queryset = Realty.objects.filter(realty_filters)
+
+        if realty_queryset.exists():
+            await update.message.reply_text(
+                get_botmessage_by_keyword('ADS_NOT_FOUND')
+            )
+
+            items = paginate(realty_queryset, page)
+
+            for item in items:
+                if item.img:
+                    await update.message.reply_photo(
+                        photo=item.img,
+                        caption=text_realty(item)
+                    )
+                else:
+                    await update.message.reply_text(
+                        text_realty(item)
+                    )
+
+            if items.has_next():
+                context.user_data['page'] = items.next_page_number()
+                await update.message.reply_text(
+                    f'{items.next_page_number()}',
+                    reply_markup=ReplyKeyboardMarkup(
+                        [['Дальше']],
+                        one_time_keyboard=True,
+                        resize_keyboard=True
+                    )
+                )
+                return next_page(update, context)
 
     context.user_data.clear()
 
@@ -407,6 +541,9 @@ search_conv_handler = ConversationHandler(
         PRICE: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, select_price)
         ],
+        # NEXT_PAGE: [
+        #     MessageHandler(filters.TEXT & ~filters.COMMAND, next_page)
+        # ],
         COMMENT_INPUT: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
         ],
