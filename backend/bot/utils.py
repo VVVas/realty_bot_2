@@ -1,7 +1,7 @@
 def paginate(queryset, page_number=1):
     """Пагинатор."""
     from django.core.paginator import Paginator
-    paginator = Paginator(queryset, 25)
+    paginator = Paginator(queryset, 2)
     return paginator.get_page(page_number)
 
 
