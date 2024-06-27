@@ -161,7 +161,7 @@ class Photo(models.Model):
         verbose_name='Пользователь'
     )
     is_published = models.BooleanField(
-        'Премодерация админом', default=False
+        'Опубликовано', default=False
     )
 
     class Meta:
@@ -190,7 +190,7 @@ class Comment(models.Model):
         verbose_name='Пользователь'
     )
     is_published = models.BooleanField(
-        'Премодерация админом', default=False
+        'Опубликовано', default=False
     )
 
     class Meta:
