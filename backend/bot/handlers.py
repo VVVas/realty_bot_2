@@ -156,10 +156,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         filters &= Q(
             price__gte=int(price[0]), price__lte=int(price[1])
         ) | Q(price=None)
-    queryset = Ad.objects.filter(filters)
-    if queryset.exists():
+    ad_queryset = Ad.objects.filter(filters)
+    if ad_queryset.exists():
 
-        items = paginate(queryset)
+        items = paginate(ad_queryset)
 
         for item in items:
             keyboard = [
@@ -179,22 +179,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 external_id=update.effective_user.id
             )
             if user_profile.is_active:
-                # keyboard = [
-                #     [
-                #         InlineKeyboardButton(
-                #             "Добавить в избранное",
-                #             callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
-                #         ),
-                #         InlineKeyboardButton(
-                #             "Комментарии",
-                #             callback_data=f'{str(COMMENT)},{item.pk}'
-                #         ),
-                #         InlineKeyboardButton(
-                #             "Добавить комментарий",
-                #             callback_data=f'{str(ADD_COMMENT)},{item.pk}'
-                #         )
-                #     ],
-                # ]
                 keyboard[0].append(
                     InlineKeyboardButton(
                         "Добавить комментарий",
@@ -289,12 +273,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         filters &= Q(
             price__gte=int(price[0]), price__lte=int(price[1])
         ) | Q(price=None)
-    queryset = Ad.objects.filter(filters)
-    if queryset.exists():
+    ad_queryset = Ad.objects.filter(filters)
+    if ad_queryset.exists():
 
-        items = paginate(queryset, page)
-
-        # for ad in queryset:
+        items = paginate(ad_queryset, page)
 
         for item in items:
 
@@ -316,22 +298,12 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             )
 
             if user_profile.is_active:
-                keyboard = [
-                    [
-                        InlineKeyboardButton(
-                            "Добавить в избранное",
-                            callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
-                        ),
-                        InlineKeyboardButton(
-                            "Комментарии",
-                            callback_data=f'{str(COMMENT)},{item.pk}'
-                        ),
-                        InlineKeyboardButton(
-                            "Добавить комментарий",
-                            callback_data=f'{str(ADD_COMMENT)},{item.pk}'
-                        )
-                    ],
-                ]
+                keyboard[0].append(
+                    InlineKeyboardButton(
+                        "Добавить комментарий",
+                        callback_data=f'{str(ADD_COMMENT)},{item.pk}'
+                    )
+                )
 
             img = Realty.objects.get(pk=item.realty_id).img
             if img:
