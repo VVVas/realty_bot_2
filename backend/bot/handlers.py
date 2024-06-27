@@ -9,7 +9,7 @@ from realties.models import Ad, Category, City, Comment, Favorite, Realty
 from users.models import Profile
 
 from .permissions import restricted
-from .utils import (chunks, get_botmessage_by_keyword, paginate, split_query,
+from .utils import (chunks, get_botmessage_by_keyword, paginate,
                     text_ad, text_realty)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
@@ -487,14 +487,17 @@ async def favorite(update: Update, context: CallbackContext):
 
 async def delete_favorite(update: Update, context: CallbackContext):
     """Убираем объявление из избранного."""
-    query_data = split_query(update)
+    query = update.callback_query
+    await query.answer()
+    query_data = query.data.split(',')
+    # query_data = split_query(update)
     if len(query_data) != 3:
         await update.callback_query.edit_message_text(
             'Некорректные данные для удаления.'
         )
         return
     try:
-        Favorite.objects.filter(
+        Favorite.objects.get(
             user__external_id=query_data[2], ad__pk=query_data[1]
         ).delete()
         await update.callback_query.edit_message_text(
