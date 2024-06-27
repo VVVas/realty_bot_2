@@ -321,7 +321,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                '«Далее» для просмотра следующих объявлений '
+                '«Далее» для просмотра следующих объявлений.\n'
                 f'Вы посмотрели {items.end_index()} '
                 f'из {ad_queryset.count()}',
                 reply_markup=ReplyKeyboardMarkup(
@@ -359,7 +359,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    '«Далее» для просмотра следующих объектов недвижимости. '
+                    '«Далее» для просмотра следующих объектов недвижимости.\n'
                     f'Вы посмотрели {items.end_index()} '
                     f'из {realty_queryset.count()}',
                     reply_markup=ReplyKeyboardMarkup(
