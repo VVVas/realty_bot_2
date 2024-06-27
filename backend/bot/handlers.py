@@ -161,23 +161,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
         items = paginate(queryset)
 
-        # for ad in queryset:
-
         for item in items:
-
-            # keyboard = [
-            #     [
-            #         InlineKeyboardButton(
-            #             "Добавить в избранное",
-            #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
-            #         ),
-            #         InlineKeyboardButton(
-            #             "Комментарии",
-            #             callback_data=f'{str(COMMENT)},{ad.pk}'
-            #         ),
-            #     ],
-            # ]
-
             keyboard = [
                 [
                     InlineKeyboardButton(
@@ -199,51 +183,26 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 #     [
                 #         InlineKeyboardButton(
                 #             "Добавить в избранное",
-                #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                #             callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                 #         ),
                 #         InlineKeyboardButton(
                 #             "Комментарии",
-                #             callback_data=f'{str(COMMENT)},{ad.pk}'
+                #             callback_data=f'{str(COMMENT)},{item.pk}'
                 #         ),
                 #         InlineKeyboardButton(
                 #             "Добавить комментарий",
-                #             callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                #             callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                 #         )
                 #     ],
                 # ]
-
-                keyboard = [
-                    [
-                        InlineKeyboardButton(
-                            "Добавить в избранное",
-                            callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
-                        ),
-                        InlineKeyboardButton(
-                            "Комментарии",
-                            callback_data=f'{str(COMMENT)},{item.pk}'
-                        ),
-                        InlineKeyboardButton(
-                            "Добавить комментарий",
-                            callback_data=f'{str(ADD_COMMENT)},{item.pk}'
-                        )
-                    ],
-                ]
-
-            # img = Realty.objects.get(pk=ad.realty_id).img
+                keyboard[0].append(
+                    InlineKeyboardButton(
+                        "Добавить комментарий",
+                        callback_data=f'{str(ADD_COMMENT)},{item.pk}'
+                    )
+                )
 
             img = Realty.objects.get(pk=item.realty_id).img
-
-            # if img:
-            #     await update.message.reply_photo(
-            #         photo=img,
-            #         caption=text_ad(ad),
-            #         reply_markup=InlineKeyboardMarkup(keyboard)
-            #     )
-            # else:
-            #     await update.message.reply_text(
-            #         text=text_ad(ad),
-            #         reply_markup=InlineKeyboardMarkup(keyboard)
-            #     )
 
             if img:
                 await update.message.reply_photo(
@@ -282,19 +241,8 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
             items = paginate(realty_queryset)
 
-            # for realty in realty_queryset:
-
             for item in items:
 
-                # if realty.img:
-                #     await update.message.reply_photo(
-                #         photo=realty.img,
-                #         caption=text_realty(realty)
-                #     )
-                # else:
-                #     await update.message.reply_text(
-                #         text_realty(realty)
-                #     )
                 if item.img:
                     await update.message.reply_photo(
                         photo=item.img,
@@ -350,19 +298,6 @@ async def next_page(update: Update, context: CallbackContext) -> int:
 
         for item in items:
 
-            # keyboard = [
-            #     [
-            #         InlineKeyboardButton(
-            #             "Добавить в избранное",
-            #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
-            #         ),
-            #         InlineKeyboardButton(
-            #             "Комментарии",
-            #             callback_data=f'{str(COMMENT)},{ad.pk}'
-            #         ),
-            #     ],
-            # ]
-
             keyboard = [
                 [
                     InlineKeyboardButton(
@@ -379,24 +314,8 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             user_profile = Profile.objects.get(
                 external_id=update.effective_user.id
             )
-            if user_profile.is_active:
-                # keyboard = [
-                #     [
-                #         InlineKeyboardButton(
-                #             "Добавить в избранное",
-                #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
-                #         ),
-                #         InlineKeyboardButton(
-                #             "Комментарии",
-                #             callback_data=f'{str(COMMENT)},{ad.pk}'
-                #         ),
-                #         InlineKeyboardButton(
-                #             "Добавить комментарий",
-                #             callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
-                #         )
-                #     ],
-                # ]
 
+            if user_profile.is_active:
                 keyboard = [
                     [
                         InlineKeyboardButton(
@@ -414,22 +333,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
                     ],
                 ]
 
-            # img = Realty.objects.get(pk=ad.realty_id).img
-
             img = Realty.objects.get(pk=item.realty_id).img
-
-            # if img:
-            #     await update.message.reply_photo(
-            #         photo=img,
-            #         caption=text_ad(ad),
-            #         reply_markup=InlineKeyboardMarkup(keyboard)
-            #     )
-            # else:
-            #     await update.message.reply_text(
-            #         text=text_ad(ad),
-            #         reply_markup=InlineKeyboardMarkup(keyboard)
-            #     )
-
             if img:
                 await update.message.reply_photo(
                     photo=img,
