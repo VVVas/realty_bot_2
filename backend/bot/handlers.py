@@ -529,9 +529,14 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     return await start(update, context)
 
 
+async def fix_start(update: Update, context: CallbackContext) -> int:
+    """Не требует /start при перезапуске бота."""
+    return await start(update, context)
+
+
 search_conv_handler = ConversationHandler(
     entry_points=[
-        MessageHandler(None, None),
+        MessageHandler(None, fix_start),
         CommandHandler('start', start)
     ],
     states={
