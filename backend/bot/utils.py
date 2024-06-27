@@ -1,13 +1,18 @@
+from django.core.paginator import Paginator
+
+from .models import BotMessage
+
+QUANTITY_PER_PAGE = 10
+
+
 def paginate(queryset, page_number=1):
-    """Пагинатор."""
-    from django.core.paginator import Paginator
-    paginator = Paginator(queryset, 2)
+    """Возвращает содержимое страницы. По умолчанию первой."""
+    paginator = Paginator(queryset, QUANTITY_PER_PAGE)
     return paginator.get_page(page_number)
 
 
 def get_botmessage_by_keyword(keyword):
     """Сообщение бота из БД."""
-    from bot.models import BotMessage
     return BotMessage.objects.filter(
         keyword=keyword
     ).values_list('text', flat=True).first()
