@@ -134,6 +134,7 @@ class Ad(models.Model):
     class Meta:
         verbose_name = 'Объявление'
         verbose_name_plural = 'объявления'
+        ordering = ('id',)
 
     def __str__(self) -> str:
         return self.title
@@ -167,6 +168,7 @@ class Photo(models.Model):
     class Meta:
         verbose_name = 'Фото'
         verbose_name_plural = 'фото'
+        ordering = ('id',)
 
 
 class Comment(models.Model):
@@ -196,6 +198,7 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Комментарий'
         verbose_name_plural = 'комментарии'
+        ordering = ('id',)
 
 
 class Favorite(models.Model):
