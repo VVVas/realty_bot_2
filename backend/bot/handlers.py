@@ -530,7 +530,10 @@ async def cancel(update: Update, context: CallbackContext) -> int:
 
 
 search_conv_handler = ConversationHandler(
-    entry_points=[CommandHandler('start', start)],
+    entry_points=[
+        MessageHandler(None, None),
+        CommandHandler('start', start)
+    ],
     states={
         START: [
             MessageHandler(filters.Regex('^(О боте)$'), help_command),
