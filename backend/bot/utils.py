@@ -2,10 +2,12 @@ from django.core.paginator import Paginator
 
 from .models import BotMessage
 
+QUANTITY_PER_PAGE = 10
+
 
 def paginate(queryset, page_number=1):
-    """Возвращает содержимое страницы."""
-    paginator = Paginator(queryset, 2)
+    """Возвращает содержимое страницы. По умолчанию первой."""
+    paginator = Paginator(queryset, QUANTITY_PER_PAGE)
     return paginator.get_page(page_number)
 
 
