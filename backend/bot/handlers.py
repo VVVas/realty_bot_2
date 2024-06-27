@@ -165,7 +165,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             keyboard = [
                 [
                     InlineKeyboardButton(
-                        "Добавить в избранное",
+                        "В избранное",
                         callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
@@ -283,7 +283,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             keyboard = [
                 [
                     InlineKeyboardButton(
-                        "Добавить в избранное",
+                        "В избранное",
                         callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
