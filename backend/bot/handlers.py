@@ -14,7 +14,7 @@ from .utils import (chunks, get_botmessage_by_keyword, paginate, split_query,
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
-COMMENT, ADD_COMMENT, COMMENT_INPUT = range(8, 11)
+COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 
 
 @restricted
@@ -251,7 +251,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                         resize_keyboard=True
                     )
                 )
-                return next_page(update, context)
+                return NEXT_PAGE
         else:
             await update.message.reply_text(
                 get_botmessage_by_keyword('REALTIES_NOT_FOUND')
@@ -359,7 +359,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
                         resize_keyboard=True
                     )
                 )
-                return next_page(update, context)
+                return NEXT_PAGE
 
     context.user_data.clear()
 
@@ -541,9 +541,9 @@ search_conv_handler = ConversationHandler(
         PRICE: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, select_price)
         ],
-        # NEXT_PAGE: [
-        #     MessageHandler(filters.TEXT & ~filters.COMMAND, next_page)
-        # ],
+        NEXT_PAGE: [
+            MessageHandler(filters.Regex('^(Дальше)$'), next_page)
+        ],
         COMMENT_INPUT: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
         ],
