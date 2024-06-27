@@ -33,6 +33,14 @@ async def main():
         allowed_updates=Update.ALL_TYPES,
     )
 
+    await bot_init.tgbot.ptb_app.bot.set_my_commands(
+        [
+            ('start', 'Запустить бота'),
+            ('cancel', 'Вернуться в начало из любого места')
+        ]
+    )
+    await bot_init.tgbot.ptb_app.bot.set_chat_menu_button()
+
     async with bot_init.tgbot.ptb_app:
         await bot_init.tgbot.ptb_app.start()
         await webserver.serve()
