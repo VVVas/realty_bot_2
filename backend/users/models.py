@@ -21,7 +21,7 @@ class Profile(models.Model):
         (const.STATUS_READONLY, 'Только чтение'),
         (const.STATUS_BLOCKED, 'Заблокирован'),
     )
-    external_id = models.PositiveIntegerField(
+    external_id = models.PositiveBigIntegerField(
         'ID пользователя в Телеграм',
         unique=True,
     )
