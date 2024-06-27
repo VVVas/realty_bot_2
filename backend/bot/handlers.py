@@ -321,7 +321,9 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                '«Далее» для просмотра следующих объявлений',
+                '«Далее» для просмотра следующих объявлений '
+                f'Вы посмотрели {items.end_index()} '
+                f'из {ad_queryset.count()}',
                 reply_markup=ReplyKeyboardMarkup(
                     [['Дальше']],
                     one_time_keyboard=True,
@@ -357,7 +359,9 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    '«Далее» для просмотра следующих объектов недвижимости',
+                    '«Далее» для просмотра следующих объектов недвижимости. '
+                    f'Вы посмотрели {items.end_index()} '
+                    f'из {realty_queryset.count()}',
                     reply_markup=ReplyKeyboardMarkup(
                         [['Дальше']],
                         one_time_keyboard=True,
@@ -526,7 +530,10 @@ async def cancel(update: Update, context: CallbackContext) -> int:
 
 
 search_conv_handler = ConversationHandler(
-    entry_points=[CommandHandler('start', start)],
+    entry_points=[
+        MessageHandler(None, None),
+        CommandHandler('start', start)
+    ],
     states={
         START: [
             MessageHandler(filters.Regex('^(О боте)$'), help_command),
