@@ -494,7 +494,7 @@ async def delete_favorite(update: Update, context: CallbackContext):
         )
         return
     try:
-        Favorite.objects.get(
+        Favorite.objects.filter(
             user__external_id=query_data[2], ad__pk=query_data[1]
         ).delete()
         await update.callback_query.edit_message_text(
