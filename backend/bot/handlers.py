@@ -158,65 +158,129 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         ) | Q(price=None)
     queryset = Ad.objects.filter(filters)
     if queryset.exists():
-        for ad in queryset:
+
+        items = paginate(queryset)
+
+        # for ad in queryset:
+
+        for item in items:
+
+            # keyboard = [
+            #     [
+            #         InlineKeyboardButton(
+            #             "Добавить в избранное",
+            #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+            #         ),
+            #         InlineKeyboardButton(
+            #             "Комментарии",
+            #             callback_data=f'{str(COMMENT)},{ad.pk}'
+            #         ),
+            #     ],
+            # ]
+
             keyboard = [
                 [
                     InlineKeyboardButton(
                         "Добавить в избранное",
-                        callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                        callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
                         "Комментарии",
-                        callback_data=f'{str(COMMENT)},{ad.pk}'
+                        callback_data=f'{str(COMMENT)},{item.pk}'
                     ),
                 ],
             ]
+
             user_profile = Profile.objects.get(
                 external_id=update.effective_user.id
             )
             if user_profile.is_active:
+                # keyboard = [
+                #     [
+                #         InlineKeyboardButton(
+                #             "Добавить в избранное",
+                #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                #         ),
+                #         InlineKeyboardButton(
+                #             "Комментарии",
+                #             callback_data=f'{str(COMMENT)},{ad.pk}'
+                #         ),
+                #         InlineKeyboardButton(
+                #             "Добавить комментарий",
+                #             callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                #         )
+                #     ],
+                # ]
+
                 keyboard = [
                     [
                         InlineKeyboardButton(
                             "Добавить в избранное",
-                            callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                            callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                         ),
                         InlineKeyboardButton(
                             "Комментарии",
-                            callback_data=f'{str(COMMENT)},{ad.pk}'
+                            callback_data=f'{str(COMMENT)},{item.pk}'
                         ),
                         InlineKeyboardButton(
                             "Добавить комментарий",
-                            callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                            callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                         )
                     ],
                 ]
-            img = Realty.objects.get(pk=ad.realty_id).img
+
+            # img = Realty.objects.get(pk=ad.realty_id).img
+
+            img = Realty.objects.get(pk=item.realty_id).img
+
+            # if img:
+            #     await update.message.reply_photo(
+            #         photo=img,
+            #         caption=text_ad(ad),
+            #         reply_markup=InlineKeyboardMarkup(keyboard)
+            #     )
+            # else:
+            #     await update.message.reply_text(
+            #         text=text_ad(ad),
+            #         reply_markup=InlineKeyboardMarkup(keyboard)
+            #     )
+
             if img:
                 await update.message.reply_photo(
                     photo=img,
-                    caption=text_ad(ad),
+                    caption=text_ad(item),
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
             else:
                 await update.message.reply_text(
-                    text=text_ad(ad),
+                    text=text_ad(item),
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
+
+        if items.has_next():
+            context.user_data['page'] = items.next_page_number()
+            await update.message.reply_text(
+                f'{items.next_page_number()}',
+                reply_markup=ReplyKeyboardMarkup(
+                    [['Дальше']],
+                    one_time_keyboard=True,
+                    resize_keyboard=True
+                )
+            )
+            return NEXT_PAGE
+
     else:
         realty_filters = Q(city__title=city)
         if category:
             realty_filters &= Q(categories__title=category)
         realty_queryset = Realty.objects.filter(realty_filters)
 
-        page = 1
-
         if realty_queryset.exists():
             await update.message.reply_text(
                 get_botmessage_by_keyword('ADS_NOT_FOUND')
             )
 
-            items = paginate(realty_queryset, page)
+            items = paginate(realty_queryset)
 
             # for realty in realty_queryset:
 
@@ -260,7 +324,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()
 
     return await cancel(update, context)
-    # return NEXT_PAGE
 
 
 async def next_page(update: Update, context: CallbackContext) -> int:
@@ -280,51 +343,116 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         ) | Q(price=None)
     queryset = Ad.objects.filter(filters)
     if queryset.exists():
-        for ad in queryset:
+        items = paginate(queryset)
+
+        # for ad in queryset:
+
+        for item in items:
+
+            # keyboard = [
+            #     [
+            #         InlineKeyboardButton(
+            #             "Добавить в избранное",
+            #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+            #         ),
+            #         InlineKeyboardButton(
+            #             "Комментарии",
+            #             callback_data=f'{str(COMMENT)},{ad.pk}'
+            #         ),
+            #     ],
+            # ]
+
             keyboard = [
                 [
                     InlineKeyboardButton(
                         "Добавить в избранное",
-                        callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                        callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
                         "Комментарии",
-                        callback_data=f'{str(COMMENT)},{ad.pk}'
+                        callback_data=f'{str(COMMENT)},{item.pk}'
                     ),
                 ],
             ]
+
             user_profile = Profile.objects.get(
                 external_id=update.effective_user.id
             )
             if user_profile.is_active:
+                # keyboard = [
+                #     [
+                #         InlineKeyboardButton(
+                #             "Добавить в избранное",
+                #             callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                #         ),
+                #         InlineKeyboardButton(
+                #             "Комментарии",
+                #             callback_data=f'{str(COMMENT)},{ad.pk}'
+                #         ),
+                #         InlineKeyboardButton(
+                #             "Добавить комментарий",
+                #             callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                #         )
+                #     ],
+                # ]
+
                 keyboard = [
                     [
                         InlineKeyboardButton(
                             "Добавить в избранное",
-                            callback_data=f'{str(ADD_FAVORITE)},{ad.pk}'
+                            callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                         ),
                         InlineKeyboardButton(
                             "Комментарии",
-                            callback_data=f'{str(COMMENT)},{ad.pk}'
+                            callback_data=f'{str(COMMENT)},{item.pk}'
                         ),
                         InlineKeyboardButton(
                             "Добавить комментарий",
-                            callback_data=f'{str(ADD_COMMENT)},{ad.pk}'
+                            callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                         )
                     ],
                 ]
-            img = Realty.objects.get(pk=ad.realty_id).img
+
+            # img = Realty.objects.get(pk=ad.realty_id).img
+
+            img = Realty.objects.get(pk=item.realty_id).img
+
+            # if img:
+            #     await update.message.reply_photo(
+            #         photo=img,
+            #         caption=text_ad(ad),
+            #         reply_markup=InlineKeyboardMarkup(keyboard)
+            #     )
+            # else:
+            #     await update.message.reply_text(
+            #         text=text_ad(ad),
+            #         reply_markup=InlineKeyboardMarkup(keyboard)
+            #     )
+
             if img:
                 await update.message.reply_photo(
                     photo=img,
-                    caption=text_ad(ad),
+                    caption=text_ad(item),
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
             else:
                 await update.message.reply_text(
-                    text=text_ad(ad),
+                    text=text_ad(item),
                     reply_markup=InlineKeyboardMarkup(keyboard)
                 )
+
+        if items.has_next():
+            context.user_data['page'] = items.next_page_number()
+            await update.message.reply_text(
+                f'{items.next_page_number()}',
+                reply_markup=ReplyKeyboardMarkup(
+                    [['Дальше']],
+                    one_time_keyboard=True,
+                    resize_keyboard=True
+                )
+            )
+            return NEXT_PAGE
+
     else:
         realty_filters = Q(city__title=city)
         if category:
