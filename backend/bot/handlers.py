@@ -468,12 +468,12 @@ async def favorite(update: Update, context: CallbackContext):
                 InlineKeyboardButton(
                     "Удалить из избранного",
                     callback_data=f'{str(DELETE_FAVORITE)},'
-                                  f'{favorite_ad.pk},'
+                                  f'{favorite_ad.ad_id},'
                                   f'{user_id}'
                 ),
                 InlineKeyboardButton(
                     "Комментарии",
-                    callback_data=f'{str(COMMENT)},{favorite_ad.pk}'
+                    callback_data=f'{str(COMMENT)},{favorite_ad.ad_id}'
                 ),
             ],
         ]
@@ -572,5 +572,5 @@ add_comment_handler = CallbackQueryHandler(
     add_comment, pattern="^" + str(ADD_COMMENT)
 )
 comment_input_handler = MessageHandler(
-    filters.Regex(f'^{str(COMMENT_INPUT)}'), comment_input
+    filters.Regex(f'^{str(COMMENT_INPUT)}$'), comment_input
 )
