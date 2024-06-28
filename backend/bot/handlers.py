@@ -1,4 +1,3 @@
-from django.db import IntegrityError
 from django.db.models import Q
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardMarkup, Update)
@@ -572,7 +571,10 @@ search_conv_handler = ConversationHandler(
 )
 
 add_comment_conv = ConversationHandler(
-    entry_points=[CallbackQueryHandler(add_comment, pattern="^" + str(ADD_COMMENT))],
+    entry_points=[CallbackQueryHandler(
+        add_comment,
+        pattern="^" + str(ADD_COMMENT)
+    )],
     states={
         COMMENT_INPUT: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
