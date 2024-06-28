@@ -428,7 +428,7 @@ async def comment_input(update: Update, context: CallbackContext):
         "будет опубликован после проверки администратором."
     )
 
-    return ConversationHandler.END
+    return await cancel(update, context)
 
 
 async def add_to_favorite(update: Update, context: CallbackContext):
@@ -526,6 +526,16 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     return await start(update, context)
 
 
+async def handle_unknown_messages(update, context) -> None:
+    context.user_data.clear()
+    if not update.message.text.startswith('/'):
+        return await update.message.reply_text(
+            'Для продолжения работы необходимо вызвать функцию /start'
+        )
+
+    return None
+
+
 search_conv_handler = ConversationHandler(
     entry_points=[
         CommandHandler('start', start)
@@ -552,12 +562,22 @@ search_conv_handler = ConversationHandler(
         NEXT_PAGE: [
             MessageHandler(filters.Regex('^(Дальше)$'), next_page)
         ],
-        COMMENT_INPUT: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
-        ],
     },
     fallbacks=[CommandHandler('cancel', cancel)],
     allow_reentry=True,
+)
+
+add_comment_conv = ConversationHandler(
+    entry_points=[CallbackQueryHandler(
+        add_comment,
+        pattern="^" + str(ADD_COMMENT)
+    )],
+    states={
+        COMMENT_INPUT: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
+        ]
+    },
+    fallbacks=[CommandHandler('cancel', cancel)],
 )
 
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
@@ -568,9 +588,6 @@ delete_favorite_handler = CallbackQueryHandler(
     delete_favorite,
     pattern="^" + str(DELETE_FAVORITE)
 )
-add_comment_handler = CallbackQueryHandler(
-    add_comment, pattern="^" + str(ADD_COMMENT)
-)
-comment_input_handler = MessageHandler(
-    filters.TEXT & ~filters.COMMAND, comment_input
+unknown_message = MessageHandler(
+    filters.TEXT & ~filters.COMMAND, handle_unknown_messages
 )
