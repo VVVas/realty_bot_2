@@ -52,7 +52,7 @@ async def start(update: Update, context: CallbackContext) -> int:
 
 
 async def help_command(update: Update, context: CallbackContext) -> int:
-    """Команда предоставляющая информацию о боте."""
+    """Выводим информацию о боте."""
     await update.message.reply_text(
         get_botmessage_by_keyword('BOT_DESCRIPTION')
     )
@@ -69,7 +69,7 @@ async def start_work(update: Update, context: CallbackContext) -> int:
 
 
 async def city_choice(update: Update, context: CallbackContext) -> int:
-    """Выбор города. Название переводим в нижний кейс."""
+    """Выбор города."""
     city_name = update.message.text.lower()
     list_names = [city.title for city in City.objects.all()]
     list_cities = []
@@ -95,11 +95,7 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
 
 
 async def select_city(update: Update, context: CallbackContext) -> int:
-    """
-    Предоставляем выбор из загруженных в БД категорий.
-
-    Возможно пропустить.
-    """
+    """Выбор категории из БД. Можно пропустить. Запоминаем город."""
     list_names = [category.title for category in Category.objects.all()]
     list_chunks = list(chunks(list_names))
     keyboard = [chunk for chunk in list_chunks]
@@ -118,7 +114,7 @@ async def select_city(update: Update, context: CallbackContext) -> int:
 
 
 async def select_category(update: Update, context: CallbackContext) -> int:
-    """Фильтрация по цене. Выбранную категорию запоминаем для выборки."""
+    """Фильтрация по цене. Можно пропустить. Запоминаем категорию."""
     selected_category = update.message.text
     if selected_category.lower() == "пропустить":
         context.user_data['selected_category'] = None
@@ -137,7 +133,7 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 
 
 async def select_price(update: Update, context: CallbackContext) -> int:
-    """Выводим список объявлений и завершаем цепочку диалога."""
+    """Вывод списка объявлений и объектов. Запоминаем цену."""
     selected_price = update.message.text.replace(' ', '').split('-')
     if (selected_price[0].lower() == "пропустить"
             or int(selected_price[1]) == 0):
@@ -159,6 +155,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     ad_queryset = Ad.objects.filter(filters)
     if ad_queryset.exists():
 
+        user_profile = Profile.objects.get(
+            external_id=update.effective_user.id
+        )
+
         items = paginate(ad_queryset)
 
         for item in items:
@@ -175,9 +175,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 ],
             ]
 
-            user_profile = Profile.objects.get(
-                external_id=update.effective_user.id
-            )
             if user_profile.is_active:
                 keyboard[0].append(
                     InlineKeyboardButton(
@@ -203,7 +200,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                '«Далее» для просмотра следующих объявлений',
+                '«Далее» для просмотра следующих объявлений.',
                 reply_markup=ReplyKeyboardMarkup(
                     [['Дальше']],
                     one_time_keyboard=True,
@@ -240,7 +237,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    '«Далее» для просмотра следующих объектов недвижимости',
+                    '«Далее» для просмотра следующих объектов недвижимости.',
                     reply_markup=ReplyKeyboardMarkup(
                         [['Дальше']],
                         one_time_keyboard=True,
@@ -259,7 +256,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
 
 async def next_page(update: Update, context: CallbackContext) -> int:
-    """Следующая страинца."""
+    """Следующая страинца для списка объявлений и объектов."""
     city = context.user_data.get('selected_city')
     category = context.user_data.get('selected_category')
     price = context.user_data.get('selected_price')
@@ -275,6 +272,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         ) | Q(price=None)
     ad_queryset = Ad.objects.filter(filters)
     if ad_queryset.exists():
+
+        user_profile = Profile.objects.get(
+            external_id=update.effective_user.id
+        )
 
         items = paginate(ad_queryset, page)
 
@@ -292,10 +293,6 @@ async def next_page(update: Update, context: CallbackContext) -> int:
                     ),
                 ],
             ]
-
-            user_profile = Profile.objects.get(
-                external_id=update.effective_user.id
-            )
 
             if user_profile.is_active:
                 keyboard[0].append(
@@ -321,7 +318,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                '«Далее» для просмотра следующих объявлений '
+                '«Далее» для просмотра следующих объявлений.\n'
                 f'Вы посмотрели {items.end_index()} '
                 f'из {ad_queryset.count()}',
                 reply_markup=ReplyKeyboardMarkup(
@@ -359,7 +356,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    '«Далее» для просмотра следующих объектов недвижимости. '
+                    '«Далее» для просмотра следующих объектов недвижимости.\n'
                     f'Вы посмотрели {items.end_index()} '
                     f'из {realty_queryset.count()}',
                     reply_markup=ReplyKeyboardMarkup(
@@ -376,7 +373,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
 
 
 async def comment(update: Update, context: CallbackContext):
-    """Вывести комментарии к объявлению."""
+    """Вывод комментариев к объявлению."""
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
@@ -400,7 +397,7 @@ async def comment(update: Update, context: CallbackContext):
 
 
 async def add_comment(update: Update, context: CallbackContext):
-    """Добавить комментарий к обьявлению."""
+    """Добавление комментария к обьявлению."""
     query = update.callback_query
     ad_id = query.data.split(',')[1]
     context.user_data['ad_id'] = ad_id
@@ -455,7 +452,7 @@ async def add_to_favorite(update: Update, context: CallbackContext):
 
 
 async def favorite(update: Update, context: CallbackContext):
-    """Показываем список избранного."""
+    """Выводим список избранного."""
     user_id = update.message.from_user.id
     favorite_ads = Favorite.objects.filter(
         user__external_id=user_id
