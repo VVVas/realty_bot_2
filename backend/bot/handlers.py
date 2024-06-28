@@ -555,6 +555,9 @@ search_conv_handler = ConversationHandler(
         NEXT_PAGE: [
             MessageHandler(filters.Regex('^(Дальше)$'), next_page)
         ],
+        COMMENT_INPUT: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
+        ],
     },
     fallbacks=[CommandHandler('cancel', cancel)],
     allow_reentry=True,
