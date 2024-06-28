@@ -555,6 +555,9 @@ search_conv_handler = ConversationHandler(
         NEXT_PAGE: [
             MessageHandler(filters.Regex('^(Дальше)$'), next_page)
         ],
+        COMMENT_INPUT: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
+        ],
     },
     fallbacks=[CommandHandler('cancel', cancel)],
     allow_reentry=True,
@@ -572,5 +575,5 @@ add_comment_handler = CallbackQueryHandler(
     add_comment, pattern="^" + str(ADD_COMMENT)
 )
 comment_input_handler = MessageHandler(
-    filters.Regex(f'^{str(COMMENT_INPUT)}$'), comment_input
+    filters.TEXT & ~filters.COMMAND, comment_input
 )
