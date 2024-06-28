@@ -159,6 +159,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     ad_queryset = Ad.objects.filter(filters)
     if ad_queryset.exists():
 
+        user_profile = Profile.objects.get(
+            external_id=update.effective_user.id
+        )
+
         items = paginate(ad_queryset)
 
         for item in items:
@@ -175,9 +179,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 ],
             ]
 
-            user_profile = Profile.objects.get(
-                external_id=update.effective_user.id
-            )
             if user_profile.is_active:
                 keyboard[0].append(
                     InlineKeyboardButton(
@@ -276,6 +277,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
     ad_queryset = Ad.objects.filter(filters)
     if ad_queryset.exists():
 
+        user_profile = Profile.objects.get(
+            external_id=update.effective_user.id
+        )
+
         items = paginate(ad_queryset, page)
 
         for item in items:
@@ -292,10 +297,6 @@ async def next_page(update: Update, context: CallbackContext) -> int:
                     ),
                 ],
             ]
-
-            user_profile = Profile.objects.get(
-                external_id=update.effective_user.id
-            )
 
             if user_profile.is_active:
                 keyboard[0].append(
