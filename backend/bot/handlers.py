@@ -533,12 +533,14 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     return await start(update, context)
 
 
-async def handle_unknown_messages(update, context):
+async def handle_unknown_messages(update, context) -> None:
     context.user_data.clear()
     if not update.message.text.startswith('/'):
         return await update.message.reply_text(
             'Для продолжения работы необходимо вызвать функцию /start'
         )
+
+    return None
 
 
 search_conv_handler = ConversationHandler(
@@ -589,4 +591,6 @@ add_comment_handler = CallbackQueryHandler(
 comment_input_handler = MessageHandler(
     filters.TEXT & ~filters.COMMAND, comment_input
 )
-unknown_message = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unknown_messages)
+unknown_message = MessageHandler(
+    filters.TEXT & ~filters.COMMAND, handle_unknown_messages
+)
