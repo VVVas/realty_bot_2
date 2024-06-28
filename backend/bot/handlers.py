@@ -421,14 +421,11 @@ async def comment_input(update: Update, context: CallbackContext):
     user_comment = update.message.text
     ad_id = context.user_data.get('ad_id')
     user_id = Profile.objects.get(external_id=update.message.from_user.id).id
-    try:
-        comment = Comment.objects.create(
-            ad_id=ad_id,
-            user_id=user_id,
-            text=user_comment
-        )
-    except IntegrityError:
-        return await handle_unknown_messages(update, context)
+    comment = Comment.objects.create(
+        ad_id=ad_id,
+        user_id=user_id,
+        text=user_comment
+    )
     comment.save()
     await update.message.reply_text(
         "Ваш комментарий был добавлен и "
@@ -569,12 +566,19 @@ search_conv_handler = ConversationHandler(
         NEXT_PAGE: [
             MessageHandler(filters.Regex('^(Дальше)$'), next_page)
         ],
-        COMMENT_INPUT: [
-            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
-        ],
     },
     fallbacks=[CommandHandler('cancel', cancel)],
     allow_reentry=True,
+)
+
+add_comment_conv = ConversationHandler(
+    entry_points=[CallbackQueryHandler(add_comment, pattern="^" + str(ADD_COMMENT))],
+    states={
+        COMMENT_INPUT: [
+            MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
+        ]
+    },
+    fallbacks=[CommandHandler('cancel', cancel)],
 )
 
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
@@ -584,12 +588,6 @@ favorite_handler = CallbackQueryHandler(
 delete_favorite_handler = CallbackQueryHandler(
     delete_favorite,
     pattern="^" + str(DELETE_FAVORITE)
-)
-add_comment_handler = CallbackQueryHandler(
-    add_comment, pattern="^" + str(ADD_COMMENT)
-)
-comment_input_handler = MessageHandler(
-    filters.TEXT & ~filters.COMMAND, comment_input
 )
 unknown_message = MessageHandler(
     filters.TEXT & ~filters.COMMAND, handle_unknown_messages
