@@ -468,8 +468,7 @@ async def favorite(update: Update, context: CallbackContext):
                 InlineKeyboardButton(
                     "Удалить из избранного",
                     callback_data=f'{str(DELETE_FAVORITE)},'
-                                  f'{favorite_ad.pk},'
-                                  f'{user_id}'
+                                  f'{favorite_ad.pk}'
                 ),
                 InlineKeyboardButton(
                     "Комментарии",
@@ -487,18 +486,17 @@ async def favorite(update: Update, context: CallbackContext):
 
 async def delete_favorite(update: Update, context: CallbackContext):
     """Убираем объявление из избранного."""
+    user_id = update.effective_user.id
     query = update.callback_query
-    await query.answer()
-    query_data = query.data.split(',')
-    # query_data = split_query(update)
-    if len(query_data) != 3:
-        await update.callback_query.edit_message_text(
-            'Некорректные данные для удаления.'
-        )
-        return
+    ad_id = query.data.split(',')[1]
+    # if len(query_data) != 2:
+    #     await update.callback_query.edit_message_text(
+    #         'Некорректные данные для удаления.'
+    #     )
+    #     return
     try:
         Favorite.objects.get(
-            user__external_id=query_data[2], ad__pk=query_data[1]
+            user__external_id=user_id, ad__pk=ad_id
         ).delete()
         await update.callback_query.edit_message_text(
             'Запись удалена из избранного!'
