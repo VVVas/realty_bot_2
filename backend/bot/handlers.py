@@ -577,7 +577,7 @@ add_comment_conv = ConversationHandler(
             MessageHandler(filters.TEXT & ~filters.COMMAND, comment_input)
         ]
     },
-    fallbacks=[CommandHandler('cancel', cancel)],
+    fallbacks=[],
 )
 
 comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
