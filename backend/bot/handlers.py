@@ -435,7 +435,7 @@ async def comment_input(update: Update, context: CallbackContext):
         "будет опубликован после проверки администратором."
     )
 
-    return ConversationHandler.END
+    return await cancel(update, context)
 
 
 async def add_to_favorite(update: Update, context: CallbackContext):
