@@ -23,7 +23,6 @@ class TGBot:
         self.ptb_app.add_handler(favorite_handler)
         self.ptb_app.add_handler(delete_favorite_handler)
         self.ptb_app.add_handler(comment_input_handler)
-        self.ptb_app.add_error_handler(cancel)
 
 
 tgbot = TGBot()
