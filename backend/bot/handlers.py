@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from django.db.models import Q
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardMarkup, Update)
@@ -420,11 +421,14 @@ async def comment_input(update: Update, context: CallbackContext):
     user_comment = update.message.text
     ad_id = context.user_data.get('ad_id')
     user_id = Profile.objects.get(external_id=update.message.from_user.id).id
-    comment = Comment.objects.create(
-        ad_id=ad_id,
-        user_id=user_id,
-        text=user_comment
-    )
+    try:
+        comment = Comment.objects.create(
+            ad_id=ad_id,
+            user_id=user_id,
+            text=user_comment
+        )
+    except IntegrityError:
+        return await handle_unknown_messages(update, context)
     comment.save()
     await update.message.reply_text(
         "Ваш комментарий был добавлен и "
@@ -529,6 +533,14 @@ async def cancel(update: Update, context: CallbackContext) -> int:
     return await start(update, context)
 
 
+async def handle_unknown_messages(update, context):
+    context.user_data.clear()
+    if not update.message.text.startswith('/'):
+        return await update.message.reply_text(
+            'Для продолжения работы необходимо вызвать функцию /start'
+        )
+
+
 search_conv_handler = ConversationHandler(
     entry_points=[
         CommandHandler('start', start)
@@ -577,3 +589,4 @@ add_comment_handler = CallbackQueryHandler(
 comment_input_handler = MessageHandler(
     filters.TEXT & ~filters.COMMAND, comment_input
 )
+unknown_message = MessageHandler(filters.TEXT & ~filters.COMMAND, handle_unknown_messages)
