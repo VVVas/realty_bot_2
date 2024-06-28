@@ -473,7 +473,7 @@ async def favorite(update: Update, context: CallbackContext):
                 ),
                 InlineKeyboardButton(
                     "Комментарии",
-                    callback_data=f'{str(COMMENT)},{favorite_ad.pk}'
+                    callback_data=f'{str(COMMENT)},{favorite_ad.ad_id}'
                 ),
             ],
         ]
