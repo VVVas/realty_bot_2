@@ -4,7 +4,6 @@ from telegram.ext import Application
 from .handlers import (search_conv_handler, comment_handler, favorite_handler,
                        delete_favorite_handler, add_comment_handler,
                        comment_input_handler)
-from .handlers import cancel
 
 
 class TGBot:
@@ -23,7 +22,6 @@ class TGBot:
         self.ptb_app.add_handler(favorite_handler)
         self.ptb_app.add_handler(delete_favorite_handler)
         self.ptb_app.add_handler(comment_input_handler)
-        self.ptb_app.add_error_handler(cancel)
 
 
 tgbot = TGBot()
