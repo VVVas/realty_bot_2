@@ -443,22 +443,30 @@ async def add_to_favorite(update: Update, context: CallbackContext):
         user=user,
         ad_id=query_data[1]
     )
-    if created:
+    if not created:
         if effective_message_type(
             update.callback_query.message
         ) == MessageType.TEXT:
             await update.callback_query.edit_message_text(
-                "Объявление добавлено в избранное."
+                "Объявление было добавлено в избранное ранее."
             )
         elif effective_message_type(
             update.callback_query.message
         ) == MessageType.PHOTO:
             await update.callback_query.edit_message_caption(
-                "Объявление добавлено в избранное."
+                "Объявление было добавлено в избранное ранее."
             )
-    else:
-        await query.edit_message_text(
-            "Данное объявление уже добавлено в избранное."
+    if effective_message_type(
+        update.callback_query.message
+    ) == MessageType.TEXT:
+        await update.callback_query.edit_message_text(
+            "Объявление добавлено в избранное."
+        )
+    elif effective_message_type(
+        update.callback_query.message
+    ) == MessageType.PHOTO:
+        await update.callback_query.edit_message_caption(
+            "Объявление добавлено в избранное."
         )
 
 
@@ -505,9 +513,18 @@ async def delete_favorite(update: Update, context: CallbackContext):
     """Убираем объявление из избранного."""
     query_data = split_query(update)
     if len(query_data) != 3:
-        await update.callback_query.edit_message_text(
-            'Некорректные данные для удаления.'
-        )
+        if effective_message_type(
+            update.callback_query.message
+        ) == MessageType.TEXT:
+            await update.callback_query.edit_message_text(
+                'Некорректные данные для удаления.'
+            )
+        elif effective_message_type(
+            update.callback_query.message
+        ) == MessageType.PHOTO:
+            await update.callback_query.edit_message_caption(
+                'Некорректные данные для удаления.'
+            )
         return
     try:
         Favorite.objects.get(
@@ -526,13 +543,31 @@ async def delete_favorite(update: Update, context: CallbackContext):
                 'Запись удалена из избранного!'
             )
     except Favorite.DoesNotExist:
-        await update.callback_query.edit_message_text(
-            'Эта запись не найдена в вашем избранном.'
-        )
+        if effective_message_type(
+            update.callback_query.message
+        ) == MessageType.TEXT:
+            await update.callback_query.edit_message_text(
+                'Эта запись не найдена в вашем избранном.'
+            )
+        elif effective_message_type(
+            update.callback_query.message
+        ) == MessageType.PHOTO:
+            await update.callback_query.edit_message_caption(
+                'Эта запись не найдена в вашем избранном.'
+            )
     except Exception:
-        await update.callback_query.edit_message_text(
-            'Произошла ошибка при удалении записи из избранного.'
-        )
+        if effective_message_type(
+            update.callback_query.message
+        ) == MessageType.TEXT:
+            await update.callback_query.edit_message_text(
+                'Произошла ошибка при удалении записи из избранного.'
+            )
+        elif effective_message_type(
+            update.callback_query.message
+        ) == MessageType.PHOTO:
+            await update.callback_query.edit_message_caption(
+                'Произошла ошибка при удалении записи из избранного.'
+            )
 
 
 async def delete_user(update: Update, context: CallbackContext):
