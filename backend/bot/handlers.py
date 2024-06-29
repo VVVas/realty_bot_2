@@ -439,14 +439,23 @@ async def add_to_favorite(update: Update, context: CallbackContext):
     await query.answer()
     query_data = query.data.split(',')
     user = Profile.objects.get(external_id=update.effective_user.id)
-    fav, res = Favorite.objects.get_or_create(
+    _, created = Favorite.objects.get_or_create(
         user=user,
         ad_id=query_data[1]
     )
-    if res:
-        await query.edit_message_text(
-            "Объявление добавлено в избранное."
-        )
+    if created:
+        if effective_message_type(
+            update.callback_query.message
+        ) == MessageType.TEXT:
+            await update.callback_query.edit_message_text(
+                "Объявление добавлено в избранное."
+            )
+        elif effective_message_type(
+            update.callback_query.message
+        ) == MessageType.PHOTO:
+            await update.callback_query.edit_message_caption(
+                "Объявление добавлено в избранное."
+            )
     else:
         await query.edit_message_text(
             "Данное объявление уже добавлено в избранное."
