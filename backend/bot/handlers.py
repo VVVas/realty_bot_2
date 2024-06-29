@@ -456,6 +456,7 @@ async def add_to_favorite(update: Update, context: CallbackContext):
             await update.callback_query.edit_message_caption(
                 "Объявление было добавлено в избранное ранее."
             )
+        return
     if effective_message_type(
         update.callback_query.message
     ) == MessageType.TEXT:
