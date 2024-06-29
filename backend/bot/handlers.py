@@ -4,6 +4,8 @@ from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
 from telegram.ext import (CallbackContext, CallbackQueryHandler,
                           CommandHandler, ConversationHandler, MessageHandler,
                           filters)
+from telegram.helpers import effective_message_type
+from telegram.constants import MessageType
 
 from realties.models import Ad, Category, City, Comment, Favorite, Realty
 from users.models import Profile
@@ -502,9 +504,18 @@ async def delete_favorite(update: Update, context: CallbackContext):
         Favorite.objects.get(
             user__external_id=query_data[2], ad__pk=query_data[1]
         ).delete()
-        await update.callback_query.edit_message_text(
-            'Запись удалена из избранного!'
-        )
+        if effective_message_type(
+            update.callback_query.message
+        ) == MessageType.TEXT:
+            await update.callback_query.edit_message_text(
+                'Запись удалена из избранного!'
+            )
+        elif effective_message_type(
+            update.callback_query.message
+        ) == MessageType.PHOTO:
+            await update.callback_query.edit_message_caption(
+                'Запись удалена из избранного!'
+            )
     except Favorite.DoesNotExist:
         await update.callback_query.edit_message_text(
             'Эта запись не найдена в вашем избранном.'
