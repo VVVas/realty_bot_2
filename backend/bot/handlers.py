@@ -474,10 +474,18 @@ async def favorite(update: Update, context: CallbackContext):
                 ),
             ],
         ]
-        await update.message.reply_text(
-            text_ad(favorite_ad.ad),
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        img = Realty.objects.get(pk=favorite_ad.ad.realty.pk).img
+        if img:
+            await update.message.reply_photo(
+                photo=img,
+                caption=text_ad(favorite_ad.ad),
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
+        else:
+            await update.message.reply_text(
+                text=text_ad(favorite_ad.ad),
+                reply_markup=InlineKeyboardMarkup(keyboard)
+            )
 
     return await cancel(update, context)
 
