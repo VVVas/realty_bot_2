@@ -615,17 +615,27 @@ search_conv_handler = ConversationHandler(
         START: [
             MessageHandler(
                 filters.Regex(
-                    re.compile(r'^(' + BUTTON_SEARCH + ')$', re.IGNORECASE)
+                    re.compile(r'^(' + BUTTON_SEARCH + ')$',
+                               re.IGNORECASE)
                 ), start_work
             ),
             MessageHandler(
-                filters.Regex('^(' + BUTTON_ABOUT + ')$'), help_command
+                filters.Regex(
+                    re.compile(r'^(' + BUTTON_ABOUT + ')$',
+                               re.IGNORECASE)
+                ), help_command
             ),
             MessageHandler(
-                filters.Regex('^(' + BUTTON_FAVORITE + ')$'), favorite
+                filters.Regex(
+                    re.compile(r'^(' + BUTTON_FAVORITE + ')$',
+                               re.IGNORECASE)
+                ), favorite
             ),
             MessageHandler(
-                filters.Regex('^(' + BUTTON_DELETE_USER + ')'), delete_user
+                filters.Regex(
+                    re.compile(r'^(' + BUTTON_DELETE_USER + ')$',
+                               re.IGNORECASE)
+                ), delete_user
             ),
         ],
         CITY_CHOICE: [
@@ -661,14 +671,17 @@ add_comment_conv = ConversationHandler(
     fallbacks=[],
 )
 
-comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
+comment_handler = CallbackQueryHandler(
+    comment, pattern="^" + str(COMMENT)
+)
+
 favorite_handler = CallbackQueryHandler(
     add_to_favorite, pattern="^" + str(ADD_FAVORITE)
 )
 delete_favorite_handler = CallbackQueryHandler(
-    delete_favorite,
-    pattern="^" + str(DELETE_FAVORITE)
+    delete_favorite, pattern="^" + str(DELETE_FAVORITE)
 )
+
 unknown_message = MessageHandler(
     filters.TEXT & ~filters.COMMAND, handle_unknown_messages
 )
