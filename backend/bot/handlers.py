@@ -18,6 +18,11 @@ START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 
+BUTTON_SEARCH = 'Поиск'
+BUTTON_ABOUT = 'О боте'
+BUTTON_FAVORITE = 'Избранное'
+BUTTON_DELETE_USER = 'Удалить свой аккаунт'
+
 
 @restricted
 async def start(update: Update, context: CallbackContext) -> int:
@@ -37,8 +42,8 @@ async def start(update: Update, context: CallbackContext) -> int:
             last_name=update.effective_user.last_name
         )
     keyboard = [
-        ['Начало работы', 'О боте'],
-        ['Избранное', 'Удалить учетную запись']
+        [BUTTON_SEARCH, BUTTON_ABOUT],
+        [BUTTON_FAVORITE, BUTTON_DELETE_USER]
     ]
 
     await update.message.reply_text(
@@ -606,10 +611,18 @@ search_conv_handler = ConversationHandler(
     ],
     states={
         START: [
-            MessageHandler(filters.Regex('^(О боте)$'), help_command),
-            MessageHandler(filters.Regex('^(Начало работы)$'), start_work),
-            MessageHandler(filters.Regex('^(Избранное)$'), favorite),
-            MessageHandler(filters.Regex('^(Удалить)'), delete_user),
+            MessageHandler(
+                filters.Regex('^(' + BUTTON_SEARCH + ')$'), start_work
+            ),
+            MessageHandler(
+                filters.Regex('^(' + BUTTON_ABOUT + ')$'), help_command
+            ),
+            MessageHandler(
+                filters.Regex('^(' + BUTTON_FAVORITE + ')$'), favorite
+            ),
+            MessageHandler(
+                filters.Regex('^(' + BUTTON_DELETE_USER + ')'), delete_user
+            ),
         ],
         CITY_CHOICE: [
             MessageHandler(filters.TEXT & ~filters.COMMAND, city_choice)
