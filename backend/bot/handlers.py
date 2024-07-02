@@ -23,7 +23,8 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 BUTTON_SEARCH = 'Поиск'
 BUTTON_ABOUT = 'О боте'
 BUTTON_FAVORITE = 'Избранное'
-BUTTON_DELETE_USER = 'Удалить свой аккаунт'
+BUTTON_DELETE_USER = 'Удалить аккаунт'
+BUTTON_SKIP = 'Пропустить'
 
 
 @restricted
@@ -108,7 +109,7 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     list_names = [category.title for category in Category.objects.all()]
     list_chunks = list(chunks(list_names))
     keyboard = [chunk for chunk in list_chunks]
-    keyboard.append(['Пропустить'])
+    keyboard.append([BUTTON_SKIP])
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
@@ -125,14 +126,14 @@ async def select_city(update: Update, context: CallbackContext) -> int:
 async def select_category(update: Update, context: CallbackContext) -> int:
     """Фильтрация по цене. Можно пропустить. Запоминаем категорию."""
     selected_category = update.message.text
-    if selected_category.lower() == "пропустить":
+    if selected_category.lower() == BUTTON_SKIP.lower():
         context.user_data['selected_category'] = None
     else:
         context.user_data['selected_category'] = selected_category
     await update.message.reply_text(
         get_botmessage_by_keyword('PRICE_INPUT'),
         reply_markup=ReplyKeyboardMarkup(
-            [['Пропустить']],
+            [[BUTTON_SKIP]],
             one_time_keyboard=True,
             resize_keyboard=True
         )
@@ -144,7 +145,7 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 async def select_price(update: Update, context: CallbackContext) -> int:
     """Вывод списка объявлений и объектов. Запоминаем цену."""
     selected_price = update.message.text.replace(' ', '').split('-')
-    if (selected_price[0].lower() == "пропустить"
+    if (selected_price[0].lower() == BUTTON_SKIP.lower()
             or int(selected_price[1]) == 0):
         context.user_data['selected_price'] = None
     else:
@@ -615,17 +616,27 @@ search_conv_handler = ConversationHandler(
         START: [
             MessageHandler(
                 filters.Regex(
-                    re.compile(r'^(' + BUTTON_SEARCH + ')$', re.IGNORECASE)
+                    re.compile(r'^(' + BUTTON_SEARCH + ')$',
+                               re.IGNORECASE)
                 ), start_work
             ),
             MessageHandler(
-                filters.Regex('^(' + BUTTON_ABOUT + ')$'), help_command
+                filters.Regex(
+                    re.compile(r'^(' + BUTTON_ABOUT + ')$',
+                               re.IGNORECASE)
+                ), help_command
             ),
             MessageHandler(
-                filters.Regex('^(' + BUTTON_FAVORITE + ')$'), favorite
+                filters.Regex(
+                    re.compile(r'^(' + BUTTON_FAVORITE + ')$',
+                               re.IGNORECASE)
+                ), favorite
             ),
             MessageHandler(
-                filters.Regex('^(' + BUTTON_DELETE_USER + ')'), delete_user
+                filters.Regex(
+                    re.compile(r'^(' + BUTTON_DELETE_USER + ')$',
+                               re.IGNORECASE)
+                ), delete_user
             ),
         ],
         CITY_CHOICE: [
@@ -661,14 +672,17 @@ add_comment_conv = ConversationHandler(
     fallbacks=[],
 )
 
-comment_handler = CallbackQueryHandler(comment, pattern="^" + str(COMMENT))
+comment_handler = CallbackQueryHandler(
+    comment, pattern="^" + str(COMMENT)
+)
+
 favorite_handler = CallbackQueryHandler(
     add_to_favorite, pattern="^" + str(ADD_FAVORITE)
 )
 delete_favorite_handler = CallbackQueryHandler(
-    delete_favorite,
-    pattern="^" + str(DELETE_FAVORITE)
+    delete_favorite, pattern="^" + str(DELETE_FAVORITE)
 )
+
 unknown_message = MessageHandler(
     filters.TEXT & ~filters.COMMAND, handle_unknown_messages
 )
