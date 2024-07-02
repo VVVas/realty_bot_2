@@ -1,3 +1,5 @@
+import re
+
 from django.db.models import Q
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardMarkup, Update)
@@ -612,7 +614,9 @@ search_conv_handler = ConversationHandler(
     states={
         START: [
             MessageHandler(
-                filters.Regex('^(' + BUTTON_SEARCH + ')$'), start_work
+                filters.Regex(
+                    re.compile(r'^(' + BUTTON_SEARCH + ')$', re.IGNORECASE)
+                ), start_work
             ),
             MessageHandler(
                 filters.Regex('^(' + BUTTON_ABOUT + ')$'), help_command
