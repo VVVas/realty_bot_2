@@ -104,13 +104,13 @@ docker compose -f docker-compose.prod.yml exec backend python manage.py createsu
 ## Стек технологий
 Python 3.11, Django 5.0, PTB 21.2, Docker 26.1, nginx 1.26, PostgreSQL 16.3  
 
-## Авторы предыдущей версии для хакатона
+## Код написали
 [Кавтырев Максим](https://github.com/h-inek)  
 [Мишустин Василий](https://github.com/VVVas), v@vvvas.ru   
 [Песчанов Никита](https://github.com/ItWasCain)  
 [Турубанов Евгений](https://github.com/eturubanov)  
 
-## Авторы предыдущей версии для хакатона
+## Код предыдущей версии для хакатона написали
 [Кавтырев Максим](https://github.com/h-inek)  
 [Мишустин Василий](https://github.com/VVVas), v@vvvas.ru   
 [Песчанов Никита](https://github.com/ItWasCain)  
