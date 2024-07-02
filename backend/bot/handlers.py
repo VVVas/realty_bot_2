@@ -1,3 +1,5 @@
+import re
+
 from django.db.models import Q
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardMarkup, Update)
