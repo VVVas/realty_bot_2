@@ -23,7 +23,8 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 BUTTON_SEARCH = 'Поиск'
 BUTTON_ABOUT = 'О боте'
 BUTTON_FAVORITE = 'Избранное'
-BUTTON_DELETE_USER = 'Удалить свой аккаунт'
+BUTTON_DELETE_USER = 'Удалить аккаунт'
+BUTTON_SKIP = 'Пропустить'
 
 
 @restricted
@@ -108,7 +109,7 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     list_names = [category.title for category in Category.objects.all()]
     list_chunks = list(chunks(list_names))
     keyboard = [chunk for chunk in list_chunks]
-    keyboard.append(['Пропустить'])
+    keyboard.append([BUTTON_SKIP])
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
@@ -125,14 +126,14 @@ async def select_city(update: Update, context: CallbackContext) -> int:
 async def select_category(update: Update, context: CallbackContext) -> int:
     """Фильтрация по цене. Можно пропустить. Запоминаем категорию."""
     selected_category = update.message.text
-    if selected_category.lower() == "пропустить":
+    if selected_category.lower() == BUTTON_SKIP.lower():
         context.user_data['selected_category'] = None
     else:
         context.user_data['selected_category'] = selected_category
     await update.message.reply_text(
         get_botmessage_by_keyword('PRICE_INPUT'),
         reply_markup=ReplyKeyboardMarkup(
-            [['Пропустить']],
+            [[BUTTON_SKIP]],
             one_time_keyboard=True,
             resize_keyboard=True
         )
@@ -144,7 +145,7 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 async def select_price(update: Update, context: CallbackContext) -> int:
     """Вывод списка объявлений и объектов. Запоминаем цену."""
     selected_price = update.message.text.replace(' ', '').split('-')
-    if (selected_price[0].lower() == "пропустить"
+    if (selected_price[0].lower() == BUTTON_SKIP.lower()
             or int(selected_price[1]) == 0):
         context.user_data['selected_price'] = None
     else:
