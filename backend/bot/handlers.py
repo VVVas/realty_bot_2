@@ -25,6 +25,10 @@ BUTTON_ABOUT = 'О боте'
 BUTTON_FAVORITE = 'Избранное'
 BUTTON_DELETE_USER = 'Удалить аккаунт'
 BUTTON_SKIP = 'Пропустить'
+BUTTON_ADD_FAVORITE = 'В избранное'
+BUTTON_DELETE_FAVORITE = 'Удалить из избранного'
+BUTTON_COMMENTS = 'Коментарии'
+BUTTON_ADD_COMMENT = 'Добавить комментарий'
 
 
 @restricted
@@ -175,11 +179,11 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             keyboard = [
                 [
                     InlineKeyboardButton(
-                        "В избранное",
+                        BUTTON_ADD_FAVORITE,
                         callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
-                        "Комментарии",
+                        BUTTON_COMMENTS,
                         callback_data=f'{str(COMMENT)},{item.pk}'
                     ),
                 ],
@@ -188,7 +192,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             if user_profile.is_active:
                 keyboard[0].append(
                     InlineKeyboardButton(
-                        "Добавить комментарий",
+                        BUTTON_ADD_COMMENT,
                         callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                     )
                 )
@@ -294,11 +298,11 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             keyboard = [
                 [
                     InlineKeyboardButton(
-                        "В избранное",
+                        BUTTON_ADD_FAVORITE,
                         callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
-                        "Комментарии",
+                        BUTTON_COMMENTS,
                         callback_data=f'{str(COMMENT)},{item.pk}'
                     ),
                 ],
@@ -307,7 +311,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if user_profile.is_active:
                 keyboard[0].append(
                     InlineKeyboardButton(
-                        "Добавить комментарий",
+                        BUTTON_ADD_COMMENT,
                         callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                     )
                 )
@@ -491,13 +495,13 @@ async def favorite(update: Update, context: CallbackContext):
         keyboard = [
             [
                 InlineKeyboardButton(
-                    "Удалить из избранного",
+                    BUTTON_DELETE_FAVORITE,
                     callback_data=f'{str(DELETE_FAVORITE)},'
                                   f'{favorite_ad.ad_id},'
                                   f'{user_id}'
                 ),
                 InlineKeyboardButton(
-                    "Комментарии",
+                    BUTTON_COMMENTS,
                     callback_data=f'{str(COMMENT)},{favorite_ad.ad_id}'
                 ),
             ],
