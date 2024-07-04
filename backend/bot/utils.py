@@ -50,11 +50,7 @@ def text_realty(realty):
     text = f'{realty.title}\n'
     if realty.address:
         text += f'\n{realty.address}'
-    if any(
-        realty.phone_number,
-        realty.mobile_number,
-        realty.number
-    ):
+    if any([realty.phone_number, realty.mobile_number, realty.number]):
         text += '\n'
         if realty.phone_number:
             text += f'{realty.phone_number} '
