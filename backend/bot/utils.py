@@ -47,14 +47,28 @@ def text_ad(ad):
 
 def text_realty(realty):
     """Текст выводимый для недвижимости."""
-    return (f'{realty.title}\n\n'
-            f'{realty.address}\n'
-            f'{realty.phone_number} '
-            f'{realty.mobile_number} '
-            f'{realty.number}\n '
-            f'{realty.email}\n'
-            f'{realty.site}\n\n'
-            f'{realty.additional_information}')
+    text = f'{realty.title}\n'
+    if realty.address:
+        text += f'\n{realty.address}'
+    if any(
+        realty.phone_number,
+        realty.mobile_number,
+        realty.number
+    ):
+        text += '\n'
+        if realty.phone_number:
+            text += f'{realty.phone_number} '
+        if realty.mobile_number:
+            text += f'{realty.mobile_number} '
+        if realty.number:
+            text += f'{realty.number}'
+    if realty.email:
+        text += f'\n{realty.email}'
+    if realty.site:
+        text += f'\n{realty.site}'
+    if realty.additional_information:
+        text += f'\n\n{realty.additional_information}'
+    return text
 
 
 def split_query(update):
