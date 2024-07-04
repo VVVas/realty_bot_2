@@ -58,7 +58,7 @@ def text_realty(realty):
             text += f'{realty.mobile_number} '
         if realty.number:
             text += realty.number
-        text.strip()
+        text.rstrip()
     if realty.email:
         text += f'\n{realty.email}'
     if realty.site:
