@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-from . import const
+from . import constants
 
 
 class User(AbstractUser):
@@ -17,9 +17,9 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     STATUS_CHOICES = (
-        (const.STATUS_ACTIVE, 'Активный'),
-        (const.STATUS_READONLY, 'Только чтение'),
-        (const.STATUS_BLOCKED, 'Заблокирован'),
+        (constants.STATUS_ACTIVE, 'Активный'),
+        (constants.STATUS_READONLY, 'Только чтение'),
+        (constants.STATUS_BLOCKED, 'Заблокирован'),
     )
     external_id = models.PositiveBigIntegerField(
         'ID пользователя в Телеграм',
@@ -41,7 +41,7 @@ class Profile(models.Model):
         verbose_name='Статус',
         max_length=255,
         choices=STATUS_CHOICES,
-        default=const.STATUS_ACTIVE
+        default=constants.STATUS_ACTIVE
     )
 
     class Meta:
@@ -53,21 +53,21 @@ class Profile(models.Model):
 
     @property
     def is_active(self):
-        return self.status == const.STATUS_ACTIVE
+        return self.status == constants.STATUS_ACTIVE
 
     @property
     def is_readonly(self):
-        return self.status == const.STATUS_READONLY
+        return self.status == constants.STATUS_READONLY
 
     @property
     def is_blocked(self):
-        return self.status == const.STATUS_BLOCKED
+        return self.status == constants.STATUS_BLOCKED
 
     @classmethod
     def get_default_tg_user_profile(cls):
         tg_user_profile, _ = Profile.objects.get_or_create(
             first_name='Unknown', external_id='1',
-            status=const.STATUS_BLOCKED,
+            status=constants.STATUS_BLOCKED,
         )
         return tg_user_profile.pk
 
