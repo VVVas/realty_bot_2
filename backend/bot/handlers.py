@@ -12,6 +12,7 @@ from telegram.constants import MessageType
 from realties.models import Ad, Category, City, Comment, Favorite, Realty
 from users.models import Profile
 
+from . import constants
 from .permissions import restricted
 from .utils import (chunks, get_botmessage_by_keyword, paginate, split_query,
                     text_ad, text_realty)
@@ -19,16 +20,6 @@ from .utils import (chunks, get_botmessage_by_keyword, paginate, split_query,
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
-
-BUTTON_SEARCH = 'Поиск'
-BUTTON_ABOUT = 'О боте'
-BUTTON_FAVORITE = 'Избранное'
-BUTTON_DELETE_USER = 'Удалить аккаунт'
-BUTTON_SKIP = 'Пропустить'
-BUTTON_ADD_FAVORITE = 'В избранное'
-BUTTON_DELETE_FAVORITE = 'Удалить из избранного'
-BUTTON_COMMENTS = 'Коментарии'
-BUTTON_ADD_COMMENT = 'Добавить комментарий'
 
 
 @restricted
@@ -49,8 +40,8 @@ async def start(update: Update, context: CallbackContext) -> int:
             last_name=update.effective_user.last_name
         )
     keyboard = [
-        [BUTTON_SEARCH, BUTTON_ABOUT],
-        [BUTTON_FAVORITE, BUTTON_DELETE_USER]
+        [constants.BUTTON_SEARCH, constants.BUTTON_ABOUT],
+        [constants.BUTTON_FAVORITE, constants.BUTTON_DELETE_USER]
     ]
 
     await update.message.reply_text(
@@ -113,7 +104,7 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     list_names = [category.title for category in Category.objects.all()]
     list_chunks = list(chunks(list_names))
     keyboard = [chunk for chunk in list_chunks]
-    keyboard.append([BUTTON_SKIP])
+    keyboard.append([constants.BUTTON_SKIP])
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
@@ -130,14 +121,14 @@ async def select_city(update: Update, context: CallbackContext) -> int:
 async def select_category(update: Update, context: CallbackContext) -> int:
     """Фильтрация по цене. Можно пропустить. Запоминаем категорию."""
     selected_category = update.message.text
-    if selected_category.lower() == BUTTON_SKIP.lower():
+    if selected_category.lower() == constants.BUTTON_SKIP.lower():
         context.user_data['selected_category'] = None
     else:
         context.user_data['selected_category'] = selected_category
     await update.message.reply_text(
         get_botmessage_by_keyword('PRICE_INPUT'),
         reply_markup=ReplyKeyboardMarkup(
-            [[BUTTON_SKIP]],
+            [[constants.BUTTON_SKIP]],
             one_time_keyboard=True,
             resize_keyboard=True
         )
@@ -149,7 +140,7 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 async def select_price(update: Update, context: CallbackContext) -> int:
     """Вывод списка объявлений и объектов. Запоминаем цену."""
     selected_price = update.message.text.replace(' ', '').split('-')
-    if (selected_price[0].lower() == BUTTON_SKIP.lower()
+    if (selected_price[0].lower() == constants.BUTTON_SKIP.lower()
             or int(selected_price[1]) == 0):
         context.user_data['selected_price'] = None
     else:
@@ -179,11 +170,11 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             keyboard = [
                 [
                     InlineKeyboardButton(
-                        BUTTON_ADD_FAVORITE,
+                        constants.BUTTON_ADD_FAVORITE,
                         callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
-                        BUTTON_COMMENTS,
+                        constants.BUTTON_COMMENTS,
                         callback_data=f'{str(COMMENT)},{item.pk}'
                     ),
                 ],
@@ -192,7 +183,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             if user_profile.is_active:
                 keyboard[0].append(
                     InlineKeyboardButton(
-                        BUTTON_ADD_COMMENT,
+                        constants.BUTTON_ADD_COMMENT,
                         callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                     )
                 )
@@ -298,11 +289,11 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             keyboard = [
                 [
                     InlineKeyboardButton(
-                        BUTTON_ADD_FAVORITE,
+                        constants.BUTTON_ADD_FAVORITE,
                         callback_data=f'{str(ADD_FAVORITE)},{item.pk}'
                     ),
                     InlineKeyboardButton(
-                        BUTTON_COMMENTS,
+                        constants.BUTTON_COMMENTS,
                         callback_data=f'{str(COMMENT)},{item.pk}'
                     ),
                 ],
@@ -311,7 +302,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if user_profile.is_active:
                 keyboard[0].append(
                     InlineKeyboardButton(
-                        BUTTON_ADD_COMMENT,
+                        constants.BUTTON_ADD_COMMENT,
                         callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                     )
                 )
@@ -495,13 +486,13 @@ async def favorite(update: Update, context: CallbackContext):
         keyboard = [
             [
                 InlineKeyboardButton(
-                    BUTTON_DELETE_FAVORITE,
+                    constants.BUTTON_DELETE_FAVORITE,
                     callback_data=f'{str(DELETE_FAVORITE)},'
                                   f'{favorite_ad.ad_id},'
                                   f'{user_id}'
                 ),
                 InlineKeyboardButton(
-                    BUTTON_COMMENTS,
+                    constants.BUTTON_COMMENTS,
                     callback_data=f'{str(COMMENT)},{favorite_ad.ad_id}'
                 ),
             ],
@@ -620,25 +611,25 @@ search_conv_handler = ConversationHandler(
         START: [
             MessageHandler(
                 filters.Regex(
-                    re.compile(r'^(' + BUTTON_SEARCH + ')$',
+                    re.compile(r'^(' + constants.BUTTON_SEARCH + ')$',
                                re.IGNORECASE)
                 ), start_work
             ),
             MessageHandler(
                 filters.Regex(
-                    re.compile(r'^(' + BUTTON_ABOUT + ')$',
+                    re.compile(r'^(' + constants.BUTTON_ABOUT + ')$',
                                re.IGNORECASE)
                 ), help_command
             ),
             MessageHandler(
                 filters.Regex(
-                    re.compile(r'^(' + BUTTON_FAVORITE + ')$',
+                    re.compile(r'^(' + constants.BUTTON_FAVORITE + ')$',
                                re.IGNORECASE)
                 ), favorite
             ),
             MessageHandler(
                 filters.Regex(
-                    re.compile(r'^(' + BUTTON_DELETE_USER + ')$',
+                    re.compile(r'^(' + constants.BUTTON_DELETE_USER + ')$',
                                re.IGNORECASE)
                 ), delete_user
             ),
