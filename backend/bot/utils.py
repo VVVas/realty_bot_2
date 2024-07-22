@@ -1,13 +1,12 @@
 from django.core.paginator import Paginator
 
+from . import constants
 from .models import BotMessage
-
-QUANTITY_PER_PAGE = 10
 
 
 def paginate(queryset, page_number=1):
     """Возвращает содержимое страницы. По умолчанию первой."""
-    paginator = Paginator(queryset, QUANTITY_PER_PAGE)
+    paginator = Paginator(queryset, constants.QUANTITY_PER_PAGE)
     return paginator.get_page(page_number)
 
 
@@ -26,23 +25,36 @@ def chunks(lst, chunk_size=3):
 
 def text_ad(ad):
     """Текст выводимый для объявлений."""
-    if ad.price is not None:
-        price_in_ad = ad.price
+    text = f'{ad.title}\n'
+    if ad.price:
+        text += f'Цена: {ad.price}'
     else:
-        price_in_ad = 'не указана'
-    return (f'{ad.title.upper()}\n\n'
-            f'Цена: {price_in_ad}\n'
-            f'{ad.additional_information}\n\n'
-            f'Расположение\n'
-            f'{ad.realty.title}\n'
-            f'{ad.realty.address}\n'
-            f'{ad.address}\n'
-            f'{ad.realty.phone_number} '
-            f'{ad.realty.mobile_number} '
-            f'{ad.realty.number}\n'
-            f'{ad.realty.email}\n'
-            f'{ad.realty.site}\n\n'
-            f'{ad.realty.additional_information}')
+        text += 'Цена: не указана'
+    if ad.additional_information:
+        text += f'\n{ad.additional_information}'
+    text += f'\n\nРасположение\n{ad.realty.title}'
+    if ad.realty.address:
+        text += f'\n{ad.realty.address}'
+    if ad.address:
+        text += f'\n{ad.address}'
+    if any(
+        [ad.realty.phone_number, ad.realty.mobile_number, ad.realty.number]
+    ):
+        text += '\n'
+        if ad.realty.phone_number:
+            text += f'{ad.realty.phone_number} '
+        if ad.realty.mobile_number:
+            text += f'{ad.realty.mobile_number} '
+        if ad.realty.number:
+            text += ad.realty.number
+        text.rstrip()
+    if ad.realty.email:
+        text += f'\n{ad.realty.email}'
+    if ad.realty.site:
+        text += f'\n{ad.realty.site}'
+    if ad.realty.additional_information:
+        text += f'\n\n{ad.realty.additional_information}'
+    return text
 
 
 def text_realty(realty):
@@ -57,7 +69,8 @@ def text_realty(realty):
         if realty.mobile_number:
             text += f'{realty.mobile_number} '
         if realty.number:
-            text += f'{realty.number}'
+            text += realty.number
+        text.rstrip()
     if realty.email:
         text += f'\n{realty.email}'
     if realty.site:
