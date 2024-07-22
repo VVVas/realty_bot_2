@@ -27,9 +27,9 @@ def text_ad(ad):
     """Текст выводимый для объявлений."""
     text = f'{ad.title}\n'
     if ad.price:
-        text += f'Цена: {ad.price}'
+        text += f'Цена за кв. м.: {ad.price} руб.'
     else:
-        text += 'Цена: не указана'
+        text += 'Цена не указана'
     if ad.additional_information:
         text += f'\n{ad.additional_information}'
     text += f'\n\nРасположение\n{ad.realty.title}'
@@ -54,6 +54,8 @@ def text_ad(ad):
         text += f'\n{ad.realty.site}'
     if ad.realty.additional_information:
         text += f'\n\n{ad.realty.additional_information}'
+    if ad.realty.city.timezone:
+        text += f'\nЧасовой пояс (по UTC): {ad.realty.city.timezone}'
     return text
 
 
@@ -77,6 +79,8 @@ def text_realty(realty):
         text += f'\n{realty.site}'
     if realty.additional_information:
         text += f'\n\n{realty.additional_information}'
+    if realty.city.timezone:
+        text += f'\nЧасовой пояс (по UTC): {realty.city.timezone}'
     return text
 
 
