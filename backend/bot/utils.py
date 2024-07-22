@@ -77,6 +77,8 @@ def text_realty(realty):
         text += f'\n{realty.site}'
     if realty.additional_information:
         text += f'\n\n{realty.additional_information}'
+    if realty.city.timezone:
+        text += f'\nЧасовой пояс (по UTC): {realty.city.timezone}'
     return text
 
 
