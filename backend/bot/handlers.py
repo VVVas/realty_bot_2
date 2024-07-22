@@ -32,8 +32,8 @@ async def start(update: Update, context: CallbackContext) -> int:
 
     if not Profile.objects.filter(
         external_id=update.effective_user.id
-    ).exists():
-        Profile.objects.create(
+    ).aexists():
+        Profile.objects.acreate(
             external_id=update.effective_user.id,
             username=update.effective_user.username,
             first_name=update.effective_user.first_name,
