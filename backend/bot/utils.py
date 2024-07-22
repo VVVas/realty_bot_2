@@ -10,11 +10,11 @@ def paginate(queryset, page_number=1):
     return paginator.get_page(page_number)
 
 
-def get_botmessage_by_keyword(keyword):
+async def get_botmessage_by_keyword(keyword):
     """Сообщение бота из БД."""
-    return BotMessage.objects.filter(
+    return await BotMessage.objects.filter(
         keyword=keyword
-    ).values_list('text', flat=True).first()
+    ).values_list('text', flat=True).afirst()
 
 
 def chunks(lst, chunk_size=3):
