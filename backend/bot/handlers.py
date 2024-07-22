@@ -25,15 +25,15 @@ COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 @restricted
 async def start(update: Update, context: CallbackContext) -> int:
     """Вход в диалог."""
-    greeting_message = get_botmessage_by_keyword('WELCOME')
+    greeting_message = await get_botmessage_by_keyword('WELCOME')
     if context.user_data.get('START_OVER'):
-        greeting_message = get_botmessage_by_keyword('START_OVER')
+        greeting_message = await get_botmessage_by_keyword('START_OVER')
     context.user_data.clear()
 
-    if not Profile.objects.filter(
+    if not await Profile.objects.filter(
         external_id=update.effective_user.id
-    ).exists():
-        Profile.objects.acreate(
+    ).aexists():
+        await Profile.objects.acreate(
             external_id=update.effective_user.id,
             username=update.effective_user.username,
             first_name=update.effective_user.first_name,
@@ -59,7 +59,7 @@ async def start(update: Update, context: CallbackContext) -> int:
 async def help_command(update: Update, context: CallbackContext) -> int:
     """Выводим информацию о боте."""
     await update.message.reply_text(
-        get_botmessage_by_keyword('BOT_DESCRIPTION')
+        await get_botmessage_by_keyword('BOT_DESCRIPTION')
     )
     return await cancel(update, context)
 
@@ -67,7 +67,7 @@ async def help_command(update: Update, context: CallbackContext) -> int:
 async def start_work(update: Update, context: CallbackContext) -> int:
     """Начало диалоговой цепочки о поиске объявлений."""
     await update.message.reply_text(
-        get_botmessage_by_keyword('START_WORK')
+        await get_botmessage_by_keyword('START_WORK')
     )
 
     return CITY_CHOICE
@@ -83,13 +83,13 @@ async def city_choice(update: Update, context: CallbackContext) -> int:
             list_cities.append(city)
     if len(list_cities) < 1:
         await update.message.reply_text(
-            get_botmessage_by_keyword('CITY_CHOICE_NOT')
+            await get_botmessage_by_keyword('CITY_CHOICE_NOT')
         )
         return CITY_CHOICE
     list_chunks = list(chunks(list_cities))
     keyboard = [chunk for chunk in list_chunks]
     await update.message.reply_text(
-        get_botmessage_by_keyword('CITY_CHOICE'),
+        await get_botmessage_by_keyword('CITY_CHOICE'),
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True,
@@ -108,7 +108,7 @@ async def select_city(update: Update, context: CallbackContext) -> int:
     selected_city = update.message.text
     context.user_data['selected_city'] = selected_city
     await update.message.reply_text(
-        get_botmessage_by_keyword('CATEGORY_CHOICE'),
+        await get_botmessage_by_keyword('CATEGORY_CHOICE'),
         reply_markup=ReplyKeyboardMarkup(
             keyboard,
             one_time_keyboard=True,
@@ -126,7 +126,7 @@ async def select_category(update: Update, context: CallbackContext) -> int:
     else:
         context.user_data['selected_category'] = selected_category
     await update.message.reply_text(
-        get_botmessage_by_keyword('PRICE_INPUT'),
+        await get_botmessage_by_keyword('PRICE_INPUT'),
         reply_markup=ReplyKeyboardMarkup(
             [[constants.BUTTON_SKIP]],
             one_time_keyboard=True,
@@ -223,7 +223,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
         if realty_queryset.exists():
             await update.message.reply_text(
-                get_botmessage_by_keyword('ADS_NOT_FOUND')
+                await get_botmessage_by_keyword('ADS_NOT_FOUND')
             )
 
             items = paginate(realty_queryset)
@@ -254,7 +254,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
                 return NEXT_PAGE
         else:
             await update.message.reply_text(
-                get_botmessage_by_keyword('REALTIES_NOT_FOUND')
+                await get_botmessage_by_keyword('REALTIES_NOT_FOUND')
             )
 
     context.user_data.clear()
@@ -343,7 +343,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
 
         if realty_queryset.exists():
             await update.message.reply_text(
-                get_botmessage_by_keyword('ADS_NOT_FOUND')
+                await get_botmessage_by_keyword('ADS_NOT_FOUND')
             )
 
             items = paginate(realty_queryset, page)
@@ -578,7 +578,7 @@ async def delete_user(update: Update, context: CallbackContext):
     """Удаление пользователя."""
     Profile.objects.get(external_id=update.message.from_user.id).delete()
     await update.message.reply_text(
-        get_botmessage_by_keyword('DELETE_PROFILE')
+        await get_botmessage_by_keyword('DELETE_PROFILE')
     )
     return await cancel(update, context)
 
