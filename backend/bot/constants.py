@@ -6,6 +6,7 @@ BUTTON_FAVORITE = 'Избранное'
 BUTTON_DELETE_USER = 'Удалить аккаунт'
 
 BUTTON_SKIP = 'Пропустить'
+BUTTON_NEXT = 'Далее'
 
 BUTTON_ADD_FAVORITE = 'В избранное'
 BUTTON_DELETE_FAVORITE = 'Удалить из избранного'

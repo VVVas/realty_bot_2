@@ -205,9 +205,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                '«Далее» для просмотра следующих объявлений.',
+                f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
+                'элементов',
                 reply_markup=ReplyKeyboardMarkup(
-                    [['Дальше']],
+                    [[constants.BUTTON_NEXT]],
                     one_time_keyboard=True,
                     resize_keyboard=True
                 )
@@ -242,9 +243,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    '«Далее» для просмотра следующих объектов недвижимости.',
+                    f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
+                    'элементов',
                     reply_markup=ReplyKeyboardMarkup(
-                        [['Дальше']],
+                        [[constants.BUTTON_NEXT]],
                         one_time_keyboard=True,
                         resize_keyboard=True
                     )
@@ -323,11 +325,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                '«Далее» для просмотра следующих объявлений.\n'
-                f'Вы посмотрели {items.end_index()} '
+                f'Вы посмотрели {items.end_index()} элементов '
                 f'из {ad_queryset.count()}',
                 reply_markup=ReplyKeyboardMarkup(
-                    [['Дальше']],
+                    [[constants.BUTTON_NEXT]],
                     one_time_keyboard=True,
                     resize_keyboard=True
                 )
@@ -361,11 +362,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    '«Далее» для просмотра следующих объектов недвижимости.\n'
-                    f'Вы посмотрели {items.end_index()} '
+                    f'Вы посмотрели {items.end_index()} элементов '
                     f'из {realty_queryset.count()}',
                     reply_markup=ReplyKeyboardMarkup(
-                        [['Дальше']],
+                        [[constants.BUTTON_NEXT]],
                         one_time_keyboard=True,
                         resize_keyboard=True
                     )
@@ -647,7 +647,12 @@ search_conv_handler = ConversationHandler(
             MessageHandler(filters.TEXT & ~filters.COMMAND, select_price)
         ],
         NEXT_PAGE: [
-            MessageHandler(filters.Regex('^(Дальше)$'), next_page)
+            MessageHandler(
+                filters.Regex(
+                    re.compile(r'^(' + constants.BUTTON_NEXT + ')$',
+                               re.IGNORECASE)
+                ), next_page
+            ),
         ],
     },
     fallbacks=[CommandHandler('cancel', cancel)],
