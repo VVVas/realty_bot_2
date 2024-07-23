@@ -8,7 +8,7 @@ from realties.models import Favorite, Realty
 from users.models import Profile
 
 from bot import constants
-from bot.handlers3 import cancel
+from .shared import cancel
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
