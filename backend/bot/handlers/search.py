@@ -1,6 +1,7 @@
 import re
 
 from django.db.models import Q
+
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardMarkup, Update)
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
@@ -9,16 +10,14 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 from realties.models import Ad, Category, City, Realty
 from users.models import Profile
 
-from . import constants
+import constants
 from .common import cancel, help_command, start
+from .constants import (ADD_COMMENT, ADD_FAVORITE, CATEGORY, CITY, CITY_CHOICE,
+                        COMMENT, NEXT_PAGE, PRICE, START)
 from .favorite import favorite
 from .user import delete_user
 from .utils import (chunks, get_botmessage_by_keyword, paginate, text_ad,
                     text_realty)
-
-START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
-COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 
 
 async def start_work(update: Update, context: CallbackContext) -> int:

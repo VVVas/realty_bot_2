@@ -6,13 +6,10 @@ from telegram.constants import MessageType
 from realties.models import Favorite, Realty
 from users.models import Profile
 
-from . import constants
+import constants
+from .constants import ADD_FAVORITE, COMMENT, DELETE_FAVORITE
 from .common import cancel
 from .utils import split_query, text_ad
-
-START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
-COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 
 
 async def add_to_favorite(update: Update, context: CallbackContext):

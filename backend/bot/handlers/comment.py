@@ -6,9 +6,7 @@ from telegram.ext import (CallbackContext, CallbackQueryHandler,
 from realties.models import Comment
 from users.models import Profile
 
-START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
-COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
+from .constants import ADD_COMMENT, COMMENT, COMMENT_INPUT
 
 
 async def comment(update: Update, context: CallbackContext):
