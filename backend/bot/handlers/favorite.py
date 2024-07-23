@@ -6,13 +6,21 @@ from telegram.constants import MessageType
 from realties.models import Favorite, Realty
 from users.models import Profile
 
-from . import constants
+import constants
+from .constants import ADD_FAVORITE, COMMENT, DELETE_FAVORITE
 from .common import cancel
 from .utils import split_query, text_ad
 
-START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
-COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
+
+async def edit_message_by_type(update: Update, text: str):
+    if effective_message_type(
+        update.callback_query.message
+    ) == MessageType.TEXT:
+        await update.callback_query.edit_message_text(text)
+    elif effective_message_type(
+        update.callback_query.message
+    ) == MessageType.PHOTO:
+        await update.callback_query.edit_message_caption(text)
 
 
 async def add_to_favorite(update: Update, context: CallbackContext):
@@ -20,24 +28,27 @@ async def add_to_favorite(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
-    user = Profile.objects.get(external_id=update.effective_user.id)
-    _, created = Favorite.objects.get_or_create(
+    user = await Profile.objects.aget(external_id=update.effective_user.id)
+    _, created = await Favorite.objects.aget_or_create(
         user=user,
         ad_id=query_data[1]
     )
     if not created:
-        if effective_message_type(
-            update.callback_query.message
-        ) == MessageType.TEXT:
-            await update.callback_query.edit_message_text(
-                "Объявление было добавлено в избранное ранее."
-            )
-        elif effective_message_type(
-            update.callback_query.message
-        ) == MessageType.PHOTO:
-            await update.callback_query.edit_message_caption(
-                "Объявление было добавлено в избранное ранее."
-            )
+        await edit_message_by_type(
+            update, 'Объявление было добавлено в избранное ранее.'
+        )
+        # if effective_message_type(
+        #     update.callback_query.message
+        # ) == MessageType.TEXT:
+        #     await update.callback_query.edit_message_text(
+        #         "Объявление было добавлено в избранное ранее."
+        #     )
+        # elif effective_message_type(
+        #     update.callback_query.message
+        # ) == MessageType.PHOTO:
+        #     await update.callback_query.edit_message_caption(
+        #         "Объявление было добавлено в избранное ранее."
+        #     )
         return
     if effective_message_type(
         update.callback_query.message
@@ -59,7 +70,7 @@ async def favorite(update: Update, context: CallbackContext):
     favorite_ads = Favorite.objects.filter(
         user__external_id=user_id
     )
-    if not favorite_ads.exists():
+    if not await favorite_ads.aexists():
         await update.message.reply_text('У вас нет избранных объявлений.')
     for favorite_ad in favorite_ads:
         keyboard = [
@@ -76,7 +87,7 @@ async def favorite(update: Update, context: CallbackContext):
                 ),
             ],
         ]
-        img = Realty.objects.get(pk=favorite_ad.ad.realty.pk).img
+        img = await Realty.objects.aget(pk=favorite_ad.ad.realty.pk).img
         if img:
             await update.message.reply_photo(
                 photo=img,
@@ -110,9 +121,9 @@ async def delete_favorite(update: Update, context: CallbackContext):
             )
         return
     try:
-        Favorite.objects.get(
+        await Favorite.objects.filter(
             user__external_id=query_data[2], ad__pk=query_data[1]
-        ).delete()
+        ).adelete()
         if effective_message_type(
             update.callback_query.message
         ) == MessageType.TEXT:

@@ -3,13 +3,10 @@ from telegram.ext import CallbackContext
 
 from users.models import Profile
 
-from . import constants
+import constants
+from .constants import START
 from .permissions import restricted
 from .utils import get_botmessage_by_keyword
-
-START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
-FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
-COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
 
 
 @restricted
