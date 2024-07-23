@@ -87,7 +87,7 @@ async def favorite(update: Update, context: CallbackContext):
                 ),
             ],
         ]
-        img = await Realty.objects.aget(pk=favorite_ad.ad.realty.pk).img
+        img = Realty.objects.get(pk=favorite_ad.ad.realty.pk).img
         if img:
             await update.message.reply_photo(
                 photo=img,
