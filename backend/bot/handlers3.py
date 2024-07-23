@@ -12,7 +12,6 @@ from users.models import Profile
 
 from . import constants
 from .handlers.favorite import favorite
-from .handlers.other import cancel
 from .permissions import restricted
 from .utils import (chunks, get_botmessage_by_keyword, paginate,
                     text_ad, text_realty)
@@ -443,6 +442,16 @@ async def delete_user(update: Update, context: CallbackContext):
         await get_botmessage_by_keyword('DELETE_PROFILE')
     )
     return await cancel(update, context)
+
+
+async def cancel(update: Update, context: CallbackContext) -> int:
+    """
+    Выход из диалога на любом этапе.
+
+    START_OVER для изменения приветственного сообщения.
+    """
+    context.user_data['START_OVER'] = True
+    return await start(update, context)
 
 
 async def handle_unknown_messages(update, context) -> None:
