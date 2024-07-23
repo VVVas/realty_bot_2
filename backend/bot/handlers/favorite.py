@@ -3,12 +3,12 @@ from telegram.ext import CallbackContext, CallbackQueryHandler
 from telegram.helpers import effective_message_type
 from telegram.constants import MessageType
 
-from bot.utils import split_query, text_ad
 from realties.models import Favorite, Realty
 from users.models import Profile
 
-from bot import constants
-from .shared import cancel
+from . import constants
+from .common import cancel
+from .utils import split_query, text_ad
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)

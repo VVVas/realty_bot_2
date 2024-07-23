@@ -3,30 +3,22 @@ import re
 from django.db.models import Q
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardMarkup, Update)
-from telegram.ext import (CallbackContext,
-                          CommandHandler, ConversationHandler, MessageHandler,
-                          filters)
+from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
+                          MessageHandler, filters)
 
 from realties.models import Ad, Category, City, Realty
 from users.models import Profile
 
 from . import constants
-from .handlers.favorite import favorite
-from .handlers.shared import start, cancel
-from .utils import (chunks, get_botmessage_by_keyword, paginate,
-                    text_ad, text_realty)
+from .common import cancel, help_command, start
+from .favorite import favorite
+from .user import delete_user
+from .utils import (chunks, get_botmessage_by_keyword, paginate, text_ad,
+                    text_realty)
 
 START, CITY, CITY_CHOICE, CATEGORY, PRICE = range(5)
 FAVORITE, ADD_FAVORITE, DELETE_FAVORITE = range(5, 8)
 COMMENT, ADD_COMMENT, COMMENT_INPUT, NEXT_PAGE = range(8, 12)
-
-
-async def help_command(update: Update, context: CallbackContext) -> int:
-    """Выводим информацию о боте."""
-    await update.message.reply_text(
-        await get_botmessage_by_keyword('BOT_DESCRIPTION')
-    )
-    return await cancel(update, context)
 
 
 async def start_work(update: Update, context: CallbackContext) -> int:
@@ -342,25 +334,6 @@ async def next_page(update: Update, context: CallbackContext) -> int:
     return await cancel(update, context)
 
 
-async def delete_user(update: Update, context: CallbackContext):
-    """Удаление пользователя."""
-    Profile.objects.get(external_id=update.message.from_user.id).delete()
-    await update.message.reply_text(
-        await get_botmessage_by_keyword('DELETE_PROFILE')
-    )
-    return await cancel(update, context)
-
-
-async def handle_unknown_messages(update, context) -> None:
-    context.user_data.clear()
-    if not update.message.text.startswith('/'):
-        return await update.message.reply_text(
-            'Для продолжения работы необходимо вызвать функцию /start'
-        )
-
-    return None
-
-
 search_conv_handler = ConversationHandler(
     entry_points=[
         CommandHandler('start', start)
@@ -415,8 +388,4 @@ search_conv_handler = ConversationHandler(
     },
     fallbacks=[CommandHandler('cancel', cancel)],
     allow_reentry=True,
-)
-
-unknown_message = MessageHandler(
-    filters.TEXT & ~filters.COMMAND, handle_unknown_messages
 )
