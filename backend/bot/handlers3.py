@@ -11,8 +11,8 @@ from realties.models import Ad, Category, City, Comment, Realty
 from users.models import Profile
 
 from . import constants
-from handlers.favorite import favorite
-from handlers.other import cancel
+from .handlers.favorite import favorite
+from .handlers.other import cancel
 from .permissions import restricted
 from .utils import (chunks, get_botmessage_by_keyword, paginate,
                     text_ad, text_realty)
