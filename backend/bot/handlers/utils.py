@@ -1,7 +1,7 @@
 from django.core.paginator import Paginator
 
+from ..models import BotMessage
 from . import constants
-from .models import BotMessage
 
 
 def paginate(queryset, page_number=1):
