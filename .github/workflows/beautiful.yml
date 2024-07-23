@@ -38,4 +38,8 @@ jobs:
       with:
         to: ${{ secrets.TELEGRAM_TO }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        message: Пулреквест проверен flake8. Разработчик ${{ github.actor }}. Коммит ${{ github.sha }}
+        message: |
+          Пулреквест проверен flake8.
+          Репозитарий ${{ github.repository }}.
+          Разработчик ${{ github.actor }}.
+          Коммит ${{ github.sha }}
