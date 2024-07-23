@@ -10,26 +10,6 @@ from .common import cancel
 from .utils import edit_message_by_type, text_ad
 
 
-async def add_to_favorite(update: Update, context: CallbackContext):
-    """Добавить объявление в избранное."""
-    query = update.callback_query
-    await query.answer()
-    query_data = query.data.replace(' ', '').split(',')
-    user = await Profile.objects.aget(external_id=update.effective_user.id)
-    _, created = await Favorite.objects.aget_or_create(
-        user=user,
-        ad_id=query_data[1]
-    )
-    if not created:
-        await edit_message_by_type(
-            update, 'Объявление было добавлено в избранное ранее.'
-        )
-        return
-    await edit_message_by_type(
-        update, 'Объявление добавлено в избранное.'
-    )
-
-
 async def favorite(update: Update, context: CallbackContext):
     """Выводим список избранного."""
     user_id = update.message.from_user.id
@@ -69,6 +49,26 @@ async def favorite(update: Update, context: CallbackContext):
     return await cancel(update, context)
 
 
+async def add_favorite(update: Update, context: CallbackContext):
+    """Добавить объявление в избранное."""
+    query = update.callback_query
+    await query.answer()
+    query_data = query.data.replace(' ', '').split(',')
+    user = await Profile.objects.aget(external_id=update.effective_user.id)
+    _, created = await Favorite.objects.aget_or_create(
+        user=user,
+        ad_id=query_data[1]
+    )
+    if not created:
+        await edit_message_by_type(
+            update, 'Объявление было добавлено в избранное ранее.'
+        )
+        return
+    await edit_message_by_type(
+        update, 'Объявление добавлено в избранное.'
+    )
+
+
 async def delete_favorite(update: Update, context: CallbackContext):
     """Убираем объявление из избранного."""
     query_data = update.callback_query.data.replace(' ', '').split(',')
@@ -93,10 +93,10 @@ async def delete_favorite(update: Update, context: CallbackContext):
             update, 'Произошла ошибка при удалении записи из избранного.'
         )
 
-favorite_handler = CallbackQueryHandler(
-    add_to_favorite, pattern="^" + str(ADD_FAVORITE)
+add_handler = CallbackQueryHandler(
+    add_favorite, pattern="^" + str(ADD_FAVORITE)
 )
 
-delete_favorite_handler = CallbackQueryHandler(
+delete_handler = CallbackQueryHandler(
     delete_favorite, pattern="^" + str(DELETE_FAVORITE)
 )
