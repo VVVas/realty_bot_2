@@ -3,7 +3,7 @@ from telegram.ext import CallbackContext
 
 from users.models import Profile
 
-import constants
+from . import constants
 from .constants import START
 from .permissions import restricted
 from .utils import get_botmessage_by_keyword

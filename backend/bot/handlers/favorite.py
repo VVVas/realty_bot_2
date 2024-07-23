@@ -6,7 +6,7 @@ from telegram.constants import MessageType
 from realties.models import Favorite, Realty
 from users.models import Profile
 
-import constants
+from . import constants
 from .constants import ADD_FAVORITE, COMMENT, DELETE_FAVORITE
 from .common import cancel
 from .utils import split_query, text_ad

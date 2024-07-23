@@ -10,7 +10,7 @@ from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
 from realties.models import Ad, Category, City, Realty
 from users.models import Profile
 
-import constants
+from . import constants
 from .common import cancel, help_command, start
 from .constants import (ADD_COMMENT, ADD_FAVORITE, CATEGORY, CITY, CITY_CHOICE,
                         COMMENT, NEXT_PAGE, PRICE, START)
