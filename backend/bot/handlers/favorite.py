@@ -1,7 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext, CallbackQueryHandler
-from telegram.helpers import effective_message_type
-from telegram.constants import MessageType
 
 from realties.models import Favorite, Realty
 from users.models import Profile
@@ -9,25 +7,14 @@ from users.models import Profile
 from . import constants
 from .constants import ADD_FAVORITE, COMMENT, DELETE_FAVORITE
 from .common import cancel
-from .utils import split_query, text_ad
-
-
-async def edit_message_by_type(update: Update, text: str):
-    if effective_message_type(
-        update.callback_query.message
-    ) == MessageType.TEXT:
-        await update.callback_query.edit_message_text(text)
-    elif effective_message_type(
-        update.callback_query.message
-    ) == MessageType.PHOTO:
-        await update.callback_query.edit_message_caption(text)
+from .utils import edit_message_by_type, text_ad
 
 
 async def add_to_favorite(update: Update, context: CallbackContext):
     """Добавить объявление в избранное."""
     query = update.callback_query
     await query.answer()
-    query_data = query.data.split(',')
+    query_data = query.data.replace(' ', '').split(',')
     user = await Profile.objects.aget(external_id=update.effective_user.id)
     _, created = await Favorite.objects.aget_or_create(
         user=user,
@@ -37,31 +24,10 @@ async def add_to_favorite(update: Update, context: CallbackContext):
         await edit_message_by_type(
             update, 'Объявление было добавлено в избранное ранее.'
         )
-        # if effective_message_type(
-        #     update.callback_query.message
-        # ) == MessageType.TEXT:
-        #     await update.callback_query.edit_message_text(
-        #         "Объявление было добавлено в избранное ранее."
-        #     )
-        # elif effective_message_type(
-        #     update.callback_query.message
-        # ) == MessageType.PHOTO:
-        #     await update.callback_query.edit_message_caption(
-        #         "Объявление было добавлено в избранное ранее."
-        #     )
         return
-    if effective_message_type(
-        update.callback_query.message
-    ) == MessageType.TEXT:
-        await update.callback_query.edit_message_text(
-            "Объявление добавлено в избранное."
-        )
-    elif effective_message_type(
-        update.callback_query.message
-    ) == MessageType.PHOTO:
-        await update.callback_query.edit_message_caption(
-            "Объявление добавлено в избранное."
-        )
+    await edit_message_by_type(
+        update, 'Объявление добавлено в избранное.'
+    )
 
 
 async def favorite(update: Update, context: CallbackContext):
@@ -105,63 +71,27 @@ async def favorite(update: Update, context: CallbackContext):
 
 async def delete_favorite(update: Update, context: CallbackContext):
     """Убираем объявление из избранного."""
-    query_data = split_query(update)
+    query_data = update.callback_query.data.replace(' ', '').split(',')
     if len(query_data) != 3:
-        if effective_message_type(
-            update.callback_query.message
-        ) == MessageType.TEXT:
-            await update.callback_query.edit_message_text(
-                'Некорректные данные для удаления.'
-            )
-        elif effective_message_type(
-            update.callback_query.message
-        ) == MessageType.PHOTO:
-            await update.callback_query.edit_message_caption(
-                'Некорректные данные для удаления.'
-            )
+        await edit_message_by_type(
+            update, 'Некорректные данные для удаления.'
+        )
         return
     try:
         await Favorite.objects.filter(
             user__external_id=query_data[2], ad__pk=query_data[1]
         ).adelete()
-        if effective_message_type(
-            update.callback_query.message
-        ) == MessageType.TEXT:
-            await update.callback_query.edit_message_text(
-                'Запись удалена из избранного!'
-            )
-        elif effective_message_type(
-            update.callback_query.message
-        ) == MessageType.PHOTO:
-            await update.callback_query.edit_message_caption(
-                'Запись удалена из избранного!'
-            )
+        await edit_message_by_type(
+            update, 'Объявление удалено из избранного.'
+        )
     except Favorite.DoesNotExist:
-        if effective_message_type(
-            update.callback_query.message
-        ) == MessageType.TEXT:
-            await update.callback_query.edit_message_text(
-                'Эта запись не найдена в вашем избранном.'
-            )
-        elif effective_message_type(
-            update.callback_query.message
-        ) == MessageType.PHOTO:
-            await update.callback_query.edit_message_caption(
-                'Эта запись не найдена в вашем избранном.'
-            )
+        await edit_message_by_type(
+            update, 'Объявление не найдено в избранном.'
+        )
     except Exception:
-        if effective_message_type(
-            update.callback_query.message
-        ) == MessageType.TEXT:
-            await update.callback_query.edit_message_text(
-                'Произошла ошибка при удалении записи из избранного.'
-            )
-        elif effective_message_type(
-            update.callback_query.message
-        ) == MessageType.PHOTO:
-            await update.callback_query.edit_message_caption(
-                'Произошла ошибка при удалении записи из избранного.'
-            )
+        await edit_message_by_type(
+            update, 'Произошла ошибка при удалении записи из избранного.'
+        )
 
 favorite_handler = CallbackQueryHandler(
     add_to_favorite, pattern="^" + str(ADD_FAVORITE)

@@ -1,4 +1,7 @@
 from django.core.paginator import Paginator
+from telegram import Update
+from telegram.helpers import effective_message_type
+from telegram.constants import MessageType
 
 from ..models import BotMessage
 from . import constants
@@ -11,10 +14,22 @@ def paginate(queryset, page_number=1):
 
 
 async def get_botmessage_by_keyword(keyword):
-    """Сообщение бота из БД."""
+    """Возвращает сообщение для бота из БД."""
     return await BotMessage.objects.filter(
         keyword=keyword
     ).values_list('text', flat=True).afirst()
+
+
+async def edit_message_by_type(update: Update, text: str):
+    """Редактирует текст в сообщении типа текст и фото."""
+    if effective_message_type(
+        update.callback_query.message
+    ) == MessageType.TEXT:
+        await update.callback_query.edit_message_text(text)
+    elif effective_message_type(
+        update.callback_query.message
+    ) == MessageType.PHOTO:
+        await update.callback_query.edit_message_caption(text)
 
 
 def chunks(lst, chunk_size=3):
@@ -86,7 +101,3 @@ def text_realty(realty):
     if realty.city.timezone:
         text += f'\nЧасовой пояс (по UTC): {realty.city.timezone}'
     return text
-
-
-def split_query(update):
-    return update.callback_query.data.replace(' ', '').split(',')
