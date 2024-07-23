@@ -1,7 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.ext import CallbackContext, CallbackQueryHandler
-from telegram.helpers import effective_message_type
-from telegram.constants import MessageType
 
 from realties.models import Favorite, Realty
 from users.models import Profile
