@@ -17,8 +17,8 @@ async def add_to_favorite(update: Update, context: CallbackContext):
     query = update.callback_query
     await query.answer()
     query_data = query.data.split(',')
-    user = Profile.objects.get(external_id=update.effective_user.id)
-    _, created = Favorite.objects.get_or_create(
+    user = await Profile.objects.aget(external_id=update.effective_user.id)
+    _, created = await Favorite.objects.aget_or_create(
         user=user,
         ad_id=query_data[1]
     )
@@ -56,7 +56,7 @@ async def favorite(update: Update, context: CallbackContext):
     favorite_ads = Favorite.objects.filter(
         user__external_id=user_id
     )
-    if not favorite_ads.exists():
+    if not await favorite_ads.aexists():
         await update.message.reply_text('У вас нет избранных объявлений.')
     for favorite_ad in favorite_ads:
         keyboard = [
@@ -73,7 +73,7 @@ async def favorite(update: Update, context: CallbackContext):
                 ),
             ],
         ]
-        img = Realty.objects.get(pk=favorite_ad.ad.realty.pk).img
+        img = await Realty.objects.aget(pk=favorite_ad.ad.realty.pk).img
         if img:
             await update.message.reply_photo(
                 photo=img,
@@ -107,9 +107,9 @@ async def delete_favorite(update: Update, context: CallbackContext):
             )
         return
     try:
-        Favorite.objects.get(
+        await Favorite.objects.filter(
             user__external_id=query_data[2], ad__pk=query_data[1]
-        ).delete()
+        ).adelete()
         if effective_message_type(
             update.callback_query.message
         ) == MessageType.TEXT:
