@@ -4,7 +4,6 @@ from telegram.ext import Application
 from .handlers import comment
 from .handlers.search import search_conv_handler
 from .handlers.favorite import favorite_handler, delete_favorite_handler
-from .handlers.comment import comment_handler, add_comment_conv
 from .handlers.unknown import unknown_message
 
 
