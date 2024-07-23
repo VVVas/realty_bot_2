@@ -40,6 +40,6 @@ jobs:
         token: ${{ secrets.TELEGRAM_TOKEN }}
         message: |
           Пулреквест проверен flake8.
-          Репозитарий ${{ github.repository }}.
-          Разработчик ${{ github.actor }}.
+          Репозитарий ${{ github.repository }}
+          Разработчик ${{ github.actor }}
           Коммит ${{ github.sha }}
