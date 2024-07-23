@@ -15,7 +15,7 @@ async def comment(update: Update, context: CallbackContext):
     await query.answer()
     query_data = query.data.split(',')
     comments = Comment.objects.filter(ad=query_data[1], is_published=True)
-    if comments.exists():
+    if await comments.aexists():
         for comment in comments:
             await update._bot.send_message(
                 text=(
@@ -53,13 +53,15 @@ async def comment_input(update: Update, context: CallbackContext):
     """Создание комментария. Будет показан после модерации."""
     user_comment = update.message.text
     ad_id = context.user_data.get('ad_id')
-    user_id = Profile.objects.get(external_id=update.message.from_user.id).id
-    comment = Comment.objects.create(
+    user_id = await Profile.objects.aget(
+        external_id=update.message.from_user.id
+    ).id
+    comment = await Comment.objects.acreate(
         ad_id=ad_id,
         user_id=user_id,
         text=user_comment
     )
-    comment.save()
+    await comment.asave()
     await update.message.reply_text(
         "Ваш комментарий был добавлен и "
         "будет опубликован после проверки администратором."
@@ -67,7 +69,7 @@ async def comment_input(update: Update, context: CallbackContext):
 
     return ConversationHandler.END
 
-add_comment_conv = ConversationHandler(
+add_conv = ConversationHandler(
     entry_points=[CallbackQueryHandler(
         add_comment,
         pattern="^" + str(ADD_COMMENT)
@@ -80,6 +82,6 @@ add_comment_conv = ConversationHandler(
     fallbacks=[],
 )
 
-comment_handler = CallbackQueryHandler(
+handler = CallbackQueryHandler(
     comment, pattern="^" + str(COMMENT)
 )
