@@ -50,6 +50,8 @@ def text_ad(ad):
         text.rstrip()
     if ad.realty.email:
         text += f'\n{ad.realty.email}'
+    if ad.realty.contact_name:
+        text += f'\n{ad.realty.contact_name}'
     if ad.realty.site:
         text += f'\n{ad.realty.site}'
     if ad.realty.additional_information:
@@ -75,6 +77,8 @@ def text_realty(realty):
         text.rstrip()
     if realty.email:
         text += f'\n{realty.email}'
+    if realty.contact_name:
+        text += f'\n{realty.contact_name}'
     if realty.site:
         text += f'\n{realty.site}'
     if realty.additional_information:
