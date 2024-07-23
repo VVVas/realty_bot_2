@@ -12,6 +12,17 @@ from .common import cancel
 from .utils import split_query, text_ad
 
 
+async def edit_message_by_type(update: Update, text: str):
+    if effective_message_type(
+        update.callback_query.message
+    ) == MessageType.TEXT:
+        await update.callback_query.edit_message_text(text)
+    elif effective_message_type(
+        update.callback_query.message
+    ) == MessageType.PHOTO:
+        await update.callback_query.edit_message_caption(text)
+
+
 async def add_to_favorite(update: Update, context: CallbackContext):
     """Добавить объявление в избранное."""
     query = update.callback_query
@@ -23,18 +34,21 @@ async def add_to_favorite(update: Update, context: CallbackContext):
         ad_id=query_data[1]
     )
     if not created:
-        if effective_message_type(
-            update.callback_query.message
-        ) == MessageType.TEXT:
-            await update.callback_query.edit_message_text(
-                "Объявление было добавлено в избранное ранее."
-            )
-        elif effective_message_type(
-            update.callback_query.message
-        ) == MessageType.PHOTO:
-            await update.callback_query.edit_message_caption(
-                "Объявление было добавлено в избранное ранее."
-            )
+        await edit_message_by_type(
+            update, 'Объявление было добавлено в избранное ранее.'
+        )
+        # if effective_message_type(
+        #     update.callback_query.message
+        # ) == MessageType.TEXT:
+        #     await update.callback_query.edit_message_text(
+        #         "Объявление было добавлено в избранное ранее."
+        #     )
+        # elif effective_message_type(
+        #     update.callback_query.message
+        # ) == MessageType.PHOTO:
+        #     await update.callback_query.edit_message_caption(
+        #         "Объявление было добавлено в избранное ранее."
+        #     )
         return
     if effective_message_type(
         update.callback_query.message
