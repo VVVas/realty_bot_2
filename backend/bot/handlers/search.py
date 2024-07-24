@@ -97,7 +97,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
     if (
         selected_price[0].lower() == constants.BUTTON_SKIP.lower()
-        or (int(selected_price[0]) == 0 and not selected_price[1])
         or int(selected_price[1]) == 0
     ):
         context.user_data['selected_price'] = None
