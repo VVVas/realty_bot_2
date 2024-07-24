@@ -13,6 +13,6 @@ async def handle_unknown_messages(
 
     return None
 
-unknown_message = MessageHandler(
+handler = MessageHandler(
     filters.TEXT & ~filters.COMMAND, handle_unknown_messages
 )
