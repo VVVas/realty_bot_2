@@ -94,12 +94,12 @@ async def select_category(update: Update, context: CallbackContext) -> int:
 
 async def select_price(update: Update, context: CallbackContext) -> int:
     """Вывод списка объявлений и объектов. Запоминаем цену."""
-    selected_price = update.message.text.replace(' ', '')
+    selected_price = update.message.text.replace(' ', '').split('-')
     if (selected_price[0].lower() == constants.BUTTON_SKIP.lower()
             or int(selected_price[1]) == 0):
         context.user_data['selected_price'] = None
     else:
-        context.user_data['selected_price'] = selected_price.split('-')
+        context.user_data['selected_price'] = selected_price
     city = context.user_data.get('selected_city')
     category = context.user_data.get('selected_category')
     price = context.user_data.get('selected_price')
