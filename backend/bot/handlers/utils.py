@@ -58,9 +58,12 @@ def get_realty_filters(context: CallbackContext):
 
 def get_ad_filters(context: CallbackContext):
     """Собирает и возвращает фильр объявлений."""
+    city = context.user_data.get('selected_city')
+    category = context.user_data.get('selected_category')
     price = context.user_data.get('selected_price')
-    ad_filters = get_realty_filters(context)
-    ad_filters &= Q(is_published=True)
+    ad_filters = Q(realty__city__title=city, is_published=True)
+    if category:
+        ad_filters &= Q(realty__categories__title=category)
     if price:
         ad_filters &= Q(
             price__gte=int(price[0]), price__lte=int(price[1])
