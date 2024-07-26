@@ -18,7 +18,7 @@ def paginate(queryset, page_number=1):
 async def get_message_and_keyboard_for_next_page(items: Page, update: Update):
     """Отправляет сообщение переходе на следующую странцу."""
     await update.message.reply_text(
-        f'Страница {items.number} из {items.paginator.num_pages} страниц.',
+        f'Страница {items.number} из {items.paginator.num_pages}.',
         reply_markup=ReplyKeyboardMarkup(
             [[constants.BUTTON_NEXT]],
             one_time_keyboard=True,
