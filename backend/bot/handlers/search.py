@@ -16,7 +16,8 @@ from .constants import (ADD_COMMENT, ADD_FAVORITE, CATEGORY, CITY, CITY_CHOICE,
                         COMMENT, NEXT_PAGE, PRICE, START)
 from .favorite import favorite
 from .user import delete_user
-from .utils import (chunks, get_botmessage_by_keyword, paginate, text_ad,
+from .utils import (chunks, get_botmessage_by_keyword,
+                    get_message_and_keyboard_for_next_page, paginate, text_ad,
                     text_realty)
 
 
@@ -161,17 +162,18 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
-            await update.message.reply_text(
-                f'Вы посмотрели {items.number} '
-                f'из {items.paginator.num_pages} страниц.',
-                # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
-                # 'элементов',
-                reply_markup=ReplyKeyboardMarkup(
-                    [[constants.BUTTON_NEXT]],
-                    one_time_keyboard=True,
-                    resize_keyboard=True
-                )
-            )
+            await get_message_and_keyboard_for_next_page(items, Update)
+            # await update.message.reply_text(
+            #     f'Вы посмотрели {items.number} '
+            #     f'из {items.paginator.num_pages} страниц.',
+            #     # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
+            #     # 'элементов',
+            #     reply_markup=ReplyKeyboardMarkup(
+            #         [[constants.BUTTON_NEXT]],
+            #         one_time_keyboard=True,
+            #         resize_keyboard=True
+            #     )
+            # )
             return NEXT_PAGE
 
     else:
@@ -201,17 +203,18 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
-                await update.message.reply_text(
-                    f'Вы посмотрели {items.number} '
-                    f'из {items.paginator.num_pages} страниц.',
-                    # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
-                    # 'элементов',
-                    reply_markup=ReplyKeyboardMarkup(
-                        [[constants.BUTTON_NEXT]],
-                        one_time_keyboard=True,
-                        resize_keyboard=True
-                    )
-                )
+                await get_message_and_keyboard_for_next_page(items, Update)
+                # await update.message.reply_text(
+                #     f'Вы посмотрели {items.number} '
+                #     f'из {items.paginator.num_pages} страниц.',
+                #     # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
+                #     # 'элементов',
+                #     reply_markup=ReplyKeyboardMarkup(
+                #         [[constants.BUTTON_NEXT]],
+                #         one_time_keyboard=True,
+                #         resize_keyboard=True
+                #     )
+                # )
                 return NEXT_PAGE
         else:
             await update.message.reply_text(
@@ -285,17 +288,18 @@ async def next_page(update: Update, context: CallbackContext) -> int:
 
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
-            await update.message.reply_text(
-                f'Вы посмотрели {items.number} '
-                f'из {items.paginator.num_pages} страниц.',
-                # f'Вы посмотрели {items.end_index()} элементов '
-                # f'из {ad_queryset.count()}',
-                reply_markup=ReplyKeyboardMarkup(
-                    [[constants.BUTTON_NEXT]],
-                    one_time_keyboard=True,
-                    resize_keyboard=True
-                )
-            )
+            await get_message_and_keyboard_for_next_page(items, Update)
+            # await update.message.reply_text(
+            #     f'Вы посмотрели {items.number} '
+            #     f'из {items.paginator.num_pages} страниц.',
+            #     # f'Вы посмотрели {items.end_index()} элементов '
+            #     # f'из {ad_queryset.count()}',
+            #     reply_markup=ReplyKeyboardMarkup(
+            #         [[constants.BUTTON_NEXT]],
+            #         one_time_keyboard=True,
+            #         resize_keyboard=True
+            #     )
+            # )
             return NEXT_PAGE
 
     else:
@@ -324,17 +328,18 @@ async def next_page(update: Update, context: CallbackContext) -> int:
 
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
-                await update.message.reply_text(
-                    f'Вы посмотрели {items.number} '
-                    f'из {items.paginator.num_pages} страниц.',
-                    # f'Вы посмотрели {items.end_index()} элементов '
-                    # f'из {realty_queryset.count()}',
-                    reply_markup=ReplyKeyboardMarkup(
-                        [[constants.BUTTON_NEXT]],
-                        one_time_keyboard=True,
-                        resize_keyboard=True
-                    )
-                )
+                await get_message_and_keyboard_for_next_page(items, Update)
+                # await update.message.reply_text(
+                #     f'Вы посмотрели {items.number} '
+                #     f'из {items.paginator.num_pages} страниц.',
+                #     # f'Вы посмотрели {items.end_index()} элементов '
+                #     # f'из {realty_queryset.count()}',
+                #     reply_markup=ReplyKeyboardMarkup(
+                #         [[constants.BUTTON_NEXT]],
+                #         one_time_keyboard=True,
+                #         resize_keyboard=True
+                #     )
+                # )
                 return NEXT_PAGE
 
     context.user_data.clear()
