@@ -162,7 +162,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
-            await get_message_and_keyboard_for_next_page(items, Update)
+            await get_message_and_keyboard_for_next_page(items, update)
             # await update.message.reply_text(
             #     f'Вы посмотрели {items.number} '
             #     f'из {items.paginator.num_pages} страниц.',
@@ -203,7 +203,7 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
-                await get_message_and_keyboard_for_next_page(items, Update)
+                await get_message_and_keyboard_for_next_page(items, update)
                 # await update.message.reply_text(
                 #     f'Вы посмотрели {items.number} '
                 #     f'из {items.paginator.num_pages} страниц.',
@@ -288,7 +288,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
 
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
-            await get_message_and_keyboard_for_next_page(items, Update)
+            await get_message_and_keyboard_for_next_page(items, update)
             # await update.message.reply_text(
             #     f'Вы посмотрели {items.number} '
             #     f'из {items.paginator.num_pages} страниц.',
@@ -328,7 +328,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
 
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
-                await get_message_and_keyboard_for_next_page(items, Update)
+                await get_message_and_keyboard_for_next_page(items, update)
                 # await update.message.reply_text(
                 #     f'Вы посмотрели {items.number} '
                 #     f'из {items.paginator.num_pages} страниц.',
