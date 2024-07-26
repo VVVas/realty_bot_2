@@ -127,12 +127,12 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             ]
 
             if user_profile.is_active:
-                keyboard[0].append(
+                keyboard.append([
                     InlineKeyboardButton(
                         constants.BUTTON_ADD_COMMENT,
                         callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                     )
-                )
+                ])
 
             img = Realty.objects.get(pk=item.realty_id).img
 
@@ -219,12 +219,12 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             ]
 
             if user_profile.is_active:
-                keyboard[0].append(
+                keyboard.append([
                     InlineKeyboardButton(
                         constants.BUTTON_ADD_COMMENT,
                         callback_data=f'{str(ADD_COMMENT)},{item.pk}'
                     )
-                )
+                ])
 
             img = Realty.objects.get(pk=item.realty_id).img
             if img:
