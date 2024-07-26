@@ -342,7 +342,7 @@ async def next_page(update: Update, context: CallbackContext) -> int:
     return await cancel(update, context)
 
 
-search_conv_handler = ConversationHandler(
+conv = ConversationHandler(
     entry_points=[
         CommandHandler('start', start)
     ],
