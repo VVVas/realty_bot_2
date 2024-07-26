@@ -1,5 +1,5 @@
-from django.core.paginator import Paginator
-from telegram import Update
+from django.core.paginator import Page, Paginator
+from telegram import ReplyKeyboardMarkup, Update
 from telegram.helpers import effective_message_type
 from telegram.constants import MessageType
 
@@ -11,6 +11,18 @@ def paginate(queryset, page_number=1):
     """Возвращает содержимое страницы. По умолчанию первой."""
     paginator = Paginator(queryset, constants.QUANTITY_PER_PAGE)
     return paginator.get_page(page_number)
+
+
+async def get_message_and_keyboard_for_next_page(items: Page, update: Update):
+    """Отправляет сообщение переходе на следующую странцу."""
+    await update.message.reply_text(
+        f'Страница {items.number} из {items.paginator.num_pages} страниц.',
+        reply_markup=ReplyKeyboardMarkup(
+            [[constants.BUTTON_NEXT]],
+            one_time_keyboard=True,
+            resize_keyboard=True
+        )
+    )
 
 
 async def get_botmessage_by_keyword(keyword):
