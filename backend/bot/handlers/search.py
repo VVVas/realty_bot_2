@@ -97,7 +97,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
     selected_price = update.message.text.replace(' ', '').split('-')
     if (
         selected_price[0].lower() == constants.BUTTON_SKIP.lower()
-        or (int(selected_price[0]) == 0 and not selected_price[1])
         or int(selected_price[1]) == 0
     ):
         context.user_data['selected_price'] = None
@@ -163,8 +162,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
-                'элементов',
+                f'Вы посмотрели {items.number} '
+                f'из {items.paginator.num_pages} страниц.',
+                # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
+                # 'элементов',
                 reply_markup=ReplyKeyboardMarkup(
                     [[constants.BUTTON_NEXT]],
                     one_time_keyboard=True,
@@ -201,8 +202,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
-                    'элементов',
+                    f'Вы посмотрели {items.number} '
+                    f'из {items.paginator.num_pages} страниц.',
+                    # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
+                    # 'элементов',
                     reply_markup=ReplyKeyboardMarkup(
                         [[constants.BUTTON_NEXT]],
                         one_time_keyboard=True,
@@ -283,8 +286,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await update.message.reply_text(
-                f'Вы посмотрели {items.end_index()} элементов '
-                f'из {ad_queryset.count()}',
+                f'Вы посмотрели {items.number} '
+                f'из {items.paginator.num_pages} страниц.',
+                # f'Вы посмотрели {items.end_index()} элементов '
+                # f'из {ad_queryset.count()}',
                 reply_markup=ReplyKeyboardMarkup(
                     [[constants.BUTTON_NEXT]],
                     one_time_keyboard=True,
@@ -320,8 +325,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await update.message.reply_text(
-                    f'Вы посмотрели {items.end_index()} элементов '
-                    f'из {realty_queryset.count()}',
+                    f'Вы посмотрели {items.number} '
+                    f'из {items.paginator.num_pages} страниц.',
+                    # f'Вы посмотрели {items.end_index()} элементов '
+                    # f'из {realty_queryset.count()}',
                     reply_markup=ReplyKeyboardMarkup(
                         [[constants.BUTTON_NEXT]],
                         one_time_keyboard=True,
