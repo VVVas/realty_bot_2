@@ -1,5 +1,7 @@
 from django.core.paginator import Page, Paginator
+from django.db.models import Q
 from telegram import ReplyKeyboardMarkup, Update
+from telegram.ext import CallbackContext
 from telegram.helpers import effective_message_type
 from telegram.constants import MessageType
 
@@ -42,6 +44,28 @@ async def edit_message_by_type(update: Update, text: str):
         update.callback_query.message
     ) == MessageType.PHOTO:
         await update.callback_query.edit_message_caption(text)
+
+
+def get_realty_filters(context: CallbackContext):
+    """Собирает и возвращает фильтр недвижимости."""
+    city = context.user_data.get('selected_city')
+    category = context.user_data.get('selected_category')
+    realty_filters = Q(city__title=city)
+    if category:
+        realty_filters &= Q(categories__title=category)
+    return realty_filters
+
+
+def get_ad_filters(context: CallbackContext):
+    """Собирает и возвращает фильр объявлений."""
+    price = context.user_data.get('selected_price')
+    ad_filters = get_realty_filters(context)
+    ad_filters &= Q(is_published=True)
+    if price:
+        ad_filters &= Q(
+            price__gte=int(price[0]), price__lte=int(price[1])
+        ) | Q(price=None)
+    return ad_filters
 
 
 def chunks(lst, chunk_size=3):

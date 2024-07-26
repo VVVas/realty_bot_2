@@ -1,7 +1,5 @@
 import re
 
-from django.db.models import Q
-
 from telegram import (InlineKeyboardButton, InlineKeyboardMarkup,
                       ReplyKeyboardMarkup, Update)
 from telegram.ext import (CallbackContext, CommandHandler, ConversationHandler,
@@ -17,7 +15,8 @@ from .constants import (ADD_COMMENT, ADD_FAVORITE, CATEGORY, CITY, CITY_CHOICE,
 from .favorite import favorite
 from .user import delete_user
 from .utils import (chunks, get_botmessage_by_keyword,
-                    get_message_and_keyboard_for_next_page, paginate, text_ad,
+                    get_message_and_keyboard_for_next_page,
+                    get_realty_filters, get_ad_filters, paginate, text_ad,
                     text_realty)
 
 
@@ -103,19 +102,8 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         context.user_data['selected_price'] = None
     else:
         context.user_data['selected_price'] = selected_price
-    city = context.user_data.get('selected_city')
-    category = context.user_data.get('selected_category')
-    price = context.user_data.get('selected_price')
-    filters = Q(is_published=True)
-    if city:
-        filters &= Q(realty__city__title=city)
-    if category:
-        filters &= Q(realty__categories__title=category)
-    if price:
-        filters &= Q(
-            price__gte=int(price[0]), price__lte=int(price[1])
-        ) | Q(price=None)
-    ad_queryset = Ad.objects.filter(filters)
+    ad_filters = get_ad_filters(context)
+    ad_queryset = Ad.objects.filter(ad_filters)
     if ad_queryset.exists():
 
         user_profile = Profile.objects.get(
@@ -163,23 +151,10 @@ async def select_price(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await get_message_and_keyboard_for_next_page(items, update)
-            # await update.message.reply_text(
-            #     f'Вы посмотрели {items.number} '
-            #     f'из {items.paginator.num_pages} страниц.',
-            #     # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
-            #     # 'элементов',
-            #     reply_markup=ReplyKeyboardMarkup(
-            #         [[constants.BUTTON_NEXT]],
-            #         one_time_keyboard=True,
-            #         resize_keyboard=True
-            #     )
-            # )
             return NEXT_PAGE
 
     else:
-        realty_filters = Q(city__title=city)
-        if category:
-            realty_filters &= Q(categories__title=category)
+        realty_filters = get_realty_filters(context)
         realty_queryset = Realty.objects.filter(realty_filters)
 
         if realty_queryset.exists():
@@ -204,17 +179,6 @@ async def select_price(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await get_message_and_keyboard_for_next_page(items, update)
-                # await update.message.reply_text(
-                #     f'Вы посмотрели {items.number} '
-                #     f'из {items.paginator.num_pages} страниц.',
-                #     # f'Вы посмотрели первые {constants.QUANTITY_PER_PAGE} '
-                #     # 'элементов',
-                #     reply_markup=ReplyKeyboardMarkup(
-                #         [[constants.BUTTON_NEXT]],
-                #         one_time_keyboard=True,
-                #         resize_keyboard=True
-                #     )
-                # )
                 return NEXT_PAGE
         else:
             await update.message.reply_text(
@@ -228,20 +192,9 @@ async def select_price(update: Update, context: CallbackContext) -> int:
 
 async def next_page(update: Update, context: CallbackContext) -> int:
     """Следующая страинца для списка объявлений и объектов."""
-    city = context.user_data.get('selected_city')
-    category = context.user_data.get('selected_category')
-    price = context.user_data.get('selected_price')
     page = context.user_data.get('page')
-    filters = Q(is_published=True)
-    if city:
-        filters &= Q(realty__city__title=city)
-    if category:
-        filters &= Q(realty__categories__title=category)
-    if price:
-        filters &= Q(
-            price__gte=int(price[0]), price__lte=int(price[1])
-        ) | Q(price=None)
-    ad_queryset = Ad.objects.filter(filters)
+    ad_filters = get_ad_filters(context)
+    ad_queryset = Ad.objects.filter(ad_filters)
     if ad_queryset.exists():
 
         user_profile = Profile.objects.get(
@@ -289,23 +242,10 @@ async def next_page(update: Update, context: CallbackContext) -> int:
         if items.has_next():
             context.user_data['page'] = items.next_page_number()
             await get_message_and_keyboard_for_next_page(items, update)
-            # await update.message.reply_text(
-            #     f'Вы посмотрели {items.number} '
-            #     f'из {items.paginator.num_pages} страниц.',
-            #     # f'Вы посмотрели {items.end_index()} элементов '
-            #     # f'из {ad_queryset.count()}',
-            #     reply_markup=ReplyKeyboardMarkup(
-            #         [[constants.BUTTON_NEXT]],
-            #         one_time_keyboard=True,
-            #         resize_keyboard=True
-            #     )
-            # )
             return NEXT_PAGE
 
     else:
-        realty_filters = Q(city__title=city)
-        if category:
-            realty_filters &= Q(categories__title=category)
+        realty_filters = get_realty_filters(context)
         realty_queryset = Realty.objects.filter(realty_filters)
 
         if realty_queryset.exists():
@@ -329,17 +269,6 @@ async def next_page(update: Update, context: CallbackContext) -> int:
             if items.has_next():
                 context.user_data['page'] = items.next_page_number()
                 await get_message_and_keyboard_for_next_page(items, update)
-                # await update.message.reply_text(
-                #     f'Вы посмотрели {items.number} '
-                #     f'из {items.paginator.num_pages} страниц.',
-                #     # f'Вы посмотрели {items.end_index()} элементов '
-                #     # f'из {realty_queryset.count()}',
-                #     reply_markup=ReplyKeyboardMarkup(
-                #         [[constants.BUTTON_NEXT]],
-                #         one_time_keyboard=True,
-                #         resize_keyboard=True
-                #     )
-                # )
                 return NEXT_PAGE
 
     context.user_data.clear()
