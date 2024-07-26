@@ -1,8 +1,7 @@
 from django.conf import settings
 from telegram.ext import Application
 
-from .handlers import comment, favorite, unknown
-from .handlers.search import search_conv_handler
+from .handlers import comment, favorite, search, unknown
 
 
 class TGBot:
@@ -15,7 +14,7 @@ class TGBot:
             .updater(None)
             .build()
         )
-        self.ptb_app.add_handler(search_conv_handler)
+        self.ptb_app.add_handler(search.conv)
         self.ptb_app.add_handler(comment.handler)
         self.ptb_app.add_handler(comment.add_conv)
         self.ptb_app.add_handler(favorite.add_handler)
